@@ -127,6 +127,30 @@ vows.describe('Monitor ').addBatch({
     }
   ),
 
+  'Incomplete line': create_test(function(m, callback) {
+    fs.writeFileSync(m.file, "line1\nline2\nline3");
+    m.monitor.start(0);
+    setTimeout(function() {
+      assert.equal(m.lines.length, 2);
+      assert.equal(m.lines[0], "line1");
+      assert.equal(m.lines[1], "line2");
+      setTimeout(function() {
+        fs.appendFileSync(m.file, "line3\nline4\nline5");
+        setTimeout(callback, 200);
+      }, 200);
+    }, 200);
+    }, function check(m) {
+      fs.unlinkSync(m.file);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 4);
+      assert.equal(m.lines[0], "line1");
+      assert.equal(m.lines[1], "line2");
+      assert.equal(m.lines[2], "line3line3");
+      assert.equal(m.lines[3], "line4");
+    }
+  ),
+
+
   'File filled while monitoring': create_test(function(m, callback) {
     m.fd = fs.openSync(m.file, 'a');
     var buffer = new Buffer("line1\nline2\n");
@@ -178,3 +202,4 @@ vows.describe('Monitor ').addBatch({
   ),
 
 }).export(module);
+// Do not remove empty line
