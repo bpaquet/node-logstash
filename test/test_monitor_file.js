@@ -37,8 +37,8 @@ vows.describe('Monitor ').addBatch({
     m.monitor.start();
     setTimeout(callback, 200);
     }, function check(m) {
-      assert.equal(0, m.errors.length);
-      assert.equal(0, m.lines.length);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 0);
     }
   ),
 
@@ -48,8 +48,8 @@ vows.describe('Monitor ').addBatch({
     setTimeout(callback, 200);
     }, function check(m) {
       fs.unlinkSync(m.file);
-      assert.equal(0, m.errors.length);
-      assert.equal(0, m.lines.length);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 0);
     }
   ),
 
@@ -59,8 +59,8 @@ vows.describe('Monitor ').addBatch({
     setTimeout(callback, 200);
     }, function check(m) {
       fs.unlinkSync(m.file);
-      assert.equal(0, m.errors.length);
-      assert.equal(0, m.lines.length);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 0);
     }
   ),
 
@@ -70,8 +70,8 @@ vows.describe('Monitor ').addBatch({
     setTimeout(callback, 200);
     }, function check(m) {
       fs.unlinkSync(m.file);
-      assert.equal(0, m.errors.length);
-      assert.equal(2, m.lines.length);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
     }
@@ -83,7 +83,7 @@ vows.describe('Monitor ').addBatch({
     setTimeout(callback, 200);
     }, function check(m) {
       fs.unlinkSync(m.file);
-      assert.equal(0, m.errors.length);
+      assert.equal(m.errors.length, 0);
       var test_file_lines = fs.readFileSync(__filename).toString().split("\n");
       var index = 0;
       test_file_lines.forEach(function(l) {
@@ -105,8 +105,8 @@ vows.describe('Monitor ').addBatch({
     }, 200);
     }, function check(m) {
       fs.unlinkSync(m.file);
-      assert.equal(0, m.errors.length);
-      assert.equal(2, m.lines.length);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
     }
@@ -120,8 +120,8 @@ vows.describe('Monitor ').addBatch({
     }, 200);
     }, function check(m) {
       fs.unlinkSync(m.file);
-      assert.equal(0, m.errors.length);
-      assert.equal(2, m.lines.length);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
     }
@@ -135,7 +135,7 @@ vows.describe('Monitor ').addBatch({
       fs.writeSync(m.fd, buffer, 0, 6, null);
       fs.fsyncSync(m.fd);
         setTimeout(function() {
-        assert.equal(1, m.lines.length);
+        assert.equal(m.lines.length, 1);
         assert.equal("line1", m.lines[0]);
         fs.writeSync(m.fd, buffer, 6, 6, null);
         fs.fsyncSync(m.fd);
@@ -145,8 +145,8 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       fs.closeSync(m.fd);
       fs.unlinkSync(m.file);
-      assert.equal(0, m.errors.length);
-      assert.equal(2, m.lines.length);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
     }
@@ -157,7 +157,7 @@ vows.describe('Monitor ').addBatch({
     setTimeout(function() {
       fs.writeFileSync(m.file, "line1\nline2\n");
       setTimeout(function() {
-        assert.equal(2, m.lines.length);
+        assert.equal(m.lines.length, 2);
         assert.equal(m.lines[0], "line1");
         assert.equal(m.lines[1], "line2");
         fs.renameSync(m.file, m.file + ".1");
@@ -168,8 +168,8 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       fs.unlinkSync(m.file);
       fs.unlinkSync(m.file + ".1");
-      assert.equal(0, m.errors.length);
-      assert.equal(4, m.lines.length);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 4);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
       assert.equal(m.lines[2], "line3");
