@@ -1,0 +1,30 @@
+{
+  "name": "node-logstash",
+  "description": "Logstash implementation in node JS",
+  "version": "0.0.1",
+  "author": "Bertrand Paquet <bertrand.paquet@gmail.com>",
+  "keywords": ["logstash", "log", "zmq", "zeromq"],
+  "main": "./lib/log4node.js",
+  "homepage": "https://github.com/bpaquet/node-logstash",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bpaquet/node-logstash.git"
+  },
+  "licenses": [
+    {
+      "type": "Apache2",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "devDependencies": {
+    "vows": "0.6.x"
+  },
+  "scripts": {
+    "test": "./test-runner.sh"
+  },
+  "dependencies": {
+    "log4node": "0.0.2",
+    "zmq": "2.1.0"
+  },
+  "engines": { "node": ">= 0.8.0" }
+}
