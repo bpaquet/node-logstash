@@ -3,23 +3,26 @@ var vows = require('vows'),
     os = require('os'),
     fs = require('fs');
     monitor_file = require('monitor_file');
+    Log4Node = require('log4node');
 
-function LocalMonitor(start_index) {
-  this.file = os.tmpDir() + "___node-logstash_test___" + Math.random();
+function LocalMonitor(path, log_level) {
+  this.file = (path || os.tmpDir()) + "___node-logstash_test___" + Math.random();
   this.errors = [];
+  logger = new Log4Node(log_level || 'warning');
+  logger.info("Start new test, using file " + this.file);
   this.lines = [];
   this.monitor = monitor_file.monitor(this.file, function(err) {
     this.errors.push(err);
   }.bind(this),
   function(line) {
     this.lines.push(line);
-  }.bind(this), {log_level: 'warning'});
+  }.bind(this), {logger: logger});
 }
 
-function create_test(start_callback, check_callback) {
+function create_test(start_callback, check_callback, path, log_level) {
   return {
     topic: function() {
-      var m = new LocalMonitor();
+      var m = new LocalMonitor(path, log_level);
       var callback = this.callback;
       start_callback(m, function() {
         callback(null, m);
@@ -101,7 +104,7 @@ vows.describe('Monitor ').addBatch({
     m.monitor.start(0);
     setTimeout(function() {
       fs.appendFileSync(m.file, "line1\nline2\n");
-      setTimeout(callback, 200);
+      setTimeout(callback, 1000);
     }, 200);
     }, function check(m) {
       fs.unlinkSync(m.file);
@@ -120,6 +123,22 @@ vows.describe('Monitor ').addBatch({
     }, 200);
     }, function check(m) {
       fs.unlinkSync(m.file);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.lines.length, 2);
+      assert.equal(m.lines[0], "line1");
+      assert.equal(m.lines[1], "line2");
+    }
+  ),
+
+  'File removed': create_test(function(m, callback) {
+    fs.writeFileSync(m.file, "line1\nline2\n");
+    m.monitor.start(0);
+    setTimeout(function() {
+      fs.unlinkSync(m.file);
+      setTimeout(callback, 200);
+    }, 200);
+    }, function check(m) {
+      assert.equal(m.monitor.fd, undefined);
       assert.equal(m.errors.length, 0);
       assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
@@ -187,7 +206,7 @@ vows.describe('Monitor ').addBatch({
         fs.renameSync(m.file, m.file + ".1");
         fs.writeFileSync(m.file, "line3\nline4\n");
         setTimeout(callback, 500);
-      }, 200);
+      }, 500);
     }, 200);
     }, function check(m) {
       fs.unlinkSync(m.file);
@@ -198,8 +217,17 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m.lines[1], "line2");
       assert.equal(m.lines[2], "line3");
       assert.equal(m.lines[3], "line4");
-}
+    }
   ),
+
+  'Wrong file path': create_test(function(m, callback) {
+    m.monitor.start(0);
+    setTimeout(callback, 200);
+    }, function check(m) {
+      assert.equal(m.errors.length, 1);
+      assert.equal(m.lines.length, 0);
+    },
+  "/toto_does_not_exists/toto.log"),
 
 }).export(module);
 // Do not remove empty line
