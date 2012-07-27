@@ -30,6 +30,7 @@ function create_test(start_callback, check_callback, path, log_level) {
     },
 
     check: function(m) {
+      m.monitor.close();
       check_callback(m);
     }
   }

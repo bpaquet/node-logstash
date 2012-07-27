@@ -26,7 +26,10 @@ vows.describe('Integation :').addBatch({
           setTimeout(function() {
             fs.appendFileSync('input1.txt', 'line3\n');
             setTimeout(function() {
-              callback(null);
+              agent.emit('close');
+              setTimeout(function() {
+                callback(null);
+              }, 100);
             }, 100);
           }, 30);
         }, 30);
