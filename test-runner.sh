@@ -6,6 +6,6 @@ cd test
 
 for test in `ls test*.js`; do
   echo "Launching test : $test"
-  NODE_PATH=../lib:../lib/lib vows $test --spec
+  NODE_PATH=../lib:../lib/lib:../lib/modules vows $test --spec
   echo ""
 done

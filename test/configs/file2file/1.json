@@ -1,0 +1,24 @@
+{"input": {
+    "stdin": ["stdin"],
+    "file": [
+      {
+        "path": "input1.txt"
+      },
+      {
+        "type": "input2",
+        "path": "input2.txt"
+      }
+    ]
+  },
+  "output": {
+    "stdout": ["stdout"],
+    "file": [
+      {
+        "path": "output1.txt"
+      },
+      {
+        "path": "output2.txt"
+      }
+    ]
+  }
+}
