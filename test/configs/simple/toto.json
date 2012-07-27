@@ -1,0 +1,17 @@
+{
+  "input": {
+    "file": [
+      {
+        "type": "titi",
+        "path": "/toto.log"
+      },
+      {
+        "type": "titi",
+        "path": "/tata.log"
+      }
+    ]
+  },
+  "output": {
+    "stdout": []
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "input": {
+    "file": [
+      {
+        "path": "/toto.log"
+      }
+    ]
+  },
+  "output": {
+    "stdout": []
+  }
+}

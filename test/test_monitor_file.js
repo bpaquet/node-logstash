@@ -230,4 +230,4 @@ vows.describe('Monitor ').addBatch({
   "/toto_does_not_exists/toto.log"),
 
 }).export(module);
-// Do not remove empty line
+// Do not remove empty line, this file is used during test
