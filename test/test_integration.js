@@ -3,11 +3,13 @@ var vows = require('vows'),
     fs = require('fs'),
     agent = require('agent'),
     net = require('net'),
+    os = require('os'),
     Log4Node = require('log4node');
 
 function cmp_without_timestamp(line, target) {
   var parsed = JSON.parse(line);
   delete parsed['@timestamp'];
+  target['@source_host'] = os.hostname();
   assert.deepEqual(parsed, target);
 }
 
