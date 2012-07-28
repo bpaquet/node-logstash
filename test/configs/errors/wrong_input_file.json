@@ -1,0 +1,11 @@
+{"input": {
+    "file": [
+      {
+        "path": "/path_which_does_not_exist/input1.txt"
+      }
+    ]
+  },
+  "output": {
+    "stdout": ["stdout"]
+  }
+}

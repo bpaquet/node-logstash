@@ -1,0 +1,12 @@
+{
+  "input": {
+    "tcp": [
+      {
+        "port": 17874
+      }
+    ]
+  },
+  "output": {
+    "stdout": ["toto"]
+  }
+}

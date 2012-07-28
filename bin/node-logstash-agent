@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+
+var nconf = require('nconf'),
+    Log4Node = require('log4node'),
+    agent = require('../lib/agent.js');
+
+nconf.argv().defaults({
+  'log_level': 'info',
+});
+
+function help() {
+  console.log("Syntax : node-logstasth-agent [--log_level=info] [--config_file=toto.json|--config_dir=/etc/config]");
+}
+
+var logger = new Log4Node(nconf.get('log_level'));
+
+var logstashAgent = agent.create();
+
+logstashAgent.set_logger(logger);
+
+logstashAgent.on('error', function(module_name, index, error) {
+  console.log("Error on module " + module_name + "[" + index + "] : " + error);
+});
+
+var file = nconf.get('config_file');
+var dir = nconf.get('config_dir');
+
+if (file) {
+  logger.info('Load config from file : ' + file);
+  logstashAgent.load_config_from_file(file);
+}
+else if (dir) {
+  logger.info('Load config from directory : ' + dir) ;
+  logstashAgent.load_config_from_directory(dir);
+}
+else {
+  help();
+}

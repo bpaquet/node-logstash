@@ -1,0 +1,9 @@
+{
+  "output": {
+    "file": [
+      {
+        "path": "/path_which_does_not_exist/titi.txt"
+      }
+    ]
+  }
+}

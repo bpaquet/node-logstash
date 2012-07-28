@@ -6,7 +6,7 @@ vows.describe('Config loader :').addBatch({
   'empty config': {
     topic: function() {
       var callback = this.callback;
-      config_loader.load('configs/empty', function(err, result) {
+      config_loader.load_directory('configs/empty', function(err, result) {
         callback(err, result);
       });
     },
@@ -20,7 +20,20 @@ vows.describe('Config loader :').addBatch({
   'parse error': {
     topic: function() {
       var callback = this.callback;
-      config_loader.load('configs/parse_error', function(err, result) {
+      config_loader.load_directory('configs/parse_error', function(err, result) {
+        callback(err, result);
+      });
+    },
+
+    check: function(err, result) {
+      assert.ifError(!err);
+    }
+  },
+
+  'parse error on a single file': {
+    topic: function() {
+      var callback = this.callback;
+      config_loader.load_file('configs/parse_error/toto.json', function(err, result) {
         callback(err, result);
       });
     },
@@ -33,7 +46,35 @@ vows.describe('Config loader :').addBatch({
   'simple config': {
     topic: function() {
       var callback = this.callback;
-      config_loader.load('configs/simple', function(err, result) {
+      config_loader.load_directory('configs/simple', function(err, result) {
+        callback(err, result);
+      });
+    },
+
+    check: function(err, result) {
+      assert.ifError(err);
+      assert.deepEqual(result, {
+        "output": {"stdout": []},
+        "input": {
+          "file": [
+            {
+              "type": "titi",
+              "path": "/toto.log"
+            },
+            {
+              "type": "titi",
+              "path": "/tata.log"
+            }
+          ]
+        }
+      });
+    }
+  },
+
+'simple config on a single file': {
+    topic: function() {
+      var callback = this.callback;
+      config_loader.load_file('configs/simple/toto.json', function(err, result) {
         callback(err, result);
       });
     },
@@ -61,7 +102,7 @@ vows.describe('Config loader :').addBatch({
   'merge config': {
     topic: function() {
       var callback = this.callback;
-      config_loader.load('configs/merge', function(err, result) {
+      config_loader.load_directory('configs/merge', function(err, result) {
         callback(err, result);
       });
     },

@@ -24,7 +24,12 @@
   },
   "dependencies": {
     "log4node": "0.0.3",
-    "zmq": "2.1.0"
+    "zmq": "2.1.0",
+    "nconf": "0.6.4"
+  },
+  "directories": {
+    "test": "./test",
+    "bin": "./bin"
   },
   "engines": { "node": ">= 0.8.0" }
 }
