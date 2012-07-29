@@ -1,0 +1,18 @@
+{
+  "input": {
+    "file": [
+      {
+        "type": "test",
+        "path": "main_input.txt"
+      }
+    ]
+  },
+  "output": {
+    "tcp": [
+      {
+        "host": "localhost",
+        "port": 35853
+      }
+    ]
+  }
+}

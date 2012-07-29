@@ -1,0 +1,16 @@
+{
+  "input": {
+    "tcp": [
+      {
+        "port": 35853
+      }
+    ]
+  },
+  "output": {
+    "file": [
+      {
+        "path": "main_output.txt"
+      }
+    ]
+  }
+}

@@ -176,4 +176,6 @@ vows.describe('Integration :').addBatch({
   }, "output_file", 0),
 }).addBatch({
   'file transport': file2x2x2file('file', function() { fs.unlinkSync('main_middle.txt'); }),
+}).addBatch({
+  'tcp transport': file2x2x2file('tcp'),
 }).export(module);
