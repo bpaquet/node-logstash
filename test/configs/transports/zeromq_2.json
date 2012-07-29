@@ -1,0 +1,16 @@
+{
+  "input": {
+    "zeromq": [
+      {
+        "listen": "tcp://*:5567"
+      }
+    ]
+  },
+  "output": {
+    "file": [
+      {
+        "path": "main_output.txt"
+      }
+    ]
+  }
+}

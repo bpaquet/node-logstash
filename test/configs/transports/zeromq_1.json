@@ -1,0 +1,17 @@
+{
+  "input": {
+    "file": [
+      {
+        "type": "test",
+        "path": "main_input.txt"
+      }
+    ]
+  },
+  "output": {
+    "zeromq": [
+      {
+        "target": "tcp://localhost:5567"
+      }
+    ]
+  }
+}

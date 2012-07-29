@@ -1,0 +1,12 @@
+{
+  "input": {
+    "stdin": ["stdin"]
+  },
+  "output": {
+    "zeromq": [
+      {
+        "target": "tcp://precise:5556"
+      }
+    ]
+  }
+}

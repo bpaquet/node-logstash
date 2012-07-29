@@ -178,4 +178,6 @@ vows.describe('Integration :').addBatch({
   'file transport': file2x2x2file('file', function() { fs.unlinkSync('main_middle.txt'); }),
 }).addBatch({
   'tcp transport': file2x2x2file('tcp'),
+}).addBatch({
+  'zeromq transport': file2x2x2file('zeromq'),
 }).export(module);
