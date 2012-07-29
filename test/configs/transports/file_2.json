@@ -1,0 +1,16 @@
+{
+  "input": {
+    "file": [
+      {
+        "path": "main_middle.txt"
+      }
+    ]
+  },
+  "output": {
+    "file": [
+      {
+        "path": "main_output.txt"
+      }
+    ]
+  }
+}
