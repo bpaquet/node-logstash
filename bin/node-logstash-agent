@@ -1,38 +1,33 @@
 #!/usr/bin/env node
 
-var nconf = require('nconf'),
+var optimist = require('optimist');
     Log4Node = require('log4node'),
     agent = require('../lib/agent.js');
 
-nconf.argv().defaults({
-  'log_level': 'info',
-});
+var argv = optimist.argv;
 
 function help() {
-  console.log("Syntax : node-logstasth-agent [--log_level=info] [--config_file=toto.json|--config_dir=/etc/config]");
+  console.log("Syntax : node-logstasth-agent [--log_level=info] [--config_file=toto.json|--config_dir=/etc/config] urls");
+  console.log("Url examples");
+  console.log("input://stdin://");
+  console.log("input://file://main_input.txt?type=toto");
+  console.log("output://stdout://");
+  console.log("output://file:///tmp/toto.txt");
 }
 
-var logger = new Log4Node(nconf.get('log_level'));
+var logger = new Log4Node(argv.log_level || 'warning');
 
 var logstashAgent = agent.create();
 
 logstashAgent.set_logger(logger);
 
-logstashAgent.on('error', function(module_name, index, error) {
-  console.log("Error on module " + module_name + "[" + index + "] : " + error);
+logstashAgent.on('error', function(module_name, error) {
+  logger.error("Error on module " + module_name + " : " + error);
 });
 
-var file = nconf.get('config_file');
-var dir = nconf.get('config_dir');
-
-if (file) {
-  logger.info('Load config from file : ' + file);
-  logstashAgent.load_config_from_file(file);
-}
-else if (dir) {
-  logger.info('Load config from directory : ' + dir) ;
-  logstashAgent.load_config_from_directory(dir);
-}
-else {
-  help();
-}
+logstashAgent.load_urls(argv._, function(err) {
+  if (err) {
+    logger.error("Unable to load urls : " + err);
+    process.exit(2);
+  }
+});

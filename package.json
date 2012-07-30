@@ -25,7 +25,7 @@
   "dependencies": {
     "log4node": "0.0.3",
     "zmq": "2.1.0",
-    "nconf": "0.6.4"
+    "optimist": "0.3.4"
   },
   "directories": {
     "test": "./test",
