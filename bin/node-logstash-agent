@@ -23,7 +23,7 @@ var logstashAgent = agent.create();
 logstashAgent.set_logger(logger);
 
 logstashAgent.on('error', function(module_name, error) {
-  logger.error("Error on module " + module_name + " : " + error);
+  logger.error("[" + module_name + "] " + error);
 });
 
 function load_config_file(config) {
