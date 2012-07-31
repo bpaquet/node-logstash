@@ -70,7 +70,6 @@ function check_error_init(urls, expected_message_pattern) {
     topic: function() {
       var callback = this.callback;
       var logstashAgent = agent.create();
-      console.log(urls);
       logstashAgent.on('error', function(module_name, error) {
         assert.ifError(error);
       });
@@ -95,7 +94,6 @@ function check_error_module(urls, expected_message_pattern, expected_module_name
     topic: function() {
       var callback = this.callback;
       var logstashAgent = agent.create();
-      console.log(urls);
       logstashAgent.on('error', function(module_name, error) {
         console.log("Error detected, " + module_name + " : " + error);
         callback(null, error.toString(), module_name);
