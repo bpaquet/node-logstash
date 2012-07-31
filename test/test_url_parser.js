@@ -52,6 +52,7 @@ vows.describe('Url parser').addBatch({
   'process url content no host': testProcessUrlContent('?type=t&z=%20t', {host: '', params: {type: 't', z: ' t'}}),
   'process url content special chars in host': testProcessUrlContent('/tmp/toto%202.txt?type=t', {host: '/tmp/toto 2.txt', params: {type: 't'}}),
   'process url content no host': testProcessUrlContent('?type=t', {host: '', params: {type: 't'}}),
+  'process url content with plus': testProcessUrlContent('?type=t+3', {host: '', params: {type: 't+3'}}),
   'extract port number hostonly': testExtractPortNumber('localhost', {host: 'localhost', port: -1}),
   'extract port number ip': testExtractPortNumber('0.0.0.0:80', {host: '0.0.0.0', port: 80}),
   'extract port number host': testExtractPortNumber('www.google.com:8080', {host: 'www.google.com', port: 8080}),
