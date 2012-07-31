@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-var optimist = require('optimist');
+var optimist = require('optimist'),
     Log4Node = require('log4node'),
-    agent = require('../lib/agent.js');
+    agent = require('../lib/agent.js'),
+    file_loader = require('../lib/lib/file_loader.js');
 
 var argv = optimist.argv;
 
@@ -25,9 +26,51 @@ logstashAgent.on('error', function(module_name, error) {
   logger.error("Error on module " + module_name + " : " + error);
 });
 
-logstashAgent.load_urls(argv._, function(err) {
-  if (err) {
-    logger.error("Unable to load urls : " + err);
-    process.exit(2);
+function load_config_file(config) {
+  if (argv.config_file) {
+    logger.info("Loading config file : " + argv.config_file);
+    file_loader.load_file(argv.config_file, function(err, result) {
+      if (err) {
+        logger.error("Unable to load config file : " + err.toString());
+        process.exit(1);
+      }
+      logger.info("File loaded, " + result.length + " urls found");
+      after_config_file(config.concat(result));
+    });
   }
-});
+  else {
+    after_config_file(config);
+  }
+}
+
+function after_config_file(config) {
+  if (argv.config_dir) {
+    logger.info("Loading config files from : " + argv.config_dir);
+    file_loader.load_directory(argv.config_dir, function(err, result) {
+      if (err) {
+        logger.error("Unable to load config from directory : " + err.toString());
+        process.exit(1);
+      }
+      logger.info("Files loaded from directory, " + result.length + " urls found");
+      after_config_directory(config.concat(result));
+    });
+  }
+  else {
+    after_config_directory(config);
+  }
+}
+
+function after_config_directory(config) {
+  logger.info("Loading config : " + config.length + " urls");
+
+  logstashAgent.load_urls(config, function(err) {
+    if (err) {
+      logger.error("Unable to load urls : " + err);
+      process.exit(2);
+    }
+    logger.info("Config loaded.");
+  });
+
+}
+
+load_config_file(argv._);
