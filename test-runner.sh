@@ -4,7 +4,11 @@ set -e
 
 cd test
 
-for test in `ls test*.js`; do
+if [ "$TEST" = "" ]; then
+  TEST=`ls test*.js`
+fi
+
+for test in $TEST; do
   echo "Launching test : $test"
   NODE_PATH=../lib:../lib/lib vows $test --spec
   echo ""
