@@ -20,7 +20,7 @@ function createAgent(urls, callback) {
     assert.ifError(error);
   });
   logstashAgent.set_logger(new Log4Node('info'));
-  logstashAgent.load_urls(urls, function(err) {
+  logstashAgent.load_urls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(err) {
     assert.ifError(err);
     callback(logstashAgent);
   }, 200);

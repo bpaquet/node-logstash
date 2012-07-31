@@ -73,4 +73,4 @@ function after_config_directory(config) {
 
 }
 
-load_config_file(argv._);
+load_config_file(argv._.concat(['filter://add_source_host://', 'filter://add_timestamp://']));
