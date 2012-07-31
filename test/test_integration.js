@@ -84,6 +84,7 @@ function check_error_init(urls, expected_message_pattern) {
     },
 
     check: function(error, message) {
+      assert.ifError(error);
       assert.ok(message.match(expected_message_pattern), 'Message does not match pattern : ' + expected_message_pattern + ' : ' + message);
     }
   }
@@ -105,8 +106,8 @@ function check_error_module(urls, expected_message_pattern, expected_module_name
       }, 200);
     },
 
-    check: function(error, message, module_name) {
-      console.log(error, message, module_name);
+    check: function(err, message, module_name) {
+      assert.ifError(err);
       assert.ok(message.match(expected_message_pattern), 'Message does not match pattern : ' + expected_message_pattern + ' : ' + message);
       assert.equal(module_name, expected_module_name);
     }
