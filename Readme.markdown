@@ -10,7 +10,7 @@ It's a [NodeJS](http://nodejs.org) implementation of [Logstash](http://logstash.
 What to do with node-logstash ?
 ---
 
-node-logstash is a tool to collect logs on servers, send them to a central server, and send them to [elastic search](http://www.elasticsearch.org/) for indexing.
+node-logstash is a tool to collect logs on servers. It allow to send its to a central server and to [elastic search](http://www.elasticsearch.org/) for indexing.
 
 In top of elastic search, you can use a specialized interface like [kibana](http://rashidkpc.github.com/Kibana/) to dive into your logs.
 
@@ -19,13 +19,13 @@ In top of elastic search, you can use a specialized interface like [kibana](http
 Why a new implementation ?
 ---
 
-When I try logstash, I have some problems. This version should have :
+When I tried logstash, I had some problems. This version should have :
 
-* low memory footprint
-* low cpu footprint
-* fast startup delay
+* lower memory footprint
+* lower cpu footprint
+* faster startup delay
 
-And it's written in NodeJS, which is perfect for use cases with lot of IO.
+Moreover it's written in NodeJS, which is a perfect language for programs with many IO.
 
 node-logstash is compatible with logstash. You can replace a node-logstash node by a logstash one. The data are formatted in the same way to be compatible with logstash UIs.
 
@@ -34,16 +34,16 @@ How it's work ?
 
 The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules :
 
-* [inputs plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs) : where data arrives into node-logstash. Examples : file, zeromq transport layer
+* [inputs plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs) : where datas come into node-logstash. Examples : file, zeromq transport layer
 * [filter plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/filters) : extract fields from logs, like timestamps. Example : regex plugin
-* [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs) : where data leaves node-logstash: Example : elastic search , zeromq transport layer.
+* [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs) : where datas leave from node-logstash: Example : elastic search , zeromq transport layer.
 
 
-A typical node-logstash deployement contains some agent to crawl log and a log server.
+A typical node-logstash deployement contains agents to crawl logs and a log server.
 
 On agent, node-logstash is configured whith inputs plugins to get logs from your software stack, and one output plugin to send logs to log server (eg. zeromq output plugin).
 
-On log server, logs arrives trough a zeromq input plugin, process logs (extract fields and timestamps), and send logs to elastic search.
+On log server, logs come trough a zeromq input plugin, are processed (fields and timestamps extraction), and send to elastic search.
 
 How to use it ?
 ===
@@ -58,7 +58,7 @@ The executable is in ``node_modules/node-logstash/bin/node-logstash-agent``
 Configuration
 ---
 
-All configuration is done by url. A plugin is instanciated by an url. Example : ``input://file:///tmp/toto.log``. This url
+Configuration is done by url. A plugin is instanciated by an url. Example : ``input://file:///tmp/toto.log``. This url
 instanciate an input file plugin which monitor the file ``/tmp/toto.log`.
 
 The urls can be specified :
@@ -130,7 +130,7 @@ Filters
 Regex
 ---
 
-The regex filter is used to extract data from lines of logs. The lines of log are not modified by this filter.
+The regex filter is used to extract data from lines of logs. The lines of logs are not modified by this filter.
 
 Example : ``filter://regex://?regex=^(\S)+ &fields=toto``, to extract the first word of a line of logs, and place it into the ``toto`` field.
 
