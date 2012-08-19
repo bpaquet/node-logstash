@@ -14,7 +14,7 @@ node-logstash is a tool to collect logs on servers, send them to a central serve
 
 In top of elastic search, you can use a specialized interface like [kibana](http://rashidkpc.github.com/Kibana/) to dive into your logs.
 
-![Archi](docs/archi.jpg)
+![Archi](https://raw.github.com/bpaquet/node-logstash/master/docs/archi.jpg)
 
 Why a new implementation ?
 ---
