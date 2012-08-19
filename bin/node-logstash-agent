@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
 var optimist = require('optimist'),
+    path = require('path'),
     Log4Node = require('log4node'),
     agent = require('../lib/agent.js'),
-    file_loader = require('../lib/lib/file_loader.js');
+    file_loader = require('../lib/lib/file_loader'),
+    patterns_loader = require('../lib/lib/patterns_loader');
 
 var argv = optimist.argv;
 
@@ -25,6 +27,14 @@ logstashAgent.set_logger(logger);
 logstashAgent.on('error', function(module_name, error) {
   logger.error("[" + module_name + "] " + error);
 });
+
+patterns_loader.add(path.join(__dirname, '..', 'lib', 'patterns'));
+
+if (argv.patterns_dir) {
+  argv.patterns_dir.split(/,/).forEach(function(d) {
+    patterns_loader.add(d);
+  });
+}
 
 function load_config_file(config) {
   if (argv.config_file) {
