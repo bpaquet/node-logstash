@@ -30,8 +30,8 @@ logstashAgent.on('error', function(module_name, error) {
 
 patterns_loader.add(path.join(__dirname, '..', 'lib', 'patterns'));
 
-if (argv.patterns_dir) {
-  argv.patterns_dir.split(/,/).forEach(function(d) {
+if (argv.patterns_directories) {
+  argv.patterns_directories.split(/,/).forEach(function(d) {
     patterns_loader.add(d);
   });
 }
