@@ -4,6 +4,8 @@ var vows = require('vows'),
     patterns_loader = require('../lib/lib/patterns_loader'),
     filter_helper = require('./filter_helper');
 
+patterns_loader.add('/toto');
+patterns_loader.add('/tata');
 patterns_loader.add('../lib/patterns');
 
 vows.describe('Filter regex ').addBatch({
@@ -78,7 +80,23 @@ vows.describe('Filter regex ').addBatch({
       '@timestamp': '2012-07-31T18:02:48+02:00'
     },
   ]),
-  'nginx parsing with predefined type': filter_helper.create('regex', '?load_config=nginx_combined', [
+  'nginx parsing with predefined type': filter_helper.create('regex', 'nginx_combined', [
+    {'@message': '127.0.0.1 - - [31/Jul/2012:18:02:28 +0200] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2"'},
+  ],[
+    {
+      '@message': '127.0.0.1 - - [31/Jul/2012:18:02:28 +0200] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2"',
+      '@fields': {
+        ip: '127.0.0.1',
+        request: 'GET /favicon.ico HTTP/1.1',
+        status: 502,
+        bytes_sent: 574,
+        user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2',
+        referer: '-',
+      },
+      '@timestamp': '2012-07-31T18:02:28+02:00'
+    },
+  ]),
+  'nginx parsing with predefined type (2)': filter_helper.create('regex', 'nginx_combined', [
     {'@message': '127.0.0.1 - - [31/Jul/2012:18:02:28 +0200] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2"'},
   ],[
     {

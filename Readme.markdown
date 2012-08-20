@@ -69,8 +69,8 @@ The urls can be specified :
 
 Others params :
 
-* ``log_level`` to change the log level (emergency, alert, critical, error, warning, notice, info, debug)
-* ``patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin
+* ``--log_level`` to change the log level (emergency, alert, critical, error, warning, notice, info, debug)
+* ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin
 
 Examples
 ---
@@ -133,6 +133,7 @@ Regex
 The regex filter is used to extract data from lines of logs. The lines of logs are not modified by this filter.
 
 Example : ``filter://regex://?regex=^(\S)+ &fields=toto``, to extract the first word of a line of logs, and place it into the ``toto`` field.
+Example 2 : ``filter://regex://nginx_combined?type=nginx``, to extract fields following configuration into the nginx_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
 
 Params :
 
@@ -140,5 +141,5 @@ Params :
 * fields : the name of fields which wil receive the pattern extracted (see below for the special field timestamp)
 * type : if this field is set, only the lines of logs with the same type will be processed by this filter.
 * date_format : if date_format is specified and a ``timestamp`` field is extracted, the plugin will process the data extracted with the date_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
-* load_config : load configuration from a file instead from url. node-logstash is bundled with [some configuration](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can use them with something like ``?load_config=nginx_combined&type=nginx``.
+
 
