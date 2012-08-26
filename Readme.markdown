@@ -52,7 +52,8 @@ Installation
 ---
 
 * Install NodeJS, version > 0.8.
-* Install node-logstash : ``npm install node-logstash`
+* Install zmq dev libraries : `apt-get install libzmq1`. This is required to build the [node zeromq module](https://github.com/JustinTulloss/zeromq.node).
+* Install node-logstash : `npm install node-logstash`
 
 The executable is in ``node_modules/node-logstash/bin/node-logstash-agent``
 Configuration
