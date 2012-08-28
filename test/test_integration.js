@@ -3,9 +3,8 @@ var vows = require('vows'),
     fs = require('fs'),
     agent = require('agent'),
     net = require('net'),
-    os = require('os'),
-    Log4Node = require('log4node');
-
+    os = require('os');
+    
 function checkResult(line, target) {
   var parsed = JSON.parse(line);
   delete parsed['@timestamp'];
@@ -19,8 +18,7 @@ function createAgent(urls, callback) {
     console.log("Error agent 1 detected, " + module_name + ", " + index + " : " + error);
     assert.ifError(error);
   });
-  logstashAgent.set_logger(new Log4Node('info'));
-  logstashAgent.load_urls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(err) {
+  logstashAgent.loadUrls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(err) {
     assert.ifError(err);
     callback(logstashAgent);
   }, 200);
@@ -73,8 +71,7 @@ function check_error_init(urls, expected_message_pattern) {
       logstashAgent.on('error', function(module_name, error) {
         assert.ifError(error);
       });
-      logstashAgent.set_logger(new Log4Node('info'));
-      logstashAgent.load_urls(urls, function(err) {
+      logstashAgent.loadUrls(urls, function(err) {
         if (err) {
           return callback(null, err.toString());
         }
@@ -98,8 +95,7 @@ function check_error_module(urls, expected_message_pattern, expected_module_name
         console.log("Error detected, " + module_name + " : " + error);
         callback(null, error.toString(), module_name);
       });
-      logstashAgent.set_logger(new Log4Node('info'));
-      logstashAgent.load_urls(urls, function(err) {
+      logstashAgent.loadUrls(urls, function(err) {
         assert.ifError(err);
       }, 200);
     },

@@ -1,31 +1,41 @@
 #!/usr/bin/env node
 
 var optimist = require('optimist'),
+    fs = require('fs'),
     path = require('path'),
-    Log4Node = require('log4node'),
-    agent = require('../lib/agent.js'),
+    logger = require('log4node'),
+    agent = require('../lib/agent'),
     file_loader = require('../lib/lib/file_loader'),
     patterns_loader = require('../lib/lib/patterns_loader');
 
 var argv = optimist.argv;
 
 function help() {
-  console.log("Syntax : node-logstasth-agent [--log_level=info] [--config_file=toto.json|--config_dir=/etc/config] urls");
-  console.log("Url examples");
-  console.log("input://stdin://");
-  console.log("input://file://main_input.txt?type=toto");
-  console.log("output://stdout://");
-  console.log("output://file:///tmp/toto.txt");
+  console.log('Syntax : node-logstasth-agent [--log_level=info] [--config_file=toto.json] [--config_dir=/etc/config] urls');
+  console.log('Url examples: ');
+  console.log('- input://stdin://');
+  console.log('- input://file://main_input.txt?type=toto');
+  console.log('- output://stdout://');
+  console.log('- output://file:///tmp/toto.txt');
 }
 
-var logger = new Log4Node(argv.log_level || 'warning');
+if (argv.help) {
+  help();
+  process.exit(0);
+}
+
+if (argv.log_level) {
+  logger.setLogLevel(argv.log_level);
+}
+
+var version = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')))['version'];
+
+logger.notice('Starting node-logstasth-agent', version);
 
 var logstashAgent = agent.create();
 
-logstashAgent.set_logger(logger);
-
 logstashAgent.on('error', function(module_name, error) {
-  logger.error("[" + module_name + "] " + error);
+  logger.error('[' + module_name + '] ' + error);
 });
 
 patterns_loader.add(path.join(__dirname, '..', 'lib', 'patterns'));
@@ -38,13 +48,13 @@ if (argv.patterns_directories) {
 
 function load_config_file(config) {
   if (argv.config_file) {
-    logger.info("Loading config file : " + argv.config_file);
-    file_loader.load_file(argv.config_file, function(err, result) {
+    logger.info('Loading config file : ' + argv.config_file);
+    file_loader.loadFile(argv.config_file, function(err, result) {
       if (err) {
-        logger.error("Unable to load config file : " + err.toString());
+        logger.error('Unable to load config file : ' + err.toString());
         process.exit(1);
       }
-      logger.info("File loaded, " + result.length + " urls found");
+      logger.info('File loaded, ' + result.length + ' urls found');
       after_config_file(config.concat(result));
     });
   }
@@ -55,13 +65,13 @@ function load_config_file(config) {
 
 function after_config_file(config) {
   if (argv.config_dir) {
-    logger.info("Loading config files from : " + argv.config_dir);
-    file_loader.load_directory(argv.config_dir, function(err, result) {
+    logger.info('Loading config files from : ' + argv.config_dir);
+    file_loader.loadDirectory(argv.config_dir, function(err, result) {
       if (err) {
-        logger.error("Unable to load config from directory : " + err.toString());
+        logger.error('Unable to load config from directory : ' + err.toString());
         process.exit(1);
       }
-      logger.info("Files loaded from directory, " + result.length + " urls found");
+      logger.info('Files loaded from directory, ' + result.length + ' urls found');
       after_config_directory(config.concat(result));
     });
   }
@@ -71,16 +81,15 @@ function after_config_file(config) {
 }
 
 function after_config_directory(config) {
-  logger.info("Loading config : " + config.length + " urls");
+  logger.info('Loading config : ' + config.length + ' urls');
 
-  logstashAgent.load_urls(config, function(err) {
+  logstashAgent.loadUrls(config, function(err) {
     if (err) {
-      logger.error("Unable to load urls : " + err);
+      logger.error('Unable to load urls : ' + err);
       process.exit(2);
     }
-    logger.info("Config loaded.");
+    logger.info('Config loaded.');
   });
-
 }
 
 load_config_file(['filter://add_source_host://', 'filter://add_timestamp://'].concat(argv._));

@@ -3,12 +3,12 @@ var vows = require('vows'),
     os = require('os'),
     fs = require('fs');
     monitor_file = require('monitor_file');
-    Log4Node = require('log4node');
+    log4node = require('log4node');
 
 function LocalMonitor(path, log_level) {
   this.file = (path || os.tmpDir()) + "___node-logstash_test___" + Math.random();
   this.errors = [];
-  logger = new Log4Node(log_level || 'warning');
+  logger = new log4node.Log4Node(log_level || 'warning');
   logger.info("Start new test, using file " + this.file);
   this.lines = [];
   this.monitor = monitor_file.monitor(this.file, function(err) {

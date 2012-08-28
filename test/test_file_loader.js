@@ -5,7 +5,7 @@ var vows = require('vows'),
 vows.describe('File loader').addBatch({
   'simple': {
     topic: function() {
-      file_loader.load_file('file_loader_test/simple', this.callback);
+      file_loader.loadFile('file_loader_test/simple', this.callback);
     },
 
     check: function(err, result) {
@@ -16,7 +16,7 @@ vows.describe('File loader').addBatch({
 
   'multiple': {
     topic: function() {
-      file_loader.load_file('file_loader_test/multiple', this.callback);
+      file_loader.loadFile('file_loader_test/multiple', this.callback);
     },
 
     check: function(err, result) {
@@ -27,7 +27,7 @@ vows.describe('File loader').addBatch({
 
   'comment': {
     topic: function() {
-      file_loader.load_file('file_loader_test/comment', this.callback);
+      file_loader.loadFile('file_loader_test/comment', this.callback);
     },
 
     check: function(err, result) {
@@ -38,7 +38,7 @@ vows.describe('File loader').addBatch({
 
   'file not found': {
     topic: function() {
-      file_loader.load_file('file_loader_test/comment2', this.callback);
+      file_loader.loadFile('file_loader_test/comment2', this.callback);
     },
 
     check: function(err, result) {
@@ -47,9 +47,9 @@ vows.describe('File loader').addBatch({
     }
   },
 
-  'load_directory': {
+  'loadDirectory': {
     topic: function() {
-      file_loader.load_directory('file_loader_test', this.callback);
+      file_loader.loadDirectory('file_loader_test', this.callback);
     },
 
     check: function(err, result) {
@@ -60,7 +60,7 @@ vows.describe('File loader').addBatch({
 
   'directory not found': {
     topic: function() {
-      file_loader.load_directory('file_loader_test2', this.callback);
+      file_loader.loadDirectory('file_loader_test2', this.callback);
     },
 
     check: function(err, result) {
