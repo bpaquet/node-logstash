@@ -214,4 +214,6 @@ vows.describe('Integration :').addBatch({
   'tcp transport': file2x2x2file(['output://tcp://localhost:17875'], ['input://tcp://0.0.0.0:17875']),
 }).addBatch({
   'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:5567'], ['input://zeromq://tcp://*:5567']),
+}).addBatch({
+  'unix socket transport': file2x2x2file(['output://unix:///tmp/test_socket'], ['input://unix:///tmp/test_socket']),
 }).export(module);
