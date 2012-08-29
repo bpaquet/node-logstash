@@ -3,8 +3,9 @@ var vows = require('vows'),
     fs = require('fs'),
     agent = require('agent'),
     net = require('net'),
+    http = require('http'),
     os = require('os');
-    
+
 function checkResult(line, target) {
   var parsed = JSON.parse(line);
   delete parsed['@timestamp'];
@@ -153,14 +154,68 @@ vows.describe('Integration :').addBatch({
     }
   },
 }).addBatch({
+  'elastic_search test': {
+    topic: function() {
+      var callback = this.callback;
+      var reqs = [];
+      var agent = createAgent([
+        'input://tcp://localhost:17874?type=nginx',
+        'input://tcp://localhost:17875',
+        'output://elasticsearch://localhost:17876',
+        ], function(agent) {
+        var es_server = http.createServer(function(req, res) {
+          var body = "";
+          req.on('data', function(chunk) {
+            body += chunk;
+          })
+          req.on('end', function() {
+            reqs.push({req: req, body: body});
+            res.writeHead(201);
+            res.end();
+            if (reqs.length == 2) {
+              es_server.close();
+              agent.close();
+              setTimeout(function() {
+                  callback(null, reqs);
+              }, 200);
+            }
+          })
+        }).listen(17876);
+        var c1 = net.createConnection({port: 17874}, function() {
+          c1.write("toto");
+          c1.end();
+        });
+        setTimeout(function() {
+          var c2 = net.createConnection({port: 17875}, function() {
+            c2.write("titi");
+            c2.end();
+          });
+        }, 200);
+      });
+    },
+
+    check: function(err, reqs) {
+      assert.ifError(err);
+      assert.equal(reqs.length, 2);
+
+      assert.equal(reqs[0].req.method, 'POST');
+      assert(reqs[0].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[0].req.url + ' does not match regex');
+      checkResult(reqs[0].body, {'@message': 'toto', '@source': 'tcp_port_17874', '@type': 'nginx'});
+
+      assert.equal(reqs[1].req.method, 'POST');
+      assert(reqs[1].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[1].req.url + ' does not match regex');
+      checkResult(reqs[1].body, {'@message': 'titi', '@source': 'tcp_port_17875'});
+    }
+ },
+}).addBatch({
   'net2file': {
     topic: function() {
       var callback = this.callback;
       createAgent([
-        'input://tcp://localhost:17874?type=2',
+        'input://tcp://localhost:17873?type=2',
         'output://file://output.txt',
         ], function(agent) {
-        var c = net.createConnection({port: 17874}, function() {
+        var c = net.createConnection({port: 17873}, function() {
           c.write("toto");
           c.end();
         });
@@ -183,7 +238,7 @@ vows.describe('Integration :').addBatch({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@source': 'tcp_port_17874', '@message': 'toto', '@type': '2'});
+      checkResult(splitted[0], {'@source': 'tcp_port_17873', '@message': 'toto', '@type': '2'});
     }
  },
 }).addBatch({
@@ -211,7 +266,7 @@ vows.describe('Integration :').addBatch({
 }).addBatch({
   'file transport': file2x2x2file(['output://file://main_middle.txt'], ['input://file://main_middle.txt'], function() { fs.unlinkSync('main_middle.txt'); }),
 }).addBatch({
-  'tcp transport': file2x2x2file(['output://tcp://localhost:17875'], ['input://tcp://0.0.0.0:17875']),
+  'tcp transport': file2x2x2file(['output://tcp://localhost:17879'], ['input://tcp://0.0.0.0:17879']),
 }).addBatch({
   'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:5567'], ['input://zeromq://tcp://*:5567']),
 }).addBatch({
