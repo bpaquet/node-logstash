@@ -12,7 +12,7 @@ var optimist = require('optimist'),
 var argv = optimist.argv;
 
 function help() {
-  console.log('Syntax : node-logstasth-agent [--log_level=info] [--config_file=toto.json] [--config_dir=/etc/config] urls');
+  console.log('Syntax : node-logstasth-agent [--log_level=info] [--log_file=file] [--config_file=toto.json] [--config_dir=/etc/config] urls');
   console.log('Url examples: ');
   console.log('- input://stdin://');
   console.log('- input://file://main_input.txt?type=toto');
@@ -25,8 +25,13 @@ if (argv.help) {
   process.exit(0);
 }
 
-if (argv.log_level) {
-  logger.setLogLevel(argv.log_level);
+if (argv.log_file) {
+  logger.reconfigure(argv.log_level, argv.log_file);
+}
+else {
+  if (argv.log_level) {
+    logger.setLogLevel(argv.log_level);
+  }
 }
 
 var package_json_file = path.join(__dirname, '..', 'package.json');
