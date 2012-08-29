@@ -15,18 +15,21 @@ function createWithCallback(filter_name, filter_config, inputs, number_of_events
       m.on('error', function(err) {
         assert.ifError(err);
       });
+      m.on('init_error', function(err) {
+        assert.ifError(err);
+      });
       m.on('output', function(x) {
         result.push(x);
         if (result.length == number_of_events) {
           callback(null, result);
         }
       });
-      m.init(filter_config, function(err) {
-        assert.ifError(err);
+      m.once('init_ok', function() {
         inputs.forEach(function(d) {
           m.emit('input', d);
-        })
+        });
       });
+      m.init(filter_config);
     },
 
     check: function(err, result) {

@@ -7,16 +7,21 @@ var vows = require('vows'),
 
 function LocalMonitor(path, log_level) {
   this.file = (path || os.tmpDir()) + "___node-logstash_test___" + Math.random();
-  this.errors = [];
   logger = new log4node.Log4Node(log_level || 'warning');
   logger.info("Start new test, using file " + this.file);
   this.lines = [];
-  this.monitor = monitor_file.monitor(this.file, function(err) {
-    this.errors.push(err);
-  }.bind(this),
-  function(line) {
-    this.lines.push(line);
-  }.bind(this), {logger: logger});
+  this.errors = [];
+  this.init_errors = [];
+  this.monitor = monitor_file.monitor(this.file, {});
+  this.monitor.on('data', function(data) {
+    this.lines.push(data);
+  }.bind(this));
+  this.monitor.on('errors', function(data) {
+    this.errors.push(data);
+  }.bind(this));
+  this.monitor.on('init_error', function(data) {
+    this.init_errors.push(data);
+  }.bind(this));
 }
 
 function create_test(start_callback, check_callback, path, log_level) {
@@ -42,6 +47,7 @@ vows.describe('Monitor ').addBatch({
     setTimeout(callback, 200);
     }, function check(m) {
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 0);
     }
   ),
@@ -53,6 +59,7 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       fs.unlinkSync(m.file);
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 0);
     }
   ),
@@ -64,6 +71,7 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       fs.unlinkSync(m.file);
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 0);
     }
   ),
@@ -75,6 +83,7 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       fs.unlinkSync(m.file);
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
@@ -88,6 +97,7 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       fs.unlinkSync(m.file);
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       var test_file_lines = fs.readFileSync(__filename).toString().split("\n");
       var index = 0;
       test_file_lines.forEach(function(l) {
@@ -110,6 +120,7 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       fs.unlinkSync(m.file);
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
@@ -120,11 +131,12 @@ vows.describe('Monitor ').addBatch({
     m.monitor.start(0);
     setTimeout(function() {
       fs.writeFileSync(m.file, "line1\nline2\n");
-      setTimeout(callback, 200);
-    }, 200);
+      setTimeout(callback, 250);
+    }, 250);
     }, function check(m) {
       fs.unlinkSync(m.file);
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
@@ -141,6 +153,7 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       assert.equal(m.monitor.fd, undefined);
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
@@ -162,6 +175,7 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       fs.unlinkSync(m.file);
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 4);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
@@ -190,6 +204,7 @@ vows.describe('Monitor ').addBatch({
       fs.closeSync(m.fd);
       fs.unlinkSync(m.file);
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 2);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
@@ -213,6 +228,7 @@ vows.describe('Monitor ').addBatch({
       fs.unlinkSync(m.file);
       fs.unlinkSync(m.file + ".1");
       assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 0);
       assert.equal(m.lines.length, 4);
       assert.equal(m.lines[0], "line1");
       assert.equal(m.lines[1], "line2");
@@ -225,7 +241,8 @@ vows.describe('Monitor ').addBatch({
     m.monitor.start(0);
     setTimeout(callback, 200);
     }, function check(m) {
-      assert.equal(m.errors.length, 1);
+      assert.equal(m.errors.length, 0);
+      assert.equal(m.init_errors.length, 1);
       assert.equal(m.lines.length, 0);
     },
   "/toto_does_not_exists/toto.log"),

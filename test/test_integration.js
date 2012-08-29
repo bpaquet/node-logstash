@@ -14,14 +14,14 @@ function checkResult(line, target) {
 }
 
 function createAgent(urls, callback) {
-  var logstashAgent = agent.create();
-  logstashAgent.on('error', function(module_name, index, error) {
+  var a = agent.create();
+  a.on('error', function(module_name, index, error) {
     console.log("Error agent 1 detected, " + module_name + ", " + index + " : " + error);
     assert.ifError(error);
   });
-  logstashAgent.loadUrls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(err) {
+  a.loadUrls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(err) {
     assert.ifError(err);
-    callback(logstashAgent);
+    callback(a);
   }, 200);
 }
 
@@ -30,13 +30,13 @@ function file2x2x2file(config1, config2, clean_callback) {
     topic: function() {
       var callback = this.callback;
 
-      createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(logstashAgent1) {
-        createAgent(config2.concat(['output://file://main_output.txt']), function(logstashAgent2) {
+      createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
+        createAgent(config2.concat(['output://file://main_output.txt']), function(a2) {
           setTimeout(function() {
             fs.appendFileSync('main_input.txt', '234 tgerhe grgh\n');
             setTimeout(function() {
-              logstashAgent1.close(),
-              logstashAgent2.close(),
+              a1.close(),
+              a2.close(),
               setTimeout(function() {
                 callback(null);
               }, 200);
@@ -68,11 +68,14 @@ function check_error_init(urls, expected_message_pattern) {
   return {
     topic: function() {
       var callback = this.callback;
-      var logstashAgent = agent.create();
-      logstashAgent.on('error', function(module_name, error) {
+      var a = agent.create();
+      a.on('error', function(module_name, error) {
         assert.ifError(error);
       });
-      logstashAgent.loadUrls(urls, function(err) {
+      a.on('init_error', function(module_name, error) {
+        assert.ifError(error);
+      });
+      a.loadUrls(urls, function(err) {
         if (err) {
           return callback(null, err.toString());
         }
@@ -87,16 +90,19 @@ function check_error_init(urls, expected_message_pattern) {
   }
 }
 
-function check_error_module(urls, expected_message_pattern, expected_module_name) {
+function check_error_module(urls, type, expected_message_pattern, expected_module_name) {
   return {
     topic: function() {
       var callback = this.callback;
-      var logstashAgent = agent.create();
-      logstashAgent.on('error', function(module_name, error) {
+      var a = agent.create();
+      a.on(type, function(module_name, error) {
         console.log("Error detected, " + module_name + " : " + error);
         callback(null, error.toString(), module_name);
       });
-      logstashAgent.loadUrls(urls, function(err) {
+      a.on(type == 'error' ? 'init_error' : 'error', function(module_name, err) {
+        assert.ifError(err);
+      });
+      a.loadUrls(urls, function(err) {
         assert.ifError(err);
       }, 200);
     },
@@ -255,14 +261,14 @@ vows.describe('Integration :').addBatch({
     'input://tcp://localhost:abcd'
     ], 'Unable to parse host'),
 }).addBatch({
-  'input_file_error': check_error_module([
-    'input://file:///path_which_does_not_exist/input1.txt',
-    'output://stdout://'
-    ], 'Directory not found', 'input_file'),
+ 'input_file_error': check_error_module([
+   'input://file:///path_which_does_not_exist/input1.txt',
+   'output://stdout://'
+   ], 'init_error', 'Directory not found', 'input_file'),
 }).addBatch({
   'wrong_output_file_module': check_error_module([
     'output://file:///path_which_does_not_exist/titi.txt'
-  ], 'ENOENT', 'output_file'),
+  ], 'error', 'ENOENT', 'output_file'),
 }).addBatch({
   'file transport': file2x2x2file(['output://file://main_middle.txt'], ['input://file://main_middle.txt'], function() { fs.unlinkSync('main_middle.txt'); }),
 }).addBatch({
