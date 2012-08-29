@@ -34,10 +34,15 @@ var version = JSON.parse(fs.readFileSync(package_json_file))['version'];
 
 logger.notice('Starting node-logstasth-agent', version);
 
-var logstashAgent = agent.create();
+var a = agent.create();
 
-logstashAgent.on('error', function(module_name, error) {
+a.on('error', function(module_name, error) {
   logger.error('[' + module_name + '] ' + error);
+});
+
+a.on('init_error', function(module_name, error) {
+  logger.error('[' + module_name + '] ' + error);
+  process.exit(1);
 });
 
 patterns_loader.add(path.join(__dirname, '..', 'lib', 'patterns'));
@@ -85,7 +90,7 @@ function after_config_file(config) {
 function after_config_directory(config) {
   logger.info('Loading config : ' + config.length + ' urls');
 
-  logstashAgent.loadUrls(config, function(err) {
+  a.loadUrls(config, function(err) {
     if (err) {
       logger.error('Unable to load urls : ' + err);
       process.exit(2);
