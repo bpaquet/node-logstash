@@ -5,6 +5,7 @@ var optimist = require('optimist'),
     path = require('path'),
     logger = require('log4node'),
     agent = require('../lib/agent'),
+    monitor_file = require('../lib/lib/monitor_file'),
     file_loader = require('../lib/lib/file_loader'),
     patterns_loader = require('../lib/lib/patterns_loader');
 
@@ -28,7 +29,8 @@ if (argv.log_level) {
   logger.setLogLevel(argv.log_level);
 }
 
-var version = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')))['version'];
+var package_json_file = path.join(__dirname, '..', 'package.json');
+var version = JSON.parse(fs.readFileSync(package_json_file))['version'];
 
 logger.notice('Starting node-logstasth-agent', version);
 
@@ -98,3 +100,5 @@ process.on('uncaughtException', function (err) {
   logger.error('Caught exception:', err);
 });
 
+// start an file monitoring to avoid process exit if no configuration is found
+monitor_file.monitor(package_json_file, function() {}, function() {}, {}).start();
