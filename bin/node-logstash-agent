@@ -54,7 +54,9 @@ a.on('error', function(module_name, error) {
 
 a.on('init_error', function(module_name, error) {
   logger.error('[' + module_name + '] ' + error);
-  process.exit(1);
+  setTimeout(function() {
+    process.exit(1);
+  }, 50);
 });
 
 patterns_loader.add(path.join(__dirname, '..', 'lib', 'patterns'));
