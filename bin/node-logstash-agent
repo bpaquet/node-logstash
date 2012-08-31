@@ -25,6 +25,13 @@ if (argv.help) {
   process.exit(0);
 }
 
+process.on('uncaughtException', function (err) {
+  logger.error('Exception has been catch, it\' a bug');
+  logger.error('Please submit an issue on https://github.com/bpaquet/node-logstash');
+  logger.error('Exception:', err);
+  logger.error(err.stack);
+});
+
 if (argv.log_file) {
   logger.reconfigure(argv.log_level, argv.log_file);
 }
