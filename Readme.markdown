@@ -125,6 +125,26 @@ This plugin is used on log server to send logs to elastic search.
 
 Example : ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
 
+Statsd
+---
+
+This plugin is used send data to statsd.
+
+Example : ``output://statsd://localhost:8125?type=nginx&metric_type=increment&metric_key=nginx.request``, to send, for each line of nginx log, a counter with value 1, key ``nginx.request``, on a statsd instance located on port 8125.
+
+Params :
+* ``metric_type`` : one of ``increment``, ``decrement``, ``counter``, ``timer``. Type of value to send to statsd.
+* ``metric_key`` : key to send to statsd.
+* ``metric_value`` : metric value to send to statsd. Mandatory for ``timer`` and ``counter`` type
+* ``type`` : if specified, this output will only apply to lines with this type.
+
+``metric_key`` and ``metric_value`` can reference log line properties :
+* ``#{@message}`` will contain the full log line
+* ``#{@type}`` will contain the type of log line
+* ``#{toto}`` will contain the field ``toto``, which have to be extracted with a regex filter
+
+Example : ``metric_key`` : ``nginx.response.#{status}``
+
 Filters
 ===
 
