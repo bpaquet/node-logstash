@@ -4,6 +4,7 @@ var vows = require('vows'),
     agent = require('agent'),
     net = require('net'),
     http = require('http'),
+    dgram = require('dgram'),
     os = require('os');
 
 function checkResult(line, target) {
@@ -15,6 +16,10 @@ function checkResult(line, target) {
 
 function createAgent(urls, callback) {
   var a = agent.create();
+  a.on('init_error', function(module_name, index, error) {
+    console.log("Init error agent 1 detected, " + module_name + ", " + index + " : " + error);
+    assert.ifError(error);
+  });
   a.on('error', function(module_name, index, error) {
     console.log("Error agent 1 detected, " + module_name + ", " + index + " : " + error);
     assert.ifError(error);
@@ -245,6 +250,54 @@ vows.describe('Integration :').addBatch({
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
       checkResult(splitted[0], {'@source': 'tcp_port_17873', '@message': 'toto', '@type': '2'});
+    }
+ },
+}).addBatch({
+  'file2statsd': {
+    topic: function() {
+      var callback = this.callback;
+      var received = [];
+      var statsd = dgram.createSocket('udp4');
+      statsd.on('message', function(d) {
+        received.push(d.toString());
+      });
+      statsd.bind(17877);
+      createAgent([
+        'input://file://input1.txt',
+        'input://file://input2.txt?type=titi',
+        'input://file://input3.txt?type=tata',
+        'input://file://input4.txt?type=tete',
+        'filter://regex://?regex=^45_(.*)$&fields=my_field',
+        'output://statsd://127.0.0.1:17877?metric_type=increment&metric_key=toto.bouh',
+        'output://statsd://127.0.0.1:17877?metric_type=decrement&metric_key=toto.#{@message}&type=titi',
+        'output://statsd://127.0.0.1:17877?metric_type=counter&metric_key=toto.counter&metric_value=#{@message}&type=tata',
+        'output://statsd://127.0.0.1:17877?metric_type=timer&metric_key=toto.#{my_field}&metric_value=20&type=tete',
+        ], function(agent) {
+        setTimeout(function() {
+          fs.appendFileSync('input1.txt', 'line1\n');
+          setTimeout(function() {
+            fs.appendFileSync('input2.txt', 'line2\n');
+            setTimeout(function() {
+              fs.appendFileSync('input3.txt', '10\n');
+              setTimeout(function() {
+                fs.appendFileSync('input4.txt', '45_123\n');
+                setTimeout(function() {
+                  callback(undefined, received);
+                }, 200);
+              }, 200);
+            }, 200);
+          }, 200);
+        }, 200);
+      });
+    },
+
+    check: function(err, data) {
+      fs.unlinkSync('input1.txt');
+      fs.unlinkSync('input2.txt');
+      fs.unlinkSync('input3.txt');
+      fs.unlinkSync('input4.txt');
+      assert.ifError(err);
+      assert.deepEqual(data.sort(), ['toto.bouh:1|c', 'toto.line2:-1|c', 'toto.bouh:1|c', 'toto.counter:10|c', 'toto.bouh:1|c', 'toto.123:20|ms', 'toto.bouh:1|c'].sort());
     }
  },
 }).addBatch({
