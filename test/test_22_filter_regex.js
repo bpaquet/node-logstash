@@ -47,9 +47,9 @@ vows.describe('Filter regex ').addBatch({
     {'@message': '31/Jul/2012'},
     {'@message': 'toto'},
   ], [
-    {'@message': '31/Jul/2012:18:02:28 +0200}', '@fields': {}, '@timestamp': '2012-07-31T18:02:28+02:00'},
-    {'@message': '31/Jul/2012', '@fields': {}, '@timestamp': '2012-07-31T02:00:00+02:00'},
-    {'@message': 'toto', '@fields': {}, '@timestamp': '0000-01-01T01:00:00+01:00'},
+    {'@message': '31/Jul/2012:18:02:28 +0200}', '@fields': {}, '@timestamp': '2012-07-31T16:02:28+00:00'},
+    {'@message': '31/Jul/2012', '@fields': {}, '@timestamp': '2012-07-31T00:00:00+00:00'},
+    {'@message': 'toto', '@fields': {}, '@timestamp': '0000-01-01T00:00:00+00:00'},
   ]),
   'nginx parsing': filter_helper.create('regex', '?regex=^(\\S+) - (\\S*) ?- \\[([^\\]]+)\\] "([^"]+)" (\\d+) (\\d+) "([^"]*)" "([^"]*)"&fields=ip,user,timestamp,request,status,bytes_sent,referer,user_agent&date_format=DD/MMMM/YYYY:HH:mm:ss ZZ', [
     {'@message': '127.0.0.1 - - [31/Jul/2012:18:02:28 +0200] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2"'},
@@ -65,7 +65,7 @@ vows.describe('Filter regex ').addBatch({
         user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2',
         referer: '-',
       },
-      '@timestamp': '2012-07-31T18:02:28+02:00'
+      '@timestamp': '2012-07-31T16:02:28+00:00'
     },
     {
       '@message': '127.0.0.1 - - [31/Jul/2012:18:02:48 +0200] "-" 400 0 "-" "-"',
@@ -77,7 +77,7 @@ vows.describe('Filter regex ').addBatch({
         user_agent: '-',
         referer: '-',
       },
-      '@timestamp': '2012-07-31T18:02:48+02:00'
+      '@timestamp': '2012-07-31T16:02:48+00:00'
     },
   ]),
   'nginx parsing with predefined type': filter_helper.create('regex', 'nginx_combined', [
@@ -93,7 +93,7 @@ vows.describe('Filter regex ').addBatch({
         user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2',
         referer: '-',
       },
-      '@timestamp': '2012-07-31T18:02:28+02:00'
+      '@timestamp': '2012-07-31T16:02:28+00:00'
     },
   ]),
   'nginx parsing with predefined type (2)': filter_helper.create('regex', 'nginx_combined', [
@@ -109,7 +109,7 @@ vows.describe('Filter regex ').addBatch({
         user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2',
         referer: '-',
       },
-      '@timestamp': '2012-07-31T18:02:28+02:00'
+      '@timestamp': '2012-07-31T16:02:28+00:00'
     },
   ]),
 }).export(module);

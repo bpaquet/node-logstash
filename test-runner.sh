@@ -10,6 +10,6 @@ fi
 
 for test in $TEST; do
   echo "Launching test : $test"
-  NODE_PATH=../lib:../lib/lib vows $test --spec
+  TZ=Etc/GMT NODE_PATH=../lib:../lib/lib vows $test --spec
   echo ""
 done
