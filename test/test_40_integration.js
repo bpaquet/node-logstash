@@ -317,7 +317,7 @@ vows.describe('Integration :').addBatch({
  'input_file_error': check_error_module([
    'input://file:///path_which_does_not_exist/input1.txt',
    'output://stdout://'
-   ], 'init_error', 'Directory not found', 'input_file'),
+   ], 'init_error', 'Error: watch ENOENT', 'input_file'),
 }).addBatch({
   'wrong_output_file_module': check_error_module([
     'output://file:///path_which_does_not_exist/titi.txt'
