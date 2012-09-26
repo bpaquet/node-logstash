@@ -14,18 +14,21 @@ function checkResult(line, target) {
   assert.deepEqual(parsed, target);
 }
 
-function createAgent(urls, callback) {
+function createAgent(urls, callback, error_callback) {
   var a = agent.create();
-  a.on('init_error', function(module_name, index, error) {
-    console.log("Init error agent 1 detected, " + module_name + ", " + index + " : " + error);
+  error_callback = error_callback || function(error) {
     assert.ifError(error);
+  }
+  a.on('init_error', function(module_name, error) {
+    console.log("Init error agent detected, " + module_name + " : " + error);
+    error_callback(error);
   });
-  a.on('error', function(module_name, index, error) {
-    console.log("Error agent 1 detected, " + module_name + ", " + index + " : " + error);
+  a.on('error', function(module_name, error) {
+    console.log("Error agent detected, " + module_name + " : " + error);
+    error_callback(error);
+  });
+  a.loadUrls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(error) {
     assert.ifError(error);
-  });
-  a.loadUrls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(err) {
-    assert.ifError(err);
     callback(a);
   }, 200);
 }
@@ -271,7 +274,7 @@ vows.describe('Integration :').addBatch({
         'output://statsd://127.0.0.1:17877?metric_type=increment&metric_key=toto.bouh',
         'output://statsd://127.0.0.1:17877?metric_type=decrement&metric_key=toto.#{@message}&type=titi',
         'output://statsd://127.0.0.1:17877?metric_type=counter&metric_key=toto.counter&metric_value=#{@message}&type=tata',
-        'output://statsd://127.0.0.1:17877?metric_type=timer&metric_key=toto.#{my_field}&metric_value=20&type=tete',
+        'output://statsd://127.0.0.1:17877?metric_type=timer&metric_key=toto.#{my_field}.#{my_field}&metric_value=20&type=tete',
         ], function(agent) {
         setTimeout(function() {
           fs.appendFileSync('input1.txt', 'line1\n');
@@ -297,7 +300,41 @@ vows.describe('Integration :').addBatch({
       fs.unlinkSync('input3.txt');
       fs.unlinkSync('input4.txt');
       assert.ifError(err);
-      assert.deepEqual(data.sort(), ['toto.bouh:1|c', 'toto.line2:-1|c', 'toto.bouh:1|c', 'toto.counter:10|c', 'toto.bouh:1|c', 'toto.123:20|ms', 'toto.bouh:1|c'].sort());
+      assert.deepEqual(data.sort(), ['toto.bouh:1|c', 'toto.line2:-1|c', 'toto.bouh:1|c', 'toto.counter:10|c', 'toto.bouh:1|c', 'toto.123.123:20|ms', 'toto.bouh:1|c'].sort());
+    }
+ },
+ }).addBatch({
+  'file2statsd_missing_field': {
+    topic: function() {
+      var callback = this.callback;
+      var received = [];
+      var errors = [];
+      var statsd = dgram.createSocket('udp4');
+      statsd.on('message', function(d) {
+        received.push(d.toString());
+      });
+      statsd.bind(17878);
+      createAgent([
+        'input://file://input1.txt',
+        'output://statsd://127.0.0.1:17878?metric_type=increment&metric_key=toto.bouh.#{unknown_field}',
+        ], function(agent) {
+        setTimeout(function() {
+          fs.appendFileSync('input1.txt', 'line1\n');
+          setTimeout(function() {
+            callback(errors, received);
+          }, 200);
+        }, 200);
+      }, function(error) {
+        errors.push(error);
+      });
+    },
+
+    check: function(errors, data) {
+      fs.unlinkSync('input1.txt');
+      assert.deepEqual(data.sort(), ['toto.bouh.:1|c'].sort());
+      console.log(errors);
+      assert.equal(errors.length, 1);
+      assert.ok(errors[0].toString().match(/unknown_field/));
     }
  },
 }).addBatch({
