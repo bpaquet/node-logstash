@@ -332,7 +332,6 @@ vows.describe('Integration :').addBatch({
     check: function(errors, data) {
       fs.unlinkSync('input1.txt');
       assert.deepEqual(data.sort(), ['toto.bouh.:1|c'].sort());
-      console.log(errors);
       assert.equal(errors.length, 1);
       assert.ok(errors[0].toString().match(/unknown_field/));
     }
