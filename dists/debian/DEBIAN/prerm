@@ -1,0 +1,5 @@
+#!/bin/sh -e
+/etc/init.d/logstash stop || true
+update-rc.d -f logstash remove || true
+userdel logstash || true
+rm -f /opt/logstash/shared/*.pid /opt/logstash/shared/log/* || true

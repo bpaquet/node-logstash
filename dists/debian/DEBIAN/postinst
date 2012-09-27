@@ -1,0 +1,5 @@
+#!/bin/sh -e
+update-rc.d logstash defaults
+useradd logstash
+chown -R logstash /opt/logstash/shared/log
+/etc/init.d/logstash start
