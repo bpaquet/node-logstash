@@ -25,7 +25,7 @@ fi
 
 echo "Creating debian package for node-logstash, target package $VERSION, sha1 $SHA1, node version $NODE_VERSION"
 
-PKG=logstash
+PKG=node-logstash
 NODE=node-v${NODE_VERSION}-linux-x64
 
 rm -rf $PKG
