@@ -173,8 +173,8 @@ vows.describe('Integration :').addBatch({
       var callback = this.callback;
       var reqs = [];
       var agent = createAgent([
-        'input://tcp://localhost:17874?type=nginx',
-        'input://tcp://localhost:17875',
+        'input://tcp://0.0.0.0:17874?type=nginx',
+        'input://tcp://0.0.0.0:17875',
         'output://elasticsearch://localhost:17876',
         ], function(agent) {
         var es_server = http.createServer(function(req, res) {
@@ -214,11 +214,11 @@ vows.describe('Integration :').addBatch({
 
       assert.equal(reqs[0].req.method, 'POST');
       assert(reqs[0].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[0].req.url + ' does not match regex');
-      checkResult(reqs[0].body, {'@message': 'toto', '@source': 'tcp_port_17874', '@type': 'nginx'});
+      checkResult(reqs[0].body, {'@message': 'toto', '@source': 'tcp_0.0.0.0_17874', '@type': 'nginx'});
 
       assert.equal(reqs[1].req.method, 'POST');
       assert(reqs[1].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[1].req.url + ' does not match regex');
-      checkResult(reqs[1].body, {'@message': 'titi', '@source': 'tcp_port_17875'});
+      checkResult(reqs[1].body, {'@message': 'titi', '@source': 'tcp_0.0.0.0_17875'});
     }
  },
 }).addBatch({
@@ -252,7 +252,7 @@ vows.describe('Integration :').addBatch({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@source': 'tcp_port_17873', '@message': 'toto', '@type': '2'});
+      checkResult(splitted[0], {'@source': 'tcp_localhost_17873', '@message': 'toto', '@type': '2'});
     }
  },
 }).addBatch({
@@ -347,8 +347,8 @@ vows.describe('Integration :').addBatch({
     'toto://non_existent_module://'
     ], 'Unknown protocol'),
   'wrong port in tcp module': check_error_init([
-    'input://tcp://localhost:abcd'
-    ], 'Unable to parse host'),
+    'input://tcp://0.0.0.0:abcd'
+    ], 'Unable to extract port'),
 }).addBatch({
  'input_file_error': check_error_module([
    'input://file:///path_which_does_not_exist/input1.txt',
