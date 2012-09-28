@@ -272,9 +272,9 @@ vows.describe('Integration :').addBatch({
         'input://file://input4.txt?type=tete',
         'filter://regex://?regex=^45_(.*)$&fields=my_field',
         'output://statsd://127.0.0.1:17877?metric_type=increment&metric_key=toto.bouh',
-        'output://statsd://127.0.0.1:17877?metric_type=decrement&metric_key=toto.#{@message}&type=titi',
-        'output://statsd://127.0.0.1:17877?metric_type=counter&metric_key=toto.counter&metric_value=#{@message}&type=tata',
-        'output://statsd://127.0.0.1:17877?metric_type=timer&metric_key=toto.#{my_field}.#{my_field}&metric_value=20&type=tete',
+        'output://statsd://127.0.0.1:17877?metric_type=decrement&metric_key=toto.#{@message}&only_type=titi',
+        'output://statsd://127.0.0.1:17877?metric_type=counter&metric_key=toto.counter&metric_value=#{@message}&only_type=tata',
+        'output://statsd://127.0.0.1:17877?metric_type=timer&metric_key=toto.#{my_field}.#{my_field}&metric_value=20&only_type=tete',
         ], function(agent) {
         setTimeout(function() {
           fs.appendFileSync('input1.txt', 'line1\n');
@@ -300,7 +300,15 @@ vows.describe('Integration :').addBatch({
       fs.unlinkSync('input3.txt');
       fs.unlinkSync('input4.txt');
       assert.ifError(err);
-      assert.deepEqual(data.sort(), ['toto.bouh:1|c', 'toto.line2:-1|c', 'toto.bouh:1|c', 'toto.counter:10|c', 'toto.bouh:1|c', 'toto.123.123:20|ms', 'toto.bouh:1|c'].sort());
+      assert.deepEqual(data.sort(), [
+        'toto.bouh:1|c',
+        'toto.line2:-1|c',
+        'toto.bouh:1|c',
+        'toto.counter:10|c',
+        'toto.bouh:1|c',
+        'toto.123.123:20|ms',
+        'toto.bouh:1|c'
+      ].sort());
     }
  },
  }).addBatch({

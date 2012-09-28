@@ -23,7 +23,7 @@ vows.describe('Filter regex ').addBatch({
   ], [
     {'@message': ' efgh ijk', '@fields': {fb: 'efgh'}},
   ]),
-  'type filtering': filter_helper.create('regex', '?type=toto&regex=^(\\S+) (\\S+)&fields=fa,fb', [
+  'type filtering': filter_helper.create('regex', '?only_type=toto&regex=^(\\S+) (\\S+)&fields=fa,fb', [
     {'@message': 'abcd efgh ijk'},
     {'@message': 'abcd efgh ijk', '@type': 'toto'},
     {'@message': 'abcd efgh ijk', '@type': 'toto2'},

@@ -9,7 +9,7 @@ vows.describe('Filter replace ').addBatch({
   'multiple': filter_helper.create('mutate_replace', 'toto?from=\\.&to=-', [{'@fields': {'toto': 'my.domain.com'}}], [{'@fields': {'toto': 'my-domain-com'}}]),
   'type_filtering': filter_helper.create(
     'mutate_replace',
-    'toto?type=titi&from=\\.&to=-', [
+    'toto?only_type=titi&from=\\.&to=-', [
       {'@type': 'titi', '@fields': {'toto': 'my.domain.com'}},
       {'@fields': {'toto': 'my.domain2.com'}}
     ], [

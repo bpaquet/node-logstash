@@ -19,7 +19,7 @@ In top of elastic search, you can use a specialized interface like [kibana](http
 Why a new implementation ?
 ---
 
-When I tried logstash, I had some problems. This version should have :
+When I tried logstash, I had some problems. This version should have:
 
 * lower memory footprint
 * lower cpu footprint
@@ -32,11 +32,11 @@ node-logstash is compatible with logstash. You can replace a node-logstash node 
 How it's work ?
 ===
 
-The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules :
+The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules:
 
-* [inputs plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs) : where datas come into node-logstash. Examples : file, zeromq transport layer
-* [filter plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/filters) : extract fields from logs, like timestamps. Example : regex plugin
-* [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs) : where datas leave from node-logstash: Example : elastic search , zeromq transport layer.
+* [inputs plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
+* [filter plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/filters): extract fields from logs, like timestamps. Example: regex plugin
+* [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs): where datas leave from node-logstash: Example: elastic search , zeromq transport layer.
 
 
 A typical node-logstash deployement contains agents to crawl logs and a log server.
@@ -52,23 +52,26 @@ Installation
 ---
 
 * Install NodeJS, version > 0.8.
-* Install zmq dev libraries : `apt-get install libzmq1`. This is required to build the [node zeromq module](https://github.com/JustinTulloss/zeromq.node).
-* Install node-logstash : `npm install node-logstash`
+* Install zmq dev libraries: `apt-get install libzmq1`. This is required to build the [node zeromq module](https://github.com/JustinTulloss/zeromq.node).
+* Install node-logstash: `npm install node-logstash`
 
 The executable is in ``node_modules/node-logstash/bin/node-logstash-agent``
+
+You have scripts in ``dists`` folder to build packages. Actually, only debian is supported.
+
 Configuration
 ---
 
-Configuration is done by url. A plugin is instanciated by an url. Example : ``input://file:///tmp/toto.log``. This url
+Configuration is done by url. A plugin is instanciated by an url. Example: ``input://file:///tmp/toto.log``. This url
 instanciate an input file plugin which monitor the file ``/tmp/toto.log`.
 
-The urls can be specified :
+The urls can be specified:
 
 * directly on the command line
 * in a file (use the ``--config-file`` switch)
 * in all files in a directory (use the ``--config-directory`` switch)
 
-Others params :
+Others params:
 
 * ``--log_level`` to change the log level (emergency, alert, critical, error, warning, notice, info, debug)
 * ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin
@@ -76,12 +79,12 @@ Others params :
 Examples
 ---
 
-Config file for an agent :
+Config file for an agent:
 
     input://file:///var/log/nginx/access.log
     output://zeromq://tcp://log_server:5555
 
-Config file for log server :
+Config file for log server:
 
     input://zeromq://tcp://0.0.0.0:5555
     filter://regex://?load_config=nginx_combined
@@ -95,18 +98,24 @@ File
 
 This plugin monitor log files. It's compatible with logrotate.
 
-Example : ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
+Example: ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
 
-Params :
-* ``start_index`` : add ``?start_index=0`` to reread files from begining. Without this params, only new lines are read.
-* ``type`` : to specify the log type, to faciliate crawling in kibana
+Params:
+
+* ``start_index``: add ``?start_index=0`` to reread files from begining. Without this params, only new lines are read.
+* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=nginx_error_log`
 
 Zeromq
 ---
 
 This plugin is used on log server to receive logs from agents.
 
-Example : ``input://zeromq://tcp://0.0.0.0:5555``, to open a zeromq socket on port 5555.
+Example: ``input://zeromq://tcp://0.0.0.0:5555``, to open a zeromq socket on port 5555.
+
+Outputs and filter, commons parameters
+===
+
+* ``only_type``: execute the filter / output plugin only on lines with specified type. Example: ``only_type=nginx``
 
 Ouputs plugins
 ===
@@ -116,34 +125,35 @@ Zeromq
 
 This plugin is used on agents to send logs to logs servers.
 
-Example : ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
+Example: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
 
 Elastic search
 ---
 
 This plugin is used on log server to send logs to elastic search.
 
-Example : ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
+Example: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
 
 Statsd
 ---
 
 This plugin is used send data to statsd.
 
-Example : ``output://statsd://localhost:8125?type=nginx&metric_type=increment&metric_key=nginx.request``, to send, for each line of nginx log, a counter with value 1, key ``nginx.request``, on a statsd instance located on port 8125.
+Example: ``output://statsd://localhost:8125?only_type=nginx&metric_type=increment&metric_key=nginx.request``, to send, for each line of nginx log, a counter with value 1, key ``nginx.request``, on a statsd instance located on port 8125.
 
-Params :
-* ``metric_type`` : one of ``increment``, ``decrement``, ``counter``, ``timer``. Type of value to send to statsd.
-* ``metric_key`` : key to send to statsd.
-* ``metric_value`` : metric value to send to statsd. Mandatory for ``timer`` and ``counter`` type
-* ``type`` : if specified, this output will only apply to lines with this type.
+Params:
 
-``metric_key`` and ``metric_value`` can reference log line properties :
+* ``metric_type``: one of ``increment``, ``decrement``, ``counter``, ``timer``. Type of value to send to statsd.
+* ``metric_key``: key to send to statsd.
+* ``metric_value``: metric value to send to statsd. Mandatory for ``timer`` and ``counter`` type
+
+``metric_key`` and ``metric_value`` can reference log line properties:
+
 * ``#{@message}`` will contain the full log line
 * ``#{@type}`` will contain the type of log line
 * ``#{toto}`` will contain the field ``toto``, which have to be extracted with a regex filter
 
-Example : ``metric_key`` : ``nginx.response.#{status}``
+Example: ``metric_key=nginx.response.#{status}``
 
 Filters
 ===
@@ -153,16 +163,27 @@ Regex
 
 The regex filter is used to extract data from lines of logs. The lines of logs are not modified by this filter.
 
-Example : ``filter://regex://?regex=^(\S)+ &fields=toto``, to extract the first word of a line of logs, and place it into the ``toto`` field.
-Example 2 : ``filter://regex://nginx_combined?type=nginx``, to extract fields following configuration into the nginx_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
+Example: ``filter://regex://?regex=^(\S)+ &fields=toto``, to extract the first word of a line of logs, and place it into the ``toto`` field.
+Example 2: ``filter://regex://nginx_combined?only_type=nginx``, to extract fields following configuration into the nginx_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
 
-Params :
+Params:
 
-* regex : the regex to apply
-* fields : the name of fields which wil receive the pattern extracted (see below for the special field timestamp)
-* type : if this field is set, only the lines of logs with the same type will be processed by this filter.
-* date_format : if date_format is specified and a ``timestamp`` field is extracted, the plugin will process the data extracted with the date_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
+* regex: the regex to apply
+* fields: the name of fields which wil receive the pattern extracted (see below for the special field timestamp)
+* type: if this field is set, only the lines of logs with the same type will be processed by this filter.
+* date\_format: if date_format is specified and a ``timestamp`` field is extracted, the plugin will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
 
+Mutate replace
+---
+
+The mutate replace filter is used to run regex on specified field.
+
+Example: ``filter://mutate_replace?toto&from=\\.&to=-`` replace all ``.`` in ``toto`` field by ``-``
+
+Params:
+
+* from: the regex to find pattern which will be replaced. You have to escape special characters.
+* to: the replacement string
 
 License
 ===
