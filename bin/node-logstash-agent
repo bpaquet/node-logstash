@@ -115,5 +115,4 @@ function after_config_directory(config) {
 
 load_config_file(['filter://add_source_host://', 'filter://add_timestamp://'].concat(argv._));
 
-// start an file monitoring to avoid process exit if no configuration is found
-monitor_file.monitor(package_json_file, function() {}, function() {}, {}).start();
+setInterval(function() {}, 3600 * 1000);
