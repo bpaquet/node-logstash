@@ -45,9 +45,7 @@ function file2x2x2file(config1, config2, clean_callback) {
             setTimeout(function() {
               a1.close(function() {
                 a2.close(function() {
-                  setTimeout(function() {
-                    callback(null);
-                  }, 200);
+                  callback(null);
                 });
               });
             }, 200);
@@ -142,9 +140,7 @@ vows.describe('Integration :').addBatch({
             fs.appendFileSync('input1.txt', 'line3\n');
             setTimeout(function() {
               agent.close(function() {
-                setTimeout(function() {
-                  callback(null);
-                }, 200);
+                callback(null);
               });
             }, 200);
           }, 200);
@@ -192,9 +188,7 @@ vows.describe('Integration :').addBatch({
             if (reqs.length == 2) {
               es_server.close(function() {
                 agent.close(function() {
-                  setTimeout(function() {
-                      callback(null, reqs);
-                  }, 200);
+                  callback(null, reqs);
                 });
               });
             }
@@ -241,9 +235,7 @@ vows.describe('Integration :').addBatch({
         c.on('end', function() {
           setTimeout(function() {
             agent.close(function() {
-              setTimeout(function() {
-                callback(null);
-              }, 100);
+              callback(null);
             });
           }, 100);
         });

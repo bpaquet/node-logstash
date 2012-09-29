@@ -44,9 +44,7 @@ function create_test(start_callback, check_callback, path, options) {
       var callback = this.callback;
       start_callback(m, function(err) {
         m.monitor.close(function() {
-          setTimeout(function() {
-            callback(err, m);
-          }, 50);
+          callback(err, m);
         });
       });
     },
@@ -281,9 +279,7 @@ vows.describe('Monitor ').addBatch({
           setTimeout(function() {
             m1.monitor.close(function() {
               m2.monitor.close(function() {
-                setTimeout(function() {
-                  callback(undefined, m1, m2);
-                }, 50);
+                callback(undefined, m1, m2);
               });
             });
           }, 200);
