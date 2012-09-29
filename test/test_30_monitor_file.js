@@ -8,8 +8,12 @@ var vows = require('vows'),
 
 // log.setLogLevel('debug');
 
-function TestMonitor(pathname, options) {
-  this.file = path.join(pathname || os.tmpDir(), '___node-logstash_test___' + Math.random());
+function randomFile(pathname) {
+  return path.join(pathname || os.tmpDir(), '___node-logstash_test___' + Math.random());
+}
+
+function TestMonitor(file, options) {
+  this.file = file;
   this.lines = [];
   this.errors = [];
   this.init_errors = [];
@@ -40,7 +44,7 @@ function TestMonitor(pathname, options) {
 function create_test(start_callback, check_callback, path, options) {
   return {
     topic: function() {
-      var m = new TestMonitor(path, options);
+      var m = new TestMonitor(randomFile(path), options);
       var callback = this.callback;
       start_callback(m, function(err) {
         m.monitor.close(function() {
@@ -242,7 +246,7 @@ vows.describe('Monitor ').addBatch({
     }
   ),
 }).addBatch({
-  'File filled while monitoring': create_test(function(m, callback) {
+  'Fd filled while monitoring': create_test(function(m, callback) {
     m.test_fd = fs.openSync(m.file, 'a');
     var buffer = new Buffer('line1\nline2\n');
     m.monitor.start(0);
@@ -264,11 +268,11 @@ vows.describe('Monitor ').addBatch({
     }
   ),
 }).addBatch({
-  'double monitoring same directory': {
+  'Double monitoring same directory': {
     topic: function() {
       var callback = this.callback;
-      var m1 = new TestMonitor();
-      var m2 = new TestMonitor();
+      var m1 = new TestMonitor(randomFile());
+      var m2 = new TestMonitor(randomFile());
       m1.monitor.start();
       m2.monitor.start();
       fs.appendFileSync(m1.file, 'line1\n');
@@ -354,5 +358,116 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m.closed_counter, 2);
     },
   undefined, {wait_delay_after_renaming: 500}),
+}).addBatch({
+  'Monitor restart': {
+    topic: function() {
+      var callback = this.callback;
+      var m1 = new TestMonitor(randomFile());
+      m1.monitor.start();
+      setTimeout(function() {
+        fs.appendFileSync(m1.file, 'line1\nline2\n');
+        setTimeout(function() {
+          m1.monitor.close(function() {
+            var m2 = new TestMonitor(m1.file);
+            m2.monitor.start();
+            setTimeout(function() {
+              fs.appendFileSync(m1.file, 'line3\nline4\n');
+              setTimeout(function() {
+                m2.monitor.close(function() {
+                  callback(undefined, m1, m2);
+                });
+              });
+            }, 200);
+          });
+        }, 200);
+      }, 200);
+    },
+
+    check: function(err, m1, m2) {
+      assert.ifError(err);
+      fs.unlinkSync(m1.file);
+      no_error(m1);
+      no_error(m2);
+      assert.deepEqual(m1.lines, ['line1', 'line2']);
+      assert.equal(m1.changed_counter, 1);
+      assert.deepEqual(m2.lines, ['line3', 'line4']);
+      assert.equal(m2.changed_counter, 1);
+    }
+  }
+}).addBatch({
+  'Monitor restart with write while restart': {
+    topic: function() {
+      var callback = this.callback;
+      var m1 = new TestMonitor(randomFile());
+      m1.monitor.start();
+      setTimeout(function() {
+        fs.appendFileSync(m1.file, 'line1\nline2\n');
+        setTimeout(function() {
+          m1.monitor.close(function() {
+            fs.appendFileSync(m1.file, 'line3\nline4\n');
+            var m2 = new TestMonitor(m1.file);
+            m2.monitor.start();
+            setTimeout(function() {
+              fs.appendFileSync(m1.file, 'line5\nline6\n');
+              setTimeout(function() {
+                m2.monitor.close(function() {
+                  callback(undefined, m1, m2);
+                });
+              });
+            }, 200);
+          });
+        }, 200);
+      }, 200);
+    },
+
+    check: function(err, m1, m2) {
+      assert.ifError(err);
+      fs.unlinkSync(m1.file);
+      no_error(m1);
+      no_error(m2);
+      assert.deepEqual(m1.lines, ['line1', 'line2']);
+      assert.equal(m1.changed_counter, 1);
+      assert.deepEqual(m2.lines, ['line3', 'line4', 'line5', 'line6']);
+      assert.equal(m2.changed_counter, 1);
+    }
+  }
+}).addBatch({
+  'Monitor restart with write while restart, inode change': {
+    topic: function() {
+      var callback = this.callback;
+      var m1 = new TestMonitor(randomFile());
+      m1.monitor.start();
+      setTimeout(function() {
+        fs.appendFileSync(m1.file, 'line1\nline2\n');
+        setTimeout(function() {
+          m1.monitor.close(function() {
+            fs.unlinkSync(m1.file);
+            fs.appendFileSync(m1.file, 'line3\nline4\n');
+            var m2 = new TestMonitor(m1.file);
+            m2.monitor.start();
+            setTimeout(function() {
+              fs.appendFileSync(m1.file, 'line5\nline6\n');
+              setTimeout(function() {
+                m2.monitor.close(function() {
+                  callback(undefined, m1, m2);
+                });
+              });
+            }, 200);
+          });
+        }, 1000);
+      }, 200);
+    },
+
+    check: function(err, m1, m2) {
+      assert.ifError(err);
+      fs.unlinkSync(m1.file);
+      no_error(m1);
+      no_error(m2);
+      assert.deepEqual(m1.lines, ['line1', 'line2']);
+      assert.equal(m1.changed_counter, 1);
+      assert.deepEqual(m2.lines, ['line3', 'line4', 'line5', 'line6']);
+      assert.equal(m2.changed_counter, 1);
+    }
+  }
 }).export(module);
 // Do not remove empty line, this file is used during test

@@ -74,7 +74,9 @@ The urls can be specified:
 Others params:
 
 * ``--log_level`` to change the log level (emergency, alert, critical, error, warning, notice, info, debug)
+* ``--log_file`` to redirect log to a log file
 * ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin
+* ``--db_file`` to specify the file to use as database for file inputs (see below)
 
 Examples
 ---
@@ -96,7 +98,7 @@ Inputs plugins
 File
 ---
 
-This plugin monitor log files. It's compatible with logrotate.
+This plugin monitor log files. It's compatible with logrotate. If a db file is specified, this plugin store where the last line were read when node-logstash stop. This value is used when node-logstash restart to read lines written node-logstash downtime.
 
 Example: ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
 

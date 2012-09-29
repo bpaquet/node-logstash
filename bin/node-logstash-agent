@@ -67,6 +67,10 @@ if (argv.patterns_directories) {
   });
 }
 
+function main_start() {
+  load_config_file(['filter://add_source_host://', 'filter://add_timestamp://'].concat(argv._));
+}
+
 function load_config_file(config) {
   if (argv.config_file) {
     logger.info('Loading config file : ' + argv.config_file);
@@ -113,17 +117,58 @@ function after_config_directory(config) {
   });
 }
 
-load_config_file(['filter://add_source_host://', 'filter://add_timestamp://'].concat(argv._));
-
 setInterval(function() {}, 3600 * 1000);
+
+function close() {
+  a.close(function() {
+    logger.info('Quitting.');
+    if (argv.db_file) {
+      fs.writeFile(argv.db_file, JSON.stringify(monitor_file.getFileStatus()), function(err) {
+        if (err) {
+          logger.error('Error while writing', argv.db_file, ':', err);
+        }
+        setTimeout(function() {
+          process.exit(1);
+        }, 50);
+      });
+    }
+    else {
+      setTimeout(function() {
+        process.exit(1);
+      }, 50);
+    }
+  });
+}
 
 process.on('SIGTERM', function() {
   logger.info('SIGTERM received.');
-  a.close(function() {
-    logger.info('Quitting.');
-    setTimeout(function() {
-      process.exit(1);
-    }, 50);
-  });
-  return false;
+  close();
 });
+
+process.on('SIGINT', function() {
+  logger.info('SIGINT received.');
+  close();
+});
+
+if (argv.db_file) {
+  fs.exists(argv.db_file, function(exists) {
+    if (!exists) {
+      logger.info('Db file not found', argv.db_file);
+      main_start();
+    }
+    else {
+      fs.readFile(argv.db_file, function(err, data) {
+        if (err) {
+          logger.error('Error while reading', argv.db_file, ':', err);
+        }
+        else {
+          monitor_file.setFileStatus(JSON.parse(data));
+        }
+        main_start();
+      });
+    }
+  });
+}
+else {
+  main_start();
+}

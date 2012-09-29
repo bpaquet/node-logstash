@@ -5,7 +5,8 @@ var vows = require('vows'),
     net = require('net'),
     http = require('http'),
     dgram = require('dgram'),
-    os = require('os');
+    os = require('os'),
+    monitor_file = require('../lib/lib/monitor_file');
 
 function checkResult(line, target) {
   var parsed = JSON.parse(line);
@@ -36,8 +37,8 @@ function createAgent(urls, callback, error_callback) {
 function file2x2x2file(config1, config2, clean_callback) {
   return {
     topic: function() {
+      monitor_file.setFileStatus({});
       var callback = this.callback;
-
       createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
         createAgent(config2.concat(['output://file://main_output.txt']), function(a2) {
           setTimeout(function() {
@@ -126,6 +127,7 @@ function check_error_module(urls, type, expected_message_pattern, expected_modul
 vows.describe('Integration :').addBatch({
   'file2file': {
     topic: function() {
+      monitor_file.setFileStatus({});
       var callback = this.callback;
       createAgent([
         'input://file://input1.txt',
@@ -256,6 +258,7 @@ vows.describe('Integration :').addBatch({
 }).addBatch({
   'file2statsd': {
     topic: function() {
+      monitor_file.setFileStatus({});
       var callback = this.callback;
       var received = [];
       var statsd = dgram.createSocket('udp4');
@@ -312,6 +315,7 @@ vows.describe('Integration :').addBatch({
  }).addBatch({
   'file2statsd_missing_field': {
     topic: function() {
+      monitor_file.setFileStatus({});
       var callback = this.callback;
       var received = [];
       var errors = [];
