@@ -6,6 +6,8 @@ function create(filter_name, filter_config, inputs, outputs) {
   });
 }
 
+exports.create = create;
+
 function createWithCallback(filter_name, filter_config, inputs, number_of_events, check_callback) {
   return {
     topic: function() {
@@ -39,7 +41,4 @@ function createWithCallback(filter_name, filter_config, inputs, number_of_events
   }
 }
 
-module.exports = {
-  create: create,
-  createWithCallback: createWithCallback,
-}
+exports.createWithCallback = createWithCallback;

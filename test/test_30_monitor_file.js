@@ -43,10 +43,11 @@ function create_test(start_callback, check_callback, path, options) {
       var m = new TestMonitor(path, options);
       var callback = this.callback;
       start_callback(m, function(err) {
-        m.monitor.close();
-        setTimeout(function() {
-          callback(err, m);
-        }, 50);
+        m.monitor.close(function() {
+          setTimeout(function() {
+            callback(err, m);
+          }, 50);
+        });
       });
     },
 
@@ -278,11 +279,13 @@ vows.describe('Monitor ').addBatch({
         setTimeout(function() {
           fs.appendFileSync(m1.file, 'line2\n');
           setTimeout(function() {
-            m1.monitor.close();
-            m2.monitor.close();
-            setTimeout(function() {
-              callback(undefined, m1, m2);
-            }, 50);
+            m1.monitor.close(function() {
+              m2.monitor.close(function() {
+                setTimeout(function() {
+                  callback(undefined, m1, m2);
+                }, 50);
+              });
+            });
           }, 200);
         }, 200);
       }, 200);

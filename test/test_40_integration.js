@@ -43,11 +43,13 @@ function file2x2x2file(config1, config2, clean_callback) {
           setTimeout(function() {
             fs.appendFileSync('main_input.txt', '234 tgerhe grgh\n');
             setTimeout(function() {
-              a1.close(),
-              a2.close(),
-              setTimeout(function() {
-                callback(null);
-              }, 200);
+              a1.close(function() {
+                a2.close(function() {
+                  setTimeout(function() {
+                    callback(null);
+                  }, 200);
+                });
+              });
             }, 200);
           }, 200);
         });
@@ -139,10 +141,11 @@ vows.describe('Integration :').addBatch({
           setTimeout(function() {
             fs.appendFileSync('input1.txt', 'line3\n');
             setTimeout(function() {
-              agent.close();
-              setTimeout(function() {
-                callback(null);
-              }, 200);
+              agent.close(function() {
+                setTimeout(function() {
+                  callback(null);
+                }, 200);
+              });
             }, 200);
           }, 200);
         }, 200);
@@ -187,11 +190,13 @@ vows.describe('Integration :').addBatch({
             res.writeHead(201);
             res.end();
             if (reqs.length == 2) {
-              es_server.close();
-              agent.close();
-              setTimeout(function() {
-                  callback(null, reqs);
-              }, 200);
+              es_server.close(function() {
+                agent.close(function() {
+                  setTimeout(function() {
+                      callback(null, reqs);
+                  }, 200);
+                });
+              });
             }
           })
         }).listen(17876);
@@ -235,10 +240,11 @@ vows.describe('Integration :').addBatch({
         });
         c.on('end', function() {
           setTimeout(function() {
-            agent.close();
-            setTimeout(function() {
-              callback(null);
-            }, 100);
+            agent.close(function() {
+              setTimeout(function() {
+                callback(null);
+              }, 100);
+            });
           }, 100);
         });
       });
