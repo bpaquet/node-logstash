@@ -177,6 +177,23 @@ vows.describe('Monitor ').addBatch({
     }
   ),
 }).addBatch({
+  'File rewritten from start': create_test(
+    function(m, callback) {
+      m.monitor.start();
+      setTimeout(function() {
+        fs.appendFileSync(m.file, 'line1\n');
+        setTimeout(function() {
+          fs.writeFileSync(m.file, 'line2\n');
+          setTimeout(callback, 200);
+        }, 1500);
+      }, 200);
+    }, function(m) {
+      fs.unlinkSync(m.file);
+      no_error(m);
+      assert.deepEqual(m.lines, ['line1', 'line2']);
+    }
+  ),
+}).addBatch({
   'File created after start, filled with append async': create_test(
     function(m, callback) {
       m.monitor.start();
@@ -454,7 +471,7 @@ vows.describe('Monitor ').addBatch({
               });
             }, 200);
           });
-        }, 1000);
+        }, 1500);
       }, 200);
     },
 
