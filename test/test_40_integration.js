@@ -286,7 +286,9 @@ vows.describe('Integration :').addBatch({
               setTimeout(function() {
                 fs.appendFileSync('input4.txt', '45_123\n');
                 setTimeout(function() {
-                  callback(undefined, received);
+                  agent.close(function() {
+                    callback(undefined, received);
+                  });
                 }, 200);
               }, 200);
             }, 200);
@@ -331,7 +333,9 @@ vows.describe('Integration :').addBatch({
         setTimeout(function() {
           fs.appendFileSync('input1.txt', 'line1\n');
           setTimeout(function() {
-            callback(errors, received);
+            agent.close(function() {
+              callback(errors, received);
+            });
           }, 200);
         }, 200);
       }, function(error) {
