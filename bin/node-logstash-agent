@@ -77,7 +77,10 @@ function load_config_file(config) {
     file_loader.loadFile(argv.config_file, function(err, result) {
       if (err) {
         logger.error('Unable to load config file : ' + err.toString());
-        process.exit(1);
+        setTimeout(function() {
+          process.exit(1);
+        });
+        return;
       }
       logger.info('File loaded, ' + result.length + ' urls found');
       after_config_file(config.concat(result));
@@ -94,7 +97,10 @@ function after_config_file(config) {
     file_loader.loadDirectory(argv.config_dir, function(err, result) {
       if (err) {
         logger.error('Unable to load config from directory : ' + err.toString());
-        process.exit(1);
+        setTimeout(function() {
+          process.exit(1);
+        }, 50);
+        return;
       }
       logger.info('Files loaded from directory, ' + result.length + ' urls found');
       after_config_directory(config.concat(result));
@@ -111,7 +117,10 @@ function after_config_directory(config) {
   a.loadUrls(config, function(err) {
     if (err) {
       logger.error('Unable to load urls : ' + err);
-      process.exit(2);
+      setTimeout(function() {
+        process.exit(2);
+      }, 50);
+      return;
     }
     logger.info('Config loaded.');
   });
