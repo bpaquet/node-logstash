@@ -243,8 +243,8 @@ vows.describe('Monitor ').addBatch({
     }, function check(m) {
       no_error(m);
       assert.deepEqual(m.lines, ['line1', 'line2', 'line3']);
-    }
-  ),
+    },
+  undefined, {wait_delay_after_renaming: 100}),
 }).addBatch({
   'Incomplete line': create_test(function(m, callback) {
     fs.writeFileSync(m.file, 'line1\nline2\nline3');
@@ -421,17 +421,19 @@ vows.describe('Monitor ').addBatch({
         fs.appendFileSync(m1.file, 'line1\nline2\n');
         setTimeout(function() {
           m1.monitor.close(function() {
-            fs.appendFileSync(m1.file, 'line3\nline4\n');
-            var m2 = new TestMonitor(m1.file);
-            m2.monitor.start();
             setTimeout(function() {
-              fs.appendFileSync(m1.file, 'line5\nline6\n');
+              fs.appendFileSync(m1.file, 'line3\nline4\n');
+              var m2 = new TestMonitor(m1.file);
+              m2.monitor.start();
               setTimeout(function() {
-                m2.monitor.close(function() {
-                  callback(undefined, m1, m2);
+                fs.appendFileSync(m1.file, 'line5\nline6\n');
+                setTimeout(function() {
+                  m2.monitor.close(function() {
+                    callback(undefined, m1, m2);
+                  });
                 });
-              });
-            }, 200);
+              }, 200);
+            }, 500);
           });
         }, 200);
       }, 200);
@@ -449,7 +451,7 @@ vows.describe('Monitor ').addBatch({
     }
   }
 }).addBatch({
-  'Monitor restart with write while restart, inode change': {
+  'Monitor restart with write while restart, in a new file, too short': {
     topic: function() {
       var callback = this.callback;
       var m1 = new TestMonitor(randomFile());
@@ -458,20 +460,22 @@ vows.describe('Monitor ').addBatch({
         fs.appendFileSync(m1.file, 'line1\nline2\n');
         setTimeout(function() {
           m1.monitor.close(function() {
-            fs.unlinkSync(m1.file);
-            fs.appendFileSync(m1.file, 'line3\nline4\n');
-            var m2 = new TestMonitor(m1.file);
-            m2.monitor.start();
             setTimeout(function() {
-              fs.appendFileSync(m1.file, 'line5\nline6\n');
+              fs.unlinkSync(m1.file);
+              fs.appendFileSync(m1.file, 'line3\n');
+              var m2 = new TestMonitor(m1.file);
+              m2.monitor.start();
               setTimeout(function() {
-                m2.monitor.close(function() {
-                  callback(undefined, m1, m2);
+                fs.appendFileSync(m1.file, 'line4\nline5\n');
+                setTimeout(function() {
+                  m2.monitor.close(function() {
+                    callback(undefined, m1, m2);
+                  });
                 });
-              });
-            }, 200);
+              }, 200);
+            }, 500);
           });
-        }, 1500);
+        }, 200);
       }, 200);
     },
 
@@ -482,7 +486,47 @@ vows.describe('Monitor ').addBatch({
       no_error(m2);
       assert.deepEqual(m1.lines, ['line1', 'line2']);
       assert.equal(m1.changed_counter, 1);
-      assert.deepEqual(m2.lines, ['line3', 'line4', 'line5', 'line6']);
+      assert.deepEqual(m2.lines, ['line4', 'line5']);
+      assert.equal(m2.changed_counter, 1);
+    }
+  }
+}).addBatch({
+  'Monitor restart with write while restart, in a new file, content not correct': {
+    topic: function() {
+      var callback = this.callback;
+      var m1 = new TestMonitor(randomFile());
+      m1.monitor.start();
+      setTimeout(function() {
+        fs.appendFileSync(m1.file, 'line1\nline2\n');
+        setTimeout(function() {
+          m1.monitor.close(function() {
+            setTimeout(function() {
+              fs.unlinkSync(m1.file);
+              fs.appendFileSync(m1.file, 'line3\nline4\nline5\n');
+              var m2 = new TestMonitor(m1.file);
+              m2.monitor.start();
+              setTimeout(function() {
+                fs.appendFileSync(m1.file, 'line6\nline7\n');
+                setTimeout(function() {
+                  m2.monitor.close(function() {
+                    callback(undefined, m1, m2);
+                  });
+                });
+              }, 200);
+            }, 500);
+          });
+        }, 200);
+      }, 200);
+    },
+
+    check: function(err, m1, m2) {
+      assert.ifError(err);
+      fs.unlinkSync(m1.file);
+      no_error(m1);
+      no_error(m2);
+      assert.deepEqual(m1.lines, ['line1', 'line2']);
+      assert.equal(m1.changed_counter, 1);
+      assert.deepEqual(m2.lines, ['line6', 'line7']);
       assert.equal(m2.changed_counter, 1);
     }
   }
