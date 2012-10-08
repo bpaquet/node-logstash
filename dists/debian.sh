@@ -33,6 +33,7 @@ cp -r debian $PKG
 cd $PKG
 
 sed -ie "s/##VERSION##/$VERSION/g" DEBIAN/control
+sed -ie "s/##GIT_SHA1##/$SHA1/g" DEBIAN/control
 
 cd opt/logstash
 git clone git@github.com:bpaquet/node-logstash.git current
