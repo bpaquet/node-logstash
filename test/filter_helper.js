@@ -1,8 +1,11 @@
 var assert = require('assert');
 
-function create(filter_name, filter_config, inputs, outputs) {
+function create(filter_name, filter_config, inputs, outputs, check_callback) {
   return createWithCallback(filter_name, filter_config, inputs, outputs.length, function(r) {
     assert.deepEqual(r, outputs);
+    if (check_callback) {
+      check_callback(r);
+    }
   });
 }
 
