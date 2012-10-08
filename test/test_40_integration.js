@@ -380,4 +380,6 @@ vows.describe('Integration :').addBatch({
   'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:5567'], ['input://zeromq://tcp://*:5567']),
 }).addBatch({
   'unix socket transport': file2x2x2file(['output://unix:///tmp/test_socket'], ['input://unix:///tmp/test_socket']),
+}).addBatch({
+  'udp transport': file2x2x2file(['output://udp://localhost:17880'], ['input://udp://127.0.0.1:17880']),
 }).export(module);

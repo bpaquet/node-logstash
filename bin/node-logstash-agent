@@ -33,10 +33,12 @@ process.on('uncaughtException', function (err) {
 });
 
 if (argv.log_file) {
-  logger.reconfigure(argv.log_level, argv.log_file);
+  logger.info('Log to file', argv.log_file, ', log_level', argv.log_level);
+  logger.reconfigure({log_level: argv.log_level, file: argv.log_file});
 }
 else {
   if (argv.log_level) {
+    logger.info('Changing log_level', argv.log_level);
     logger.setLogLevel(argv.log_level);
   }
 }

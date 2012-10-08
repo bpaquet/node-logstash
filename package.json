@@ -17,13 +17,14 @@
     }
   ],
   "devDependencies": {
-    "vows": "0.6.x"
+    "vows": "0.6.x",
+    "whereis": "0.0.2"
   },
   "scripts": {
     "test": "./test-runner.sh"
   },
   "dependencies": {
-    "log4node": "0.0.5",
+    "log4node": "0.1.0",
     "zmq": "2.1.0",
     "optimist": "0.3.4",
     "moment": "1.7.0"
