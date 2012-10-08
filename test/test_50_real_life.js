@@ -128,6 +128,7 @@ vows.describe('Real life :').addBatch({
       assert.ifError(err);
       fs.unlinkSync('output.txt');
       fs.unlinkSync('output.txt.1');
+      fs.unlinkSync('output.txt.2');
       fs.unlinkSync('process.pid');
       assert.equal(0, exitCode);
       assert.equal(500, datas.length);
