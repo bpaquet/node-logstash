@@ -328,10 +328,12 @@ vows.describe('Integration :').addBatch({
       statsd.bind(17878);
       createAgent([
         'input://file://input1.txt',
+        'filter://regex://?regex=(line2)&fields=unknown_field',
         'output://statsd://127.0.0.1:17878?metric_type=increment&metric_key=toto.bouh.#{unknown_field}',
         ], function(agent) {
         setTimeout(function() {
           fs.appendFileSync('input1.txt', 'line1\n');
+          fs.appendFileSync('input1.txt', 'line2\n');
           setTimeout(function() {
             agent.close(function() {
               callback(errors, received);
@@ -345,9 +347,8 @@ vows.describe('Integration :').addBatch({
 
     check: function(errors, data) {
       fs.unlinkSync('input1.txt');
-      assert.deepEqual(data.sort(), ['toto.bouh.:1|c'].sort());
-      assert.equal(errors.length, 1);
-      assert.ok(errors[0].toString().match(/unknown_field/));
+      assert.deepEqual(data.sort(), ['toto.bouh.line2:1|c'].sort());
+      assert.equal(errors.length, 0);
     }
  },
 }).addBatch({
