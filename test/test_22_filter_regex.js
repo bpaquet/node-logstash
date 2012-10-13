@@ -105,8 +105,9 @@ vows.describe('Filter regex ').addBatch({
     assert.equal(typeof(r[0]['@fields'].bytes_sent), 'number');
     assert.equal(typeof(r[0]['@fields'].referer), 'string');
   }),
-  'nginx parsing with predefined type': filter_helper.create('regex', 'nginx_combined', [
+  'http combined with predefined type': filter_helper.create('regex', 'http_combined', [
     {'@message': '127.0.0.1 - - [31/Jul/2012:18:02:28 +0200] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2"'},
+    {'@message': '88.178.233.127 - cdv [12/Oct/2012:14:23:28 +0000] "GET /public/utils/ejam.jar HTTP/1.1" 304 172 "-" "Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07"'}
   ],[
     {
       '@message': '127.0.0.1 - - [31/Jul/2012:18:02:28 +0200] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2"',
@@ -117,24 +118,40 @@ vows.describe('Filter regex ').addBatch({
         bytes_sent: 574,
         user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2',
         referer: '-',
+        user: '-',
       },
       '@timestamp': '2012-07-31T16:02:28+00:00'
     },
+    {
+      '@message': '88.178.233.127 - cdv [12/Oct/2012:14:23:28 +0000] "GET /public/utils/ejam.jar HTTP/1.1" 304 172 "-" "Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07"',
+      '@fields': {
+        user: 'cdv',
+        bytes_sent: 172,
+        ip: '88.178.233.127',
+        status: 304,
+        referer: '-',
+        user_agent: 'Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07',
+        request: 'GET /public/utils/ejam.jar HTTP/1.1'
+      },
+      '@timestamp': '2012-10-12T14:23:28+00:00'
+    }
   ]),
-  'nginx parsing with predefined type (2)': filter_helper.create('regex', 'nginx_combined', [
-    {'@message': '127.0.0.1 - - [31/Jul/2012:18:02:28 +0200] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2"'},
+  'http vhost combined with predefined type': filter_helper.create('regex', 'http_vhost_combined', [
+    {'@message': 'ip-10-62-95-254.eu-west-1.compute.internal:80 88.178.233.127 - cdv [12/Oct/2012:14:23:28 +0000] "GET /public/utils/ejam.jar HTTP/1.1" 304 172 "-" "Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07"'}
   ],[
     {
-      '@message': '127.0.0.1 - - [31/Jul/2012:18:02:28 +0200] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2"',
+      '@message': 'ip-10-62-95-254.eu-west-1.compute.internal:80 88.178.233.127 - cdv [12/Oct/2012:14:23:28 +0000] "GET /public/utils/ejam.jar HTTP/1.1" 304 172 "-" "Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07"',
       '@fields': {
-        ip: '127.0.0.1',
-        request: 'GET /favicon.ico HTTP/1.1',
-        status: 502,
-        bytes_sent: 574,
-        user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2',
+        user: 'cdv',
+        bytes_sent: 172,
+        ip: '88.178.233.127',
+        status: 304,
         referer: '-',
+        user_agent: 'Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07',
+        request: 'GET /public/utils/ejam.jar HTTP/1.1',
+        vhost: 'ip-10-62-95-254.eu-west-1.compute.internal:80',
       },
-      '@timestamp': '2012-07-31T16:02:28+00:00'
-    },
+      '@timestamp': '2012-10-12T14:23:28+00:00'
+    }
   ]),
 }).export(module);

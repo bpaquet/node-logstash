@@ -89,7 +89,7 @@ Config file for an agent:
 Config file for log server:
 
     input://zeromq://tcp://0.0.0.0:5555
-    filter://regex://?load_config=nginx_combined
+    filter://regex://?load_config=http_combined
     output://elasticsearch://localhost:9001
 
 Inputs plugins
@@ -166,7 +166,7 @@ Regex
 The regex filter is used to extract data from lines of logs. The lines of logs are not modified by this filter.
 
 Example: ``filter://regex://?regex=^(\S)+ &fields=toto``, to extract the first word of a line of logs, and place it into the ``toto`` field.
-Example 2: ``filter://regex://nginx_combined?only_type=nginx``, to extract fields following configuration into the nginx_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
+Example 2: ``filter://regex://http_combined?only_type=nginx``, to extract fields following configuration into the http_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
 
 Params:
 
