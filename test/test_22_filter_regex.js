@@ -137,7 +137,8 @@ vows.describe('Filter regex ').addBatch({
     }
   ]),
   'http vhost combined with predefined type': filter_helper.create('regex', 'http_vhost_combined', [
-    {'@message': 'ip-10-62-95-254.eu-west-1.compute.internal:80 88.178.233.127 - cdv [12/Oct/2012:14:23:28 +0000] "GET /public/utils/ejam.jar HTTP/1.1" 304 172 "-" "Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07"'}
+    {'@message': 'ip-10-62-95-254.eu-west-1.compute.internal:80 88.178.233.127 - cdv [12/Oct/2012:14:23:28 +0000] "GET /public/utils/ejam.jar HTTP/1.1" 304 172 "-" "Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07"'},
+    {'@message': 'www.skillstar.com:80 86.221.21.138 - - [13/Oct/2012:09:04:42 +0200] "GET /favicon.ico HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20100101 Firefox/15.0.1"'},
   ],[
     {
       '@message': 'ip-10-62-95-254.eu-west-1.compute.internal:80 88.178.233.127 - cdv [12/Oct/2012:14:23:28 +0000] "GET /public/utils/ejam.jar HTTP/1.1" 304 172 "-" "Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07"',
@@ -152,6 +153,20 @@ vows.describe('Filter regex ').addBatch({
         vhost: 'ip-10-62-95-254.eu-west-1.compute.internal:80',
       },
       '@timestamp': '2012-10-12T14:23:28+00:00'
+    },
+    {
+      '@message': 'www.skillstar.com:80 86.221.21.138 - - [13/Oct/2012:09:04:42 +0200] "GET /favicon.ico HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20100101 Firefox/15.0.1"',
+      '@fields': {
+        user: '-',
+        bytes_sent: 0,
+        ip: '86.221.21.138',
+        status: 304,
+        referer: '-',
+        vhost: 'www.skillstar.com:80',
+        user_agent: 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20100101 Firefox/15.0.1',
+        request: 'GET /favicon.ico HTTP/1.1'
+      },
+      '@timestamp': '2012-10-13T07:04:42+00:00'
     }
   ]),
 }).export(module);
