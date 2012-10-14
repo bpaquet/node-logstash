@@ -118,6 +118,8 @@ Outputs and filter, commons parameters
 ===
 
 * ``only_type``: execute the filter / output plugin only on lines with specified type. Example: ``only_type=nginx``
+* ``only_field_exist_toto``: execute the filter / output plugin only on lines with a field ``toto``. You can specify it multiple times, all fields have to exist.
+* ``only_field_equal_toto=aaa``: execute the filter / output plugin only on lines with a field ``toto``, with value ``aaa``. You can specify it multiple times, all fields have to exist and have the specified value.
 
 Ouputs plugins
 ===
@@ -132,9 +134,18 @@ Example: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1
 Elastic search
 ---
 
-This plugin is used on log server to send logs to elastic search.
+This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
 
 Example: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
+
+Elastic search ZeroMQ
+---
+
+This plugin is used on log server to send logs to elastic search, using ZeroMQ transport.
+You can find the ZeroMQ transport here: https://github.com/bpaquet/transport-zeromq.
+
+Example: ``output://elasticsearch_zeromq://tcp://localhost:9700`` to send to the zeromq transport of an elastic search server listening on port 9700.
+
 
 Statsd
 ---
