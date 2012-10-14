@@ -271,11 +271,13 @@ vows.describe('Integration :').addBatch({
         'input://file://input2.txt?type=titi',
         'input://file://input3.txt?type=tata',
         'input://file://input4.txt?type=tete',
+        'input://file://input5.txt?type=toto',
         'filter://regex://?regex=^45_(.*)$&fields=my_field',
         'output://statsd://127.0.0.1:17877?metric_type=increment&metric_key=toto.bouh',
         'output://statsd://127.0.0.1:17877?metric_type=decrement&metric_key=toto.#{@message}&only_type=titi',
         'output://statsd://127.0.0.1:17877?metric_type=counter&metric_key=toto.counter&metric_value=#{@message}&only_type=tata',
         'output://statsd://127.0.0.1:17877?metric_type=timer&metric_key=toto.#{my_field}.#{my_field}&metric_value=20&only_type=tete',
+        'output://statsd://127.0.0.1:17877?metric_type=gauge&metric_key=toto.gauge&metric_value=45&only_type=toto',
         ], function(agent) {
         setTimeout(function() {
           fs.appendFileSync('input1.txt', 'line1\n');
@@ -286,9 +288,12 @@ vows.describe('Integration :').addBatch({
               setTimeout(function() {
                 fs.appendFileSync('input4.txt', '45_123\n');
                 setTimeout(function() {
-                  agent.close(function() {
-                    callback(undefined, received);
-                  });
+                  fs.appendFileSync('input5.txt', 'line3\n');
+                  setTimeout(function() {
+                    agent.close(function() {
+                      callback(undefined, received);
+                    });
+                  }, 200);
                 }, 200);
               }, 200);
             }, 200);
@@ -302,6 +307,7 @@ vows.describe('Integration :').addBatch({
       fs.unlinkSync('input2.txt');
       fs.unlinkSync('input3.txt');
       fs.unlinkSync('input4.txt');
+      fs.unlinkSync('input5.txt');
       assert.ifError(err);
       assert.deepEqual(data.sort(), [
         'toto.bouh:1|c',
@@ -310,7 +316,9 @@ vows.describe('Integration :').addBatch({
         'toto.counter:10|c',
         'toto.bouh:1|c',
         'toto.123.123:20|ms',
-        'toto.bouh:1|c'
+        'toto.bouh:1|c',
+        'toto.bouh:1|c',
+        'toto.gauge:45|g',
       ].sort());
     }
  },
