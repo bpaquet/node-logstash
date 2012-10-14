@@ -36,7 +36,7 @@ The architecture is identical to logstash architecture. You have to instanciates
 
 * [inputs plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
 * [filter plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/filters): extract fields from logs, like timestamps. Example: regex plugin
-* [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs): where datas leave from node-logstash: Example: elastic search , zeromq transport layer.
+* [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
 
 
 A typical node-logstash deployement contains agents to crawl logs and a log server.
@@ -165,7 +165,8 @@ Regex
 
 The regex filter is used to extract data from lines of logs. The lines of logs are not modified by this filter.
 
-Example: ``filter://regex://?regex=^(\S)+ &fields=toto``, to extract the first word of a line of logs, and place it into the ``toto`` field.
+Example 1: ``filter://regex://?regex=^(\S)+ &fields=toto``, to extract the first word of a line of logs, and place it into the ``toto`` field.
+
 Example 2: ``filter://regex://http_combined?only_type=nginx``, to extract fields following configuration into the http_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
 
 Params:
@@ -186,6 +187,35 @@ Params:
 
 * from: the regex to find pattern which will be replaced. You have to escape special characters.
 * to: the replacement string
+
+Grep
+---
+
+The grep filter can remove lines which match or do not match a given regex.
+
+Example 1: ``filter://grep://?regex=abc`` remove all lines which do not contain ``abc``. Equivalent to ``grep`
+
+Example 2: ``filter://grep://?regex=abc&invert=true`` remove all lines which contain ``abc``. Equivalent to ``grep -v``
+
+Example 3: ``filter://grep://?type=nginx&regex=abc`` remove all lines with type ``nginx`` which do not contain ``abc`` and
+
+Params:
+
+* regex: the regex to be matched
+* invert: if ``true``, remove lines which match. Default value: false
+
+Compute field
+---
+
+The compute field filter is used to add a new field to a line, with a fixed value, or with a value computed from other fields.
+
+Example 1: ``filter://compute_field?toto&value=abc`` add a field named ``toto`` with value ``abc``
+
+Example 2: ``filter://compute_field?toto&value=abc#{titi}`` add a field named ``toto`` with value ``abcef``, if line contain a field ``titi`` with value ``ef``
+
+Params:
+
+* value: the value to place in the given field
 
 License
 ===
