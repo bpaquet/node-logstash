@@ -64,11 +64,11 @@ vows.describe('Filter regex ').addBatch({
     {'@message': 'abcd efgh ijk', '@fields': {fa: 'abcd'}},
   ]),
   'date parsing': filter_helper.create('regex', '?regex=^(.*)$&fields=timestamp&date_format=DD/MMMM/YYYY:HH:mm:ss ZZ', [
-    {'@message': '31/Jul/2012:18:02:28 +0200}'},
+    {'@message': '31/Jul/2012:18:02:28 +0200'},
     {'@message': '31/Jul/2012'},
     {'@message': 'toto'},
   ], [
-    {'@message': '31/Jul/2012:18:02:28 +0200}', '@fields': {}, '@timestamp': '2012-07-31T16:02:28+00:00'},
+    {'@message': '31/Jul/2012:18:02:28 +0200', '@fields': {}, '@timestamp': '2012-07-31T16:02:28+00:00'},
     {'@message': '31/Jul/2012', '@fields': {}, '@timestamp': '2012-07-31T00:00:00+00:00'},
     {'@message': 'toto', '@fields': {}, '@timestamp': '0000-01-01T00:00:00+00:00'},
   ]),

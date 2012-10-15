@@ -6,6 +6,7 @@ var vows = require('vows'),
     http = require('http'),
     dgram = require('dgram'),
     os = require('os'),
+    zlib = require('zlib'),
     monitor_file = require('../lib/lib/monitor_file');
 
 function checkResult(line, target) {
@@ -291,6 +292,7 @@ vows.describe('Integration :').addBatch({
                   fs.appendFileSync('input5.txt', 'line3\n');
                   setTimeout(function() {
                     agent.close(function() {
+                      statsd.close();
                       callback(undefined, received);
                     });
                   }, 200);
@@ -344,6 +346,7 @@ vows.describe('Integration :').addBatch({
           fs.appendFileSync('input1.txt', 'line2\n');
           setTimeout(function() {
             agent.close(function() {
+              statsd.close();
               callback(errors, received);
             });
           }, 200);
@@ -357,6 +360,65 @@ vows.describe('Integration :').addBatch({
       fs.unlinkSync('input1.txt');
       assert.deepEqual(data.sort(), ['toto.bouh.line2:1|c'].sort());
       assert.equal(errors.length, 0);
+    }
+ },
+}).addBatch({
+  'filegelf': {
+    topic: function() {
+      monitor_file.setFileStatus({});
+      var callback = this.callback;
+      var received = [];
+      var gelf = dgram.createSocket('udp4');
+      gelf.on('message', function(d) {
+        zlib.inflate(d, function(err, data) {
+          assert.ifError(err);
+          data = JSON.parse(data);
+          received.push(data);
+        });
+      });
+      gelf.bind(17879);
+      createAgent([
+        'input://file://input1.txt?type=toto',
+        'input://file://input2.txt',
+        'filter://regex://?regex=^\\[(.*)\\]&fields=timestamp&date_format=DD/MMMM/YYYY:HH:mm:ss ZZ',
+        'output://gelf://localhost:17879'
+        ], function(agent) {
+        setTimeout(function() {
+          fs.appendFileSync('input1.txt', '[31/Jul/2012:18:02:28 +0200] line1\n');
+          setTimeout(function() {
+            fs.appendFileSync('input2.txt', '[31/Jul/2012:20:02:28 +0200] line2\n');
+            setTimeout(function() {
+              agent.close(function() {
+                gelf.close();
+                callback(undefined, received);
+              });
+            }, 200);
+          }, 200);
+        }, 200);
+      });
+    },
+
+    check: function(err, data) {
+      fs.unlinkSync('input1.txt');
+      assert.ifError(err);
+      assert.deepEqual(data.sort(), [
+       {
+        version: '1.0',
+        short_message: '[31/Jul/2012:18:02:28 +0200] line1',
+        timestamp: (new Date('2012-07-31T16:02:28+00:00')).getTime() / 1000,
+        host: os.hostname(),
+        facility: 'toto',
+        level: '6'
+       },
+       {
+        version: '1.0',
+        short_message: '[31/Jul/2012:20:02:28 +0200] line2',
+        timestamp: (new Date('2012-07-31T18:02:28+00:00')).getTime() / 1000,
+        host: os.hostname(),
+        facility: 'no_facility',
+        level: '6'
+       }
+      ].sort());
     }
  },
 }).addBatch({
