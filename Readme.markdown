@@ -121,6 +121,16 @@ Outputs and filter, commons parameters
 * ``only_field_exist_toto``: execute the filter / output plugin only on lines with a field ``toto``. You can specify it multiple times, all fields have to exist.
 * ``only_field_equal_toto=aaa``: execute the filter / output plugin only on lines with a field ``toto``, with value ``aaa``. You can specify it multiple times, all fields have to exist and have the specified value.
 
+Access to line log properties
+===
+
+Some params are string, which can reference line log properties:
+
+* ``#{@message}`` will contain the full log line
+* ``#{@type}`` will contain the type of log line
+* ``#{toto}`` will contain the value of the field ``toto``, which have to be extracted with a regex filter
+* ``2#{toto}`` will contain ``2`` followed by the value of the field ``toto``.
+
 Ouputs plugins
 ===
 
@@ -146,7 +156,6 @@ You can find the ZeroMQ transport here: https://github.com/bpaquet/transport-zer
 
 Example: ``output://elasticsearch_zeromq://tcp://localhost:9700`` to send to the zeromq transport of an elastic search server listening on port 9700.
 
-
 Statsd
 ---
 
@@ -156,17 +165,27 @@ Example: ``output://statsd://localhost:8125?only_type=nginx&metric_type=incremen
 
 Params:
 
-* ``metric_type``: one of ``increment``, ``decrement``, ``counter``, ``timer``. Type of value to send to statsd.
+* ``metric_type``: one of ``increment``, ``decrement``, ``counter``, ``timer``, ``gauge``. Type of value to send to statsd.
 * ``metric_key``: key to send to statsd.
-* ``metric_value``: metric value to send to statsd. Mandatory for ``timer`` and ``counter`` type
+* ``metric_value``: metric value to send to statsd. Mandatory for ``timer``, ``counter`` and ``gauge`` type
 
-``metric_key`` and ``metric_value`` can reference log line properties:
-
-* ``#{@message}`` will contain the full log line
-* ``#{@type}`` will contain the type of log line
-* ``#{toto}`` will contain the field ``toto``, which have to be extracted with a regex filter
+``metric_key`` and ``metric_value`` can reference log line properties (see above).
 
 Example: ``metric_key=nginx.response.#{status}``
+
+Gelf
+---
+
+This plugin is used to send data to a GELF enabled server, eg [Graylog2](http://graylog2.org/). Documentation of GELF messages is [here](https://github.com/Graylog2/graylog2-docs/wiki/GELF).
+
+Example: ``output://gelf://192.168.1.1:12201``, to send logs to 192.168.1.1 port 1221.
+
+Params:
+
+* ``message``: ``short_message`` field. Default value: ``#{@message}``, the line of log. Can reference log line properties (see above).
+* ``facility``: ``facility`` field. Default value: ``#{@type}``, the line type. ``no_facility`` if no value. Can reference log line properties (see above).
+* ``level``: ``level`` field. Default value: ``6``. Can reference log line properties (see above).
+* ``version``: ``version`` field. Default value: ``1.0``.
 
 Filters
 ===
