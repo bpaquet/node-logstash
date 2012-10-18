@@ -69,7 +69,7 @@ The urls can be specified:
 
 * directly on the command line
 * in a file (use the ``--config_file`` switch)
-* in all files in a directory (use the ``--config_directory`` switch)
+* in all files in a directory (use the ``--config_dir`` switch)
 
 Others params:
 
