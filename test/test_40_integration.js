@@ -41,7 +41,7 @@ function file2x2x2file(config1, config2, clean_callback) {
       monitor_file.setFileStatus({});
       var callback = this.callback;
       createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
-        createAgent(config2.concat(['output://file://main_output.txt']), function(a2) {
+        createAgent(config2.concat(['output://file://main_output.txt?output_type=json']), function(a2) {
           setTimeout(function() {
             fs.appendFileSync('main_input.txt', '234 tgerhe grgh\n');
             setTimeout(function() {
@@ -133,8 +133,8 @@ vows.describe('Integration :').addBatch({
       createAgent([
         'input://file://input1.txt',
         'input://file://input2.txt?type=input2',
-        'output://file://output1.txt',
-        'output://file://output2.txt',
+        'output://file://output1.txt?output_type=json',
+        'output://file://output2.txt?output_type=json',
         ], function(agent) {
         fs.appendFileSync('input1.txt', 'line1\n');
         setTimeout(function() {
@@ -229,7 +229,7 @@ vows.describe('Integration :').addBatch({
       var callback = this.callback;
       createAgent([
         'input://tcp://localhost:17873?type=2',
-        'output://file://output.txt',
+        'output://file://output.txt?output_type=json',
         ], function(agent) {
         var c = net.createConnection({port: 17873}, function() {
           c.write("toto");
@@ -444,7 +444,7 @@ vows.describe('Integration :').addBatch({
     'output://file:///path_which_does_not_exist/titi.txt'
   ], 'error', 'ENOENT', 'output_file'),
 }).addBatch({
-  'file transport': file2x2x2file(['output://file://main_middle.txt'], ['input://file://main_middle.txt'], function() { fs.unlinkSync('main_middle.txt'); }),
+  'file transport': file2x2x2file(['output://file://main_middle.txt?output_type=json'], ['input://file://main_middle.txt'], function() { fs.unlinkSync('main_middle.txt'); }),
 }).addBatch({
   'tcp transport': file2x2x2file(['output://tcp://localhost:17879'], ['input://tcp://0.0.0.0:17879']),
 }).addBatch({

@@ -48,8 +48,8 @@ function run(command, args, pid_file, callback) {
   });
 }
 
-vows.describe('Real life :').addBatch({
-  'simple test': {
+function input_file_test(args, topic_callback, check_callback) {
+  return {
     topic: function() {
       var callback = this.callback;
       var socket = dgram.createSocket('udp4');
@@ -59,40 +59,8 @@ vows.describe('Real life :').addBatch({
         datas.push(data);
       });
       createAgent([
-        'input://file://output.txt',
+        'input://file://output.txt' + args,
         'output://udp://localhost:17881',
-        ], function(agent) {
-        run('node', ['50_real_life/run.js', '--file=output.txt', '--count=500', '--period=1'], undefined, function(exitCode) {
-          setTimeout(function() {
-            socket.close();
-            agent.close(function() {
-              callback(undefined, exitCode, datas);
-            });
-          }, 100);
-        });
-      });
-    },
-
-    check: function(err, exitCode, datas) {
-      assert.ifError(err);
-      fs.unlinkSync('output.txt');
-      assert.equal(0, exitCode);
-      assert.equal(500, datas.length);
-    }
-  },
-}).addBatch({
-  'logrotate test': {
-    topic: function() {
-      var callback = this.callback;
-      var socket = dgram.createSocket('udp4');
-      socket.bind(17882);
-      var datas = [];
-      socket.on('message', function(data) {
-        datas.push(data.toString());
-      });
-      createAgent([
-        'input://file://output.txt',
-        'output://udp://localhost:17882',
         ], function(agent) {
         run('node', ['50_real_life/run.js', '--file=output.txt', '--count=500', '--period=1'], 'process.pid', function(exitCode) {
           setTimeout(function() {
@@ -102,36 +70,164 @@ vows.describe('Real life :').addBatch({
             });
           }, 100);
         });
-        whereis('logrotate', function(err, logrotate) {
-          if (err) {
-            return console.log(err);
-          }
-          setTimeout(function() {
-            console.log(logrotate);
-            run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
-              console.log('Logrotate exit code', exitCode);
-              assert.equal(0, exitCode);
-            });
-          }, 500);
-          setTimeout(function() {
-            console.log(logrotate);
-            run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
-              console.log('Logrotate exit code', exitCode);
-              assert.equal(0, exitCode);
-            });
-          }, 1000);
-        });
       });
+      topic_callback();
     },
 
     check: function(err, exitCode, datas) {
       assert.ifError(err);
       fs.unlinkSync('output.txt');
-      fs.unlinkSync('output.txt.1');
-      fs.unlinkSync('output.txt.2');
       fs.unlinkSync('process.pid');
+      check_callback();
       assert.equal(0, exitCode);
       assert.equal(500, datas.length);
     }
-  },
+  }
+}
+
+function output_file_test(topic_callback, check_callback) {
+  return {
+    topic: function() {
+      var callback = this.callback;
+      var socket = dgram.createSocket('udp4');
+      run('node', ['../bin/node-logstash-agent', 'input://udp://localhost:17883', 'output://file://output.txt'], 'process.pid', function(exitCode) {
+        setTimeout(function() {
+          socket.close();
+          callback(undefined, exitCode);
+        }, 100);
+      });
+      setTimeout(function() {
+        a = function(k) {
+          if (k == 0) {
+            setTimeout(function() {
+              process.kill(fs.readFileSync('process.pid'));
+            }, 200);
+            return;
+          }
+          setTimeout(function() {
+            var message = new Buffer('line ' + k);
+            socket.send(message, 0, message.length, 17883, 'localhost', function(err) {
+              if (err) {
+                console.log(err);
+              }
+              a(k - 1);
+            });
+          }, 1);
+        }
+        a(500);
+      }, 200);
+      topic_callback();
+    },
+
+    check: function(err, exitCode) {
+      assert.ifError(err);
+      check_callback(exitCode);
+    }
+  }
+}
+
+vows.describe('Real life :').addBatch({
+  'simple test': input_file_test('',
+    function() {
+    }, function() {
+    }
+  ),
+}).addBatch({
+  'logrotate test, short wait_delay_after_renaming': input_file_test('?wait_delay_after_renaming=20',
+    function() {
+      whereis('logrotate', function(err, logrotate) {
+        if (err) {
+          return console.log(err);
+        }
+        setTimeout(function() {
+          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+            console.log('Logrotate exit code', exitCode);
+            assert.equal(0, exitCode);
+          });
+        }, 500);
+        setTimeout(function() {
+          console.log(logrotate);
+          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+            console.log('Logrotate exit code', exitCode);
+            assert.equal(0, exitCode);
+          });
+        }, 1000);
+      });
+    }, function() {
+      fs.unlinkSync('output.txt.1');
+      fs.unlinkSync('output.txt.2');
+    }
+  ),
+}).addBatch({
+  'logrotate test': input_file_test('',
+    function() {
+      whereis('logrotate', function(err, logrotate) {
+        if (err) {
+          return console.log(err);
+        }
+        setTimeout(function() {
+          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+            console.log('Logrotate exit code', exitCode);
+            assert.equal(0, exitCode);
+          });
+        }, 500);
+        setTimeout(function() {
+          console.log(logrotate);
+          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+            console.log('Logrotate exit code', exitCode);
+            assert.equal(0, exitCode);
+          });
+        }, 1000);
+      });
+    }, function() {
+      fs.unlinkSync('output.txt.1');
+      fs.unlinkSync('output.txt.2');
+    }
+  ),
+}).addBatch({
+  'file output test': output_file_test(
+    function() {
+    }, function(exitCode) {
+      var output = fs.readFileSync('output.txt').toString().trim().split('\n');
+      fs.unlinkSync('output.txt');
+      assert.equal(1, exitCode);
+      assert.equal(500, output.length);
+      var i = 500;
+      output.forEach(function(k) {
+        assert.equal("line " + i, k);
+        i --;
+      }
+    );
+  }),
+}).addBatch({
+  'file output test with logrotate': output_file_test(
+    function() {
+      setTimeout(function() {
+        whereis('logrotate', function(err, logrotate) {
+          if (err) {
+            return console.log(err);
+          }
+          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+            console.log('Logrotate exit code', exitCode);
+            assert.equal(0, exitCode);
+          });
+        });
+      }, 500);
+    }, function(exitCode) {
+      var o1 = fs.readFileSync('output.txt.1').toString();
+      var o2 = fs.readFileSync('output.txt').toString();
+      var output = (o1 + o2).trim().split('\n');
+      fs.unlinkSync('output.txt');
+      fs.unlinkSync('output.txt.1');
+      assert.equal(1, exitCode);
+      assert(o1.length > 0);
+      assert(o2.length > 0);
+      assert.equal(500, output.length);
+      var i = 500;
+      output.forEach(function(k) {
+        assert.equal("line " + i, k);
+        i --;
+      }
+    );
+  }),
 }).export(module);
