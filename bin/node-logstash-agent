@@ -128,8 +128,6 @@ function after_config_directory(config) {
   });
 }
 
-setInterval(function() {}, 3600 * 1000);
-
 function close() {
   a.close(function() {
     logger.info('Quitting.');
@@ -183,3 +181,6 @@ if (argv.db_file) {
 else {
   main_start();
 }
+
+// avoid stop if no config is given
+setInterval(function() {}, 3600 * 1000);

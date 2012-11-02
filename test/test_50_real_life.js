@@ -115,7 +115,7 @@ function output_file_test(topic_callback, check_callback) {
           }, 1);
         }
         a(500);
-      }, 200);
+      }, 500);
       topic_callback();
     },
 
@@ -133,7 +133,7 @@ vows.describe('Real life :').addBatch({
     }
   ),
 }).addBatch({
-  'logrotate test, short wait_delay_after_renaming': input_file_test('?wait_delay_after_renaming=20',
+  'logrotate test, short wait_delay_after_renaming': input_file_test('?wait_delay_after_renaming=100',
     function() {
       whereis('logrotate', function(err, logrotate) {
         if (err) {

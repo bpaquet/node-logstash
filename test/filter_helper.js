@@ -26,7 +26,9 @@ function createWithCallback(filter_name, filter_config, inputs, number_of_events
       m.on('output', function(x) {
         result.push(x);
         if (result.length == number_of_events) {
-          callback(null, result);
+          m.close(function() {
+            callback(null, result);
+          });
         }
       });
       m.once('init_ok', function() {
