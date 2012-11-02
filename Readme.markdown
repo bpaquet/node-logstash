@@ -201,10 +201,10 @@ Example 2: ``filter://regex://http_combined?only_type=nginx``, to extract fields
 
 Params:
 
-* regex: the regex to apply
-* fields: the name of fields which wil receive the pattern extracted (see below for the special field timestamp)
-* type: if this field is set, only the lines of logs with the same type will be processed by this filter.
-* date\_format: if date_format is specified and a ``timestamp`` field is extracted, the plugin will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
+* ``regex``: the regex to apply
+* ``fields``: the name of fields which wil receive the pattern extracted (see below for the special field timestamp)
+* ``type``: if this field is set, only the lines of logs with the same type will be processed by this filter.
+* ``date\_format``: if date_format is specified and a ``timestamp`` field is extracted, the plugin will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
 
 Mutate replace
 ---
@@ -215,8 +215,8 @@ Example: ``filter://mutate_replace?toto&from=\\.&to=-`` replace all ``.`` in ``t
 
 Params:
 
-* from: the regex to find pattern which will be replaced. You have to escape special characters.
-* to: the replacement string
+* ``from``: the regex to find pattern which will be replaced. You have to escape special characters.
+* ``to``: the replacement string
 
 Grep
 ---
@@ -231,8 +231,8 @@ Example 3: ``filter://grep://?type=nginx&regex=abc`` remove all lines with type 
 
 Params:
 
-* regex: the regex to be matched
-* invert: if ``true``, remove lines which match. Default value: false
+* ``regex``: the regex to be matched
+* ``invert``: if ``true``, remove lines which match. Default value: false
 
 Compute field
 ---
@@ -245,7 +245,30 @@ Example 2: ``filter://compute_field?toto&value=abc#{titi}`` add a field named ``
 
 Params:
 
-* value: the value to place in the given field
+* ``value``: the value to place in the given field
+
+Split
+---
+
+The split filter is used to split a line of log into multiple lines, on a given delimiter.
+
+Example 1: ``filter://split://?delimiter=|`` split all lines of logs on ``|`` char.
+
+Params:
+
+* ``delimiter``: the delimiter used to split
+
+Multiline
+---
+
+The multiline filter is used to regroup lines into blocks. For example, you can group lines from a Java stacktrace into single line of log. To do that, you have to provide a regular expression which match the first line of each block. Standard way is to detect a timestamp.
+
+Example 1: ``filter://multiline?start_line_regex=^\\d{4}-\\d{2}-\\d{2}`` will regroup lines by blocks, each block have to start with a line with a date like ``2012-12-02``
+
+Params:
+
+* ``start_line_regex``: the regular expression which is used to find lines which start blocks
+* ``max_delay``: delay to wait the end of a block. Default value: 50 ms. Softwares which write logs by block usually write blocks in one time, this parameter is used to send lines without waiting the next matching start line.
 
 License
 ===
