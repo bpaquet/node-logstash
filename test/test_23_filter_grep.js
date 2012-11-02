@@ -1,19 +1,20 @@
 var vows = require('vows'),
     assert = require('assert'),
     os = require('os'),
-    filter_helper = require('./filter_helper');
+    filter_helper = require('./filter_helper'),
+    logstash_event = require('../lib/lib/logstash_event');
 
 vows.describe('Filter grep ').addBatch({
   'normal': filter_helper.create('grep', '?regex=abc', [
-    {'@message': 'abcd'},
-    {'@message': 'abd'},
+    logstash_event.create({'@message': 'abcd', '@timestamp': '2012-01-01T01:00:00.000Z'}),
+    logstash_event.create({'@message': 'abd', '@timestamp': '2012-01-01T01:00:00.000Z'}),
   ], [
-    {'@message': 'abcd'},
+    logstash_event.create({'@message': 'abcd', '@timestamp': '2012-01-01T01:00:00.000Z'}),
   ]),
   'regex': filter_helper.create('grep', '?regex=\\d', [
-    {'@message': 'abcd'},
-    {'@message': 'abd5'},
+    logstash_event.create({'@message': 'abcd', '@timestamp': '2012-01-01T01:00:00.000Z'}),
+    logstash_event.create({'@message': 'abd5', '@timestamp': '2012-01-01T01:00:00.000Z'}),
   ], [
-    {'@message': 'abd5'},
+    logstash_event.create({'@message': 'abd5', '@timestamp': '2012-01-01T01:00:00.000Z'}),
   ]),
 }).export(module);

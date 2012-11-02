@@ -7,13 +7,20 @@ var vows = require('vows'),
     dgram = require('dgram'),
     os = require('os'),
     zlib = require('zlib'),
-    monitor_file = require('../lib/lib/monitor_file');
+    monitor_file = require('../lib/lib/monitor_file'),
+    logstash_event = require('../lib/lib/logstash_event');
 
 function checkResult(line, target) {
   var parsed = JSON.parse(line);
-  delete parsed['@timestamp'];
-  target['@source_host'] = os.hostname();
-  assert.deepEqual(parsed, target);
+  parsed['@timestamp'] = '2012-01-01T01:00:00.000Z';
+  target_event = logstash_event.create(target);
+  if(target['@source'].substring(0,7)=='file://') {
+    target_event.setSource(target['@source'].replace('file://', 'file://'+os.hostname()));
+  } else {
+    target_event.setSource(target['@source']);
+  }
+  target_event.setTimestamp('2012-01-01T01:00:00.000Z');
+  assert.deepEqual(parsed, target_event.toJSON());
 }
 
 function createAgent(urls, callback, error_callback) {
@@ -29,7 +36,7 @@ function createAgent(urls, callback, error_callback) {
     console.log("Error agent detected, " + module_name + " : " + error);
     error_callback(error);
   });
-  a.loadUrls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(error) {
+  a.loadUrls(urls, function(error) {
     assert.ifError(error);
     callback(a);
   }, 200);
@@ -40,10 +47,10 @@ function file2x2x2file(config1, config2, clean_callback) {
     topic: function() {
       monitor_file.setFileStatus({});
       var callback = this.callback;
-      createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
-        createAgent(config2.concat(['output://file://main_output.txt?output_type=json']), function(a2) {
+      createAgent(['input://file:///tmp/main_input.txt?type=test'].concat(config1), function(a1) {
+        createAgent(config2.concat(['output://file:///tmp/main_output.txt?output_type=json']), function(a2) {
           setTimeout(function() {
-            fs.appendFileSync('main_input.txt', '234 tgerhe grgh\n');
+            fs.appendFileSync('/tmp/main_input.txt', '234 tgerhe grgh\n');
             setTimeout(function() {
               a1.close(function() {
                 a2.close(function() {
@@ -59,14 +66,14 @@ function file2x2x2file(config1, config2, clean_callback) {
     check: function(err) {
       assert.ifError(err);
 
-      var c = fs.readFileSync('main_output.txt').toString();
-      fs.unlinkSync('main_input.txt');
-      fs.unlinkSync('main_output.txt');
+      var c = fs.readFileSync('/tmp/main_output.txt').toString();
+      fs.unlinkSync('/tmp/main_input.txt');
+      fs.unlinkSync('/tmp/main_output.txt');
 
       var splitted = c.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@source': 'main_input.txt', '@message': '234 tgerhe grgh', '@type': 'test'});
+      checkResult(splitted[0], {'@source': 'file:///tmp/main_input.txt', '@message': '234 tgerhe grgh', '@type': 'test'});
       if (clean_callback) {
         clean_callback();
       }
@@ -131,16 +138,16 @@ vows.describe('Integration :').addBatch({
       monitor_file.setFileStatus({});
       var callback = this.callback;
       createAgent([
-        'input://file://input1.txt',
-        'input://file://input2.txt?type=input2',
-        'output://file://output1.txt?output_type=json',
-        'output://file://output2.txt?output_type=json',
+        'input://file:///tmp/input1.txt',
+        'input://file:///tmp/input2.txt?type=input2',
+        'output://file:///tmp/output1.txt?output_type=json',
+        'output://file:///tmp/output2.txt?output_type=json',
         ], function(agent) {
-        fs.appendFileSync('input1.txt', 'line1\n');
+        fs.appendFileSync('/tmp/input1.txt', 'line1\n');
         setTimeout(function() {
-          fs.appendFileSync('input2.txt', 'line2\n');
+          fs.appendFileSync('/tmp/input2.txt', 'line2\n');
           setTimeout(function() {
-            fs.appendFileSync('input1.txt', 'line3\n');
+            fs.appendFileSync('/tmp/input1.txt', 'line3\n');
             setTimeout(function() {
               agent.close(function() {
                 callback(null);
@@ -153,20 +160,20 @@ vows.describe('Integration :').addBatch({
 
     check: function(err) {
       assert.ifError(err);
-      var c1 = fs.readFileSync('output1.txt').toString();
-      var c2 = fs.readFileSync('output2.txt').toString();
-      fs.unlinkSync('input1.txt');
-      fs.unlinkSync('input2.txt');
-      fs.unlinkSync('output1.txt');
-      fs.unlinkSync('output2.txt');
+      var c1 = fs.readFileSync('/tmp/output1.txt').toString();
+      var c2 = fs.readFileSync('/tmp/output2.txt').toString();
+      fs.unlinkSync('/tmp/input1.txt');
+      fs.unlinkSync('/tmp/input2.txt');
+      fs.unlinkSync('/tmp/output1.txt');
+      fs.unlinkSync('/tmp/output2.txt');
 
       assert.equal(c1, c2);
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 4);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@source': 'input1.txt', '@message': 'line1'});
-      checkResult(splitted[1], {'@source': 'input2.txt', '@message': 'line2', '@type': 'input2'});
-      checkResult(splitted[2], {'@source': 'input1.txt', '@message': 'line3'});
+      checkResult(splitted[0], {'@source': 'file:///tmp/input1.txt', '@message': 'line1'});
+      checkResult(splitted[1], {'@source': 'file:///tmp/input2.txt', '@message': 'line2', '@type': 'input2'});
+      checkResult(splitted[2], {'@source': 'file:///tmp/input1.txt', '@message': 'line3'});
     }
   },
 }).addBatch({
@@ -216,11 +223,11 @@ vows.describe('Integration :').addBatch({
 
       assert.equal(reqs[0].req.method, 'POST');
       assert(reqs[0].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[0].req.url + ' does not match regex');
-      checkResult(reqs[0].body, {'@message': 'toto', '@source': 'tcp_0.0.0.0_17874', '@type': 'nginx'});
+      checkResult(reqs[0].body, {'@message': 'toto', '@source': 'tcp://0.0.0.0:17874', '@type': 'nginx'});
 
       assert.equal(reqs[1].req.method, 'POST');
       assert(reqs[1].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[1].req.url + ' does not match regex');
-      checkResult(reqs[1].body, {'@message': 'titi', '@source': 'tcp_0.0.0.0_17875'});
+      checkResult(reqs[1].body, {'@message': 'titi', '@source': 'tcp://0.0.0.0:17875'});
     }
  },
 }).addBatch({
@@ -229,7 +236,7 @@ vows.describe('Integration :').addBatch({
       var callback = this.callback;
       createAgent([
         'input://tcp://localhost:17873?type=2',
-        'output://file://output.txt?output_type=json',
+        'output://file:///tmp/output.txt?output_type=json',
         ], function(agent) {
         var c = net.createConnection({port: 17873}, function() {
           c.write("toto");
@@ -247,13 +254,13 @@ vows.describe('Integration :').addBatch({
 
     check: function(err) {
       assert.ifError(err);
-      var c1 = fs.readFileSync('output.txt').toString();
-      fs.unlinkSync('output.txt');
+      var c1 = fs.readFileSync('/tmp/output.txt').toString();
+      fs.unlinkSync('/tmp/output.txt');
 
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@source': 'tcp_localhost_17873', '@message': 'toto', '@type': '2'});
+      checkResult(splitted[0], {'@source': 'tcp://localhost:17873', '@message': 'toto', '@type': '2'});
     }
  },
 }).addBatch({
@@ -268,11 +275,11 @@ vows.describe('Integration :').addBatch({
       });
       statsd.bind(17877);
       createAgent([
-        'input://file://input1.txt',
-        'input://file://input2.txt?type=titi',
-        'input://file://input3.txt?type=tata',
-        'input://file://input4.txt?type=tete',
-        'input://file://input5.txt?type=toto',
+        'input://file:///tmp/input1.txt',
+        'input://file:///tmp/input2.txt?type=titi',
+        'input://file:///tmp/input3.txt?type=tata',
+        'input://file:///tmp/input4.txt?type=tete',
+        'input://file:///tmp/input5.txt?type=toto',
         'filter://regex://?regex=^45_(.*)$&fields=my_field',
         'output://statsd://127.0.0.1:17877?metric_type=increment&metric_key=toto.bouh',
         'output://statsd://127.0.0.1:17877?metric_type=decrement&metric_key=toto.#{@message}&only_type=titi',
@@ -281,15 +288,15 @@ vows.describe('Integration :').addBatch({
         'output://statsd://127.0.0.1:17877?metric_type=gauge&metric_key=toto.gauge&metric_value=45&only_type=toto',
         ], function(agent) {
         setTimeout(function() {
-          fs.appendFileSync('input1.txt', 'line1\n');
+          fs.appendFileSync('/tmp/input1.txt', 'line1\n');
           setTimeout(function() {
-            fs.appendFileSync('input2.txt', 'line2\n');
+            fs.appendFileSync('/tmp/input2.txt', 'line2\n');
             setTimeout(function() {
-              fs.appendFileSync('input3.txt', '10\n');
+              fs.appendFileSync('/tmp/input3.txt', '10\n');
               setTimeout(function() {
-                fs.appendFileSync('input4.txt', '45_123\n');
+                fs.appendFileSync('/tmp/input4.txt', '45_123\n');
                 setTimeout(function() {
-                  fs.appendFileSync('input5.txt', 'line3\n');
+                  fs.appendFileSync('/tmp/input5.txt', 'line3\n');
                   setTimeout(function() {
                     agent.close(function() {
                       statsd.close();
@@ -305,11 +312,11 @@ vows.describe('Integration :').addBatch({
     },
 
     check: function(err, data) {
-      fs.unlinkSync('input1.txt');
-      fs.unlinkSync('input2.txt');
-      fs.unlinkSync('input3.txt');
-      fs.unlinkSync('input4.txt');
-      fs.unlinkSync('input5.txt');
+      fs.unlinkSync('/tmp/input1.txt');
+      fs.unlinkSync('/tmp/input2.txt');
+      fs.unlinkSync('/tmp/input3.txt');
+      fs.unlinkSync('/tmp/input4.txt');
+      fs.unlinkSync('/tmp/input5.txt');
       assert.ifError(err);
       assert.deepEqual(data.sort(), [
         'toto.bouh:1|c',
@@ -337,13 +344,13 @@ vows.describe('Integration :').addBatch({
       });
       statsd.bind(17878);
       createAgent([
-        'input://file://input1.txt',
+        'input://file:///tmp/input1.txt',
         'filter://regex://?regex=(line2)&fields=unknown_field',
         'output://statsd://127.0.0.1:17878?metric_type=increment&metric_key=toto.bouh.#{unknown_field}',
         ], function(agent) {
         setTimeout(function() {
-          fs.appendFileSync('input1.txt', 'line1\n');
-          fs.appendFileSync('input1.txt', 'line2\n');
+          fs.appendFileSync('/tmp/input1.txt', 'line1\n');
+          fs.appendFileSync('/tmp/input1.txt', 'line2\n');
           setTimeout(function() {
             agent.close(function() {
               statsd.close();
@@ -357,7 +364,7 @@ vows.describe('Integration :').addBatch({
     },
 
     check: function(errors, data) {
-      fs.unlinkSync('input1.txt');
+      fs.unlinkSync('/tmp/input1.txt');
       assert.deepEqual(data.sort(), ['toto.bouh.line2:1|c'].sort());
       assert.equal(errors.length, 0);
     }
@@ -378,15 +385,15 @@ vows.describe('Integration :').addBatch({
       });
       gelf.bind(17879);
       createAgent([
-        'input://file://input1.txt?type=toto',
-        'input://file://input2.txt',
+        'input://file:///tmp/input1.txt?type=toto',
+        'input://file:///tmp/input2.txt',
         'filter://regex://?regex=^\\[(.*)\\]&fields=timestamp&date_format=DD/MMMM/YYYY:HH:mm:ss ZZ',
         'output://gelf://localhost:17879'
         ], function(agent) {
         setTimeout(function() {
-          fs.appendFileSync('input1.txt', '[31/Jul/2012:18:02:28 +0200] line1\n');
+          fs.appendFileSync('/tmp/input1.txt', '[31/Jul/2012:18:02:28 +0200] line1\n');
           setTimeout(function() {
-            fs.appendFileSync('input2.txt', '[31/Jul/2012:20:02:28 +0200] line2\n');
+            fs.appendFileSync('/tmp/input2.txt', '[31/Jul/2012:20:02:28 +0200] line2\n');
             setTimeout(function() {
               agent.close(function() {
                 gelf.close();
@@ -399,14 +406,14 @@ vows.describe('Integration :').addBatch({
     },
 
     check: function(err, data) {
-      fs.unlinkSync('input1.txt');
+      fs.unlinkSync('/tmp/input1.txt');
       assert.ifError(err);
       assert.deepEqual(data.sort(), [
        {
         version: '1.0',
         short_message: '[31/Jul/2012:18:02:28 +0200] line1',
         timestamp: (new Date('2012-07-31T16:02:28+00:00')).getTime() / 1000,
-        host: os.hostname(),
+        host: os.hostname().toLowerCase(),
         facility: 'toto',
         level: '6'
        },
@@ -414,7 +421,7 @@ vows.describe('Integration :').addBatch({
         version: '1.0',
         short_message: '[31/Jul/2012:20:02:28 +0200] line2',
         timestamp: (new Date('2012-07-31T18:02:28+00:00')).getTime() / 1000,
-        host: os.hostname(),
+        host: os.hostname().toLowerCase(),
         facility: 'no_facility',
         level: '6'
        }
@@ -444,13 +451,13 @@ vows.describe('Integration :').addBatch({
     'output://file:///path_which_does_not_exist/titi.txt'
   ], 'error', 'ENOENT', 'output_file'),
 }).addBatch({
-  'file transport': file2x2x2file(['output://file://main_middle.txt?output_type=json'], ['input://file://main_middle.txt'], function() { fs.unlinkSync('main_middle.txt'); }),
+  'file transport': file2x2x2file(['output://file:///tmp/main_middle.txt?output_type=json'], ['input://file:///tmp/main_middle.txt?format=json_event'], function() { fs.unlinkSync('/tmp/main_middle.txt'); }),
 }).addBatch({
-  'tcp transport': file2x2x2file(['output://tcp://localhost:17879'], ['input://tcp://0.0.0.0:17879']),
+  'tcp transport': file2x2x2file(['output://tcp://localhost:17879'], ['input://tcp://0.0.0.0:17879?format=json_event']),
 }).addBatch({
   'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:5567'], ['input://zeromq://tcp://*:5567']),
 }).addBatch({
-  'unix socket transport': file2x2x2file(['output://unix:///tmp/test_socket'], ['input://unix:///tmp/test_socket']),
+  'unix socket transport': file2x2x2file(['output://unix:///tmp/test_socket'], ['input://unix:///tmp/test_socket?format=json_event']),
 }).addBatch({
-  'udp transport': file2x2x2file(['output://udp://localhost:17880'], ['input://udp://127.0.0.1:17880']),
+  'udp transport': file2x2x2file(['output://udp://localhost:17880'], ['input://udp://127.0.0.1:17880?format=json_event']),
 }).export(module);
