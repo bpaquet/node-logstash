@@ -9,7 +9,7 @@ function testExtractProtocol(url, target) {
     },
 
     check: function(result) {
-      assert.deepEqual(result, target);
+      assert.deepEqual(target, result);
     }
   }
 }
@@ -21,7 +21,7 @@ function testProcessUrlContent(url, target) {
     },
 
     check: function(result) {
-      assert.deepEqual(result, target);
+      assert.deepEqual(target, result);
     }
   }
 }
@@ -33,7 +33,19 @@ function testExtractPortNumber(url, target) {
     },
 
     check: function(result) {
-      assert.deepEqual(result, target);
+      assert.deepEqual(target, result);
+    }
+  }
+}
+
+function testExtractPath(url, target) {
+  return {
+    topic: function() {
+      this.callback(null, url_parser.extractPath(url));
+    },
+
+    check: function(result) {
+      assert.deepEqual(target, result);
     }
   }
 }
@@ -53,7 +65,7 @@ vows.describe('Url parser').addBatch({
   'process url content special chars in host': testProcessUrlContent('/tmp/toto%202.txt?type=t', {host: '/tmp/toto 2.txt', params: {type: 't'}}),
   'process url content no host': testProcessUrlContent('?type=t', {host: '', params: {type: 't'}}),
   'process url content with plus': testProcessUrlContent('?type=t+3', {host: '', params: {type: 't+3'}}),
-  'extract port number hostonly': testExtractPortNumber('localhost', {host: 'localhost', port: -1}),
+  'extract port number hostonly': testExtractPortNumber('localhost', undefined),
   'extract port number ip': testExtractPortNumber('0.0.0.0:80', {host: '0.0.0.0', port: 80}),
   'extract port number host': testExtractPortNumber('www.google.com:8080', {host: 'www.google.com', port: 8080}),
   'extract port number wrong port': testExtractPortNumber('www.google.com:abcd', undefined),
