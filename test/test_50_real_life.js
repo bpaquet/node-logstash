@@ -90,7 +90,7 @@ function output_file_test(topic_callback, check_callback) {
     topic: function() {
       var callback = this.callback;
       var socket = dgram.createSocket('udp4');
-      run('node', ['../bin/node-logstash-agent', 'input://udp://localhost:17883', 'output://file://output.txt'], 'process.pid', function(exitCode) {
+      run('node', ['../bin/node-logstash-agent', 'input://udp://localhost:17874', 'output://file://output.txt'], 'process.pid', function(exitCode) {
         setTimeout(function() {
           socket.close();
           callback(undefined, exitCode);
@@ -106,7 +106,7 @@ function output_file_test(topic_callback, check_callback) {
           }
           setTimeout(function() {
             var message = new Buffer('line ' + k);
-            socket.send(message, 0, message.length, 17883, 'localhost', function(err) {
+            socket.send(message, 0, message.length, 17874, 'localhost', function(err) {
               if (err) {
                 console.log(err);
               }

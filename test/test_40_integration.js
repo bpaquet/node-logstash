@@ -228,10 +228,10 @@ vows.describe('Integration :').addBatch({
     topic: function() {
       var callback = this.callback;
       createAgent([
-        'input://tcp://localhost:17873?type=2',
+        'input://tcp://localhost:17874?type=2',
         'output://file://output.txt?output_type=json',
         ], function(agent) {
-        var c = net.createConnection({port: 17873}, function() {
+        var c = net.createConnection({port: 17874}, function() {
           c.write("toto");
           c.end();
         });
@@ -253,7 +253,7 @@ vows.describe('Integration :').addBatch({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@source': 'tcp_localhost_17873', '@message': 'toto', '@type': '2'});
+      checkResult(splitted[0], {'@source': 'tcp_localhost_17874', '@message': 'toto', '@type': '2'});
     }
  },
 }).addBatch({
@@ -266,7 +266,7 @@ vows.describe('Integration :').addBatch({
       statsd.on('message', function(d) {
         received.push(d.toString());
       });
-      statsd.bind(17877);
+      statsd.bind(17874);
       createAgent([
         'input://file://input1.txt',
         'input://file://input2.txt?type=titi',
@@ -274,11 +274,11 @@ vows.describe('Integration :').addBatch({
         'input://file://input4.txt?type=tete',
         'input://file://input5.txt?type=toto',
         'filter://regex://?regex=^45_(.*)$&fields=my_field',
-        'output://statsd://127.0.0.1:17877?metric_type=increment&metric_key=toto.bouh',
-        'output://statsd://127.0.0.1:17877?metric_type=decrement&metric_key=toto.#{@message}&only_type=titi',
-        'output://statsd://127.0.0.1:17877?metric_type=counter&metric_key=toto.counter&metric_value=#{@message}&only_type=tata',
-        'output://statsd://127.0.0.1:17877?metric_type=timer&metric_key=toto.#{my_field}.#{my_field}&metric_value=20&only_type=tete',
-        'output://statsd://127.0.0.1:17877?metric_type=gauge&metric_key=toto.gauge&metric_value=45&only_type=toto',
+        'output://statsd://127.0.0.1:17874?metric_type=increment&metric_key=toto.bouh',
+        'output://statsd://127.0.0.1:17874?metric_type=decrement&metric_key=toto.#{@message}&only_type=titi',
+        'output://statsd://127.0.0.1:17874?metric_type=counter&metric_key=toto.counter&metric_value=#{@message}&only_type=tata',
+        'output://statsd://127.0.0.1:17874?metric_type=timer&metric_key=toto.#{my_field}.#{my_field}&metric_value=20&only_type=tete',
+        'output://statsd://127.0.0.1:17874?metric_type=gauge&metric_key=toto.gauge&metric_value=45&only_type=toto',
         ], function(agent) {
         setTimeout(function() {
           fs.appendFileSync('input1.txt', 'line1\n');
@@ -335,11 +335,11 @@ vows.describe('Integration :').addBatch({
       statsd.on('message', function(d) {
         received.push(d.toString());
       });
-      statsd.bind(17878);
+      statsd.bind(17874);
       createAgent([
         'input://file://input1.txt',
         'filter://regex://?regex=(line2)&fields=unknown_field',
-        'output://statsd://127.0.0.1:17878?metric_type=increment&metric_key=toto.bouh.#{unknown_field}',
+        'output://statsd://127.0.0.1:17874?metric_type=increment&metric_key=toto.bouh.#{unknown_field}',
         ], function(agent) {
         setTimeout(function() {
           fs.appendFileSync('input1.txt', 'line1\n');
@@ -363,7 +363,7 @@ vows.describe('Integration :').addBatch({
     }
  },
 }).addBatch({
-  'filegelf': {
+  'file2gelf': {
     topic: function() {
       monitor_file.setFileStatus({});
       var callback = this.callback;
@@ -376,12 +376,12 @@ vows.describe('Integration :').addBatch({
           received.push(data);
         });
       });
-      gelf.bind(17879);
+      gelf.bind(17874);
       createAgent([
         'input://file://input1.txt?type=toto',
         'input://file://input2.txt',
         'filter://regex://?regex=^\\[(.*)\\]&fields=timestamp&date_format=DD/MMMM/YYYY:HH:mm:ss ZZ',
-        'output://gelf://localhost:17879'
+        'output://gelf://localhost:17874'
         ], function(agent) {
         setTimeout(function() {
           fs.appendFileSync('input1.txt', '[31/Jul/2012:18:02:28 +0200] line1\n');
@@ -421,6 +421,7 @@ vows.describe('Integration :').addBatch({
       ].sort());
     }
   },
+}).addBatch({
   'multiline simple test': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -478,11 +479,11 @@ vows.describe('Integration :').addBatch({
 }).addBatch({
   'file transport': file2x2x2file(['output://file://main_middle.txt?output_type=json'], ['input://file://main_middle.txt'], function() { fs.unlinkSync('main_middle.txt'); }),
 }).addBatch({
-  'tcp transport': file2x2x2file(['output://tcp://localhost:17879'], ['input://tcp://0.0.0.0:17879']),
+  'tcp transport': file2x2x2file(['output://tcp://localhost:17874'], ['input://tcp://0.0.0.0:17874']),
 }).addBatch({
-  'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:5567'], ['input://zeromq://tcp://*:5567']),
+  'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:17874'], ['input://zeromq://tcp://*:17874']),
 }).addBatch({
   'unix socket transport': file2x2x2file(['output://unix:///tmp/test_socket'], ['input://unix:///tmp/test_socket']),
 }).addBatch({
-  'udp transport': file2x2x2file(['output://udp://localhost:17880'], ['input://udp://127.0.0.1:17880']),
+  'udp transport': file2x2x2file(['output://udp://localhost:17874'], ['input://udp://127.0.0.1:17874']),
 }).export(module);
