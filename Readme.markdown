@@ -103,7 +103,7 @@ This plugin monitor log files. It's compatible with logrotate. If a db file is s
 
 Example: ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
 
-Params:
+Parameters:
 
 * ``start_index``: add ``?start_index=0`` to reread files from begining. Without this params, only new lines are read.
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=nginx_error_log`
@@ -164,7 +164,7 @@ This plugin is used send data to statsd.
 
 Example: ``output://statsd://localhost:8125?only_type=nginx&metric_type=increment&metric_key=nginx.request``, to send, for each line of nginx log, a counter with value 1, key ``nginx.request``, on a statsd instance located on port 8125.
 
-Params:
+Parameters:
 
 * ``metric_type``: one of ``increment``, ``decrement``, ``counter``, ``timer``, ``gauge``. Type of value to send to statsd.
 * ``metric_key``: key to send to statsd.
@@ -181,7 +181,7 @@ This plugin is used to send data to a GELF enabled server, eg [Graylog2](http://
 
 Example: ``output://gelf://192.168.1.1:12201``, to send logs to 192.168.1.1 port 1221.
 
-Params:
+Parameters:
 
 * ``message``: ``short_message`` field. Default value: ``#{@message}``, the line of log. Can reference log line properties (see above).
 * ``facility``: ``facility`` field. Default value: ``#{@type}``, the line type. ``no_facility`` if no value. Can reference log line properties (see above).
@@ -191,7 +191,21 @@ Params:
 File
 ---
 
-This plugin is used to write data into files. There are two modes: JSON
+This plugin is used to write data into files. There are two modes: JSON, and raw (default).
+
+In JSON mode, each line of log is dumped to target file as JSON object, containing all fields.
+
+In raw mode, each line of log is dumped to target file as specified in ``format`` parameter. Default format is ``#{@message}``, which means the original log line.
+
+Note: target files can be reopened by sending USR signal to node-logstash.
+
+Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each ``nginx`` log lines to ``/var/log/toto.log``.
+
+Parameters:
+
+* ``output_type``: ``raw`` or ``json``. Default is ``raw``.
+* ``format``: Log format in ``raw`` mode. Default is ``#{@message}``.
+
 Filters
 ===
 
@@ -204,7 +218,7 @@ Example 1: ``filter://regex://?regex=^(\S)+ &fields=toto``, to extract the first
 
 Example 2: ``filter://regex://http_combined?only_type=nginx``, to extract fields following configuration into the http_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
 
-Params:
+Parameters:
 
 * ``regex``: the regex to apply
 * ``fields``: the name of fields which wil receive the pattern extracted (see below for the special field timestamp)
@@ -218,7 +232,7 @@ The mutate replace filter is used to run regex on specified field.
 
 Example: ``filter://mutate_replace?toto&from=\\.&to=-`` replace all ``.`` in ``toto`` field by ``-``
 
-Params:
+Parameters:
 
 * ``from``: the regex to find pattern which will be replaced. You have to escape special characters.
 * ``to``: the replacement string
@@ -234,7 +248,7 @@ Example 2: ``filter://grep://?regex=abc&invert=true`` remove all lines which con
 
 Example 3: ``filter://grep://?type=nginx&regex=abc`` remove all lines with type ``nginx`` which do not contain ``abc`` and
 
-Params:
+Parameters:
 
 * ``regex``: the regex to be matched
 * ``invert``: if ``true``, remove lines which match. Default value: false
@@ -248,7 +262,7 @@ Example 1: ``filter://compute_field?toto&value=abc`` add a field named ``toto`` 
 
 Example 2: ``filter://compute_field?toto&value=abc#{titi}`` add a field named ``toto`` with value ``abcef``, if line contain a field ``titi`` with value ``ef``
 
-Params:
+Parameters:
 
 * ``value``: the value to place in the given field
 
@@ -259,7 +273,7 @@ The split filter is used to split a line of log into multiple lines, on a given 
 
 Example 1: ``filter://split://?delimiter=|`` split all lines of logs on ``|`` char.
 
-Params:
+Parameters:
 
 * ``delimiter``: the delimiter used to split
 
@@ -270,7 +284,7 @@ The multiline filter is used to regroup lines into blocks. For example, you can 
 
 Example 1: ``filter://multiline?start_line_regex=^\\d{4}-\\d{2}-\\d{2}`` will regroup lines by blocks, each block have to start with a line with a date like ``2012-12-02``
 
-Params:
+Parameters:
 
 * ``start_line_regex``: the regular expression which is used to find lines which start blocks
 * ``max_delay``: delay to wait the end of a block. Default value: 50 ms. Softwares which write logs by block usually write blocks in one time, this parameter is used to send lines without waiting the next matching start line.
