@@ -120,6 +120,7 @@ function output_file_test(topic_callback, check_callback) {
     },
 
     check: function(err, exitCode) {
+      fs.unlinkSync('process.pid');
       assert.ifError(err);
       check_callback(exitCode);
     }

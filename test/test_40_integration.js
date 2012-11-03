@@ -443,6 +443,7 @@ vows.describe('Integration :').addBatch({
 
     check: function(err, data) {
       fs.unlinkSync('input1.txt');
+      fs.unlinkSync('input2.txt');
       assert.ifError(err);
       assert.deepEqual(data.sort(), [
        {
