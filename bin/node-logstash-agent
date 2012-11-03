@@ -70,7 +70,8 @@ if (argv.patterns_directories) {
 }
 
 function main_start() {
-  load_config_file(['filter://add_source_host://', 'filter://add_timestamp://'].concat(argv._));
+  //load_config_file(['filter://add_source_host://', 'filter://add_timestamp://'].concat(argv._));
+  load_config_file(argv._);
 }
 
 function load_config_file(config) {
