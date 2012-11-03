@@ -106,7 +106,7 @@ Example: ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
 Parameters:
 
 * ``start_index``: add ``?start_index=0`` to reread files from begining. Without this params, only new lines are read.
-* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=nginx_error_log`
+* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=nginx_error_log``.
 
 ZeroMQ
 ---
@@ -168,7 +168,7 @@ Parameters:
 
 * ``metric_type``: one of ``increment``, ``decrement``, ``counter``, ``timer``, ``gauge``. Type of value to send to statsd.
 * ``metric_key``: key to send to statsd.
-* ``metric_value``: metric value to send to statsd. Mandatory for ``timer``, ``counter`` and ``gauge`` type
+* ``metric_value``: metric value to send to statsd. Mandatory for ``timer``, ``counter`` and ``gauge`` type.
 
 ``metric_key`` and ``metric_value`` can reference log line properties (see above).
 
@@ -204,7 +204,7 @@ Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each 
 Parameters:
 
 * ``output_type``: ``raw`` or ``json``. Default is ``raw``.
-* ``format``: Log format for ``raw`` mode. Default is ``#{@message}``.
+* ``format``: Log format for ``raw`` mode. Default is ``#{@message}``. Can reference log line properties (see above).
 
 HTTP Post
 ---
@@ -219,10 +219,10 @@ Example 1: Send data to [Loggly](http://loggly.com/): ``output://http_post://log
 
 Parameters:
 
-* ``path``: the path to use in the HTTP request
-* ``proto``: ``http`` or ``https``. Default value: ``http``
+* ``path``: the path to use in the HTTP request. Can reference log line properties (see above).
+* ``proto``: ``http`` or ``https``. Default value: ``http``.
 * ``output_type``: ``raw`` or ``json``. Default is ``raw``.
-* ``format``: Log format for ``raw`` mode. Default is ``#{@message}``.
+* ``format``: Log format for ``raw`` mode. Default is ``#{@message}``. Can reference log line properties (see above).
 
 Filters
 ===
@@ -238,8 +238,8 @@ Example 2: ``filter://regex://http_combined?only_type=nginx``, to extract fields
 
 Parameters:
 
-* ``regex``: the regex to apply
-* ``fields``: the name of fields which wil receive the pattern extracted (see below for the special field timestamp)
+* ``regex``: the regex to apply.
+* ``fields``: the name of fields which wil receive the pattern extracted (see below for the special field timestamp).
 * ``type``: if this field is set, only the lines of logs with the same type will be processed by this filter.
 * ``date\_format``: if date_format is specified and a ``timestamp`` field is extracted, the plugin will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
 
@@ -253,7 +253,7 @@ Example: ``filter://mutate_replace?toto&from=\\.&to=-`` replace all ``.`` in ``t
 Parameters:
 
 * ``from``: the regex to find pattern which will be replaced. You have to escape special characters.
-* ``to``: the replacement string
+* ``to``: the replacement string.
 
 Grep
 ---
@@ -268,8 +268,8 @@ Example 3: ``filter://grep://?type=nginx&regex=abc`` remove all lines with type 
 
 Parameters:
 
-* ``regex``: the regex to be matched
-* ``invert``: if ``true``, remove lines which match. Default value: false
+* ``regex``: the regex to be matched. You have to escape special characters.
+* ``invert``: if ``true``, remove lines which match. Default value: false.
 
 Compute field
 ---
@@ -282,7 +282,7 @@ Example 2: ``filter://compute_field?toto&value=abc#{titi}`` add a field named ``
 
 Parameters:
 
-* ``value``: the value to place in the given field
+* ``value``: the value to place in the given field.
 
 Split
 ---
@@ -293,7 +293,7 @@ Example 1: ``filter://split://?delimiter=|`` split all lines of logs on ``|`` ch
 
 Parameters:
 
-* ``delimiter``: the delimiter used to split
+* ``delimiter``: the delimiter used to split.
 
 Multiline
 ---
@@ -304,7 +304,7 @@ Example 1: ``filter://multiline?start_line_regex=^\\d{4}-\\d{2}-\\d{2}`` will re
 
 Parameters:
 
-* ``start_line_regex``: the regular expression which is used to find lines which start blocks
+* ``start_line_regex``: the regular expression which is used to find lines which start blocks. You have to escape special characters.
 * ``max_delay``: delay to wait the end of a block. Default value: 50 ms. Softwares which write logs by block usually write blocks in one time, this parameter is used to send lines without waiting the next matching start line.
 
 License
