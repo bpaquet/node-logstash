@@ -77,6 +77,7 @@ Others params:
 * ``--log_file`` to redirect log to a log file
 * ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin
 * ``--db_file`` to specify the file to use as database for file inputs (see below)
+* ``--http_max_sockets`` to specify the max sockets of [http.globalAgent.maxSockets](http://nodejs.org/api/http.html#http_agent_maxsockets). Default to 100.
 
 Examples
 ---
@@ -187,6 +188,10 @@ Params:
 * ``level``: ``level`` field. Default value: ``6``. Can reference log line properties (see above).
 * ``version``: ``version`` field. Default value: ``1.0``.
 
+File
+---
+
+This plugin is used to write data into files. There are two modes: JSON
 Filters
 ===
 

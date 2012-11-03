@@ -3,6 +3,7 @@
 var optimist = require('optimist'),
     fs = require('fs'),
     path = require('path'),
+    http = require('http'),
     logger = require('log4node'),
     agent = require('../lib/agent'),
     monitor_file = require('../lib/lib/monitor_file'),
@@ -47,6 +48,10 @@ var package_json_file = path.join(__dirname, '..', 'package.json');
 var version = JSON.parse(fs.readFileSync(package_json_file))['version'];
 
 logger.notice('Starting node-logstasth-agent', version);
+
+var http_max_sockets = argv.http_max_sockets || 100;
+logger.info('Max http socket', http_max_sockets);
+http.globalAgent.maxSocket = http_max_sockets;
 
 var a = agent.create();
 
