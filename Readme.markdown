@@ -204,7 +204,25 @@ Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each 
 Parameters:
 
 * ``output_type``: ``raw`` or ``json``. Default is ``raw``.
-* ``format``: Log format in ``raw`` mode. Default is ``#{@message}``.
+* ``format``: Log format for ``raw`` mode. Default is ``#{@message}``.
+
+HTTP Post
+---
+
+This plugin is used to send data to an HTTP server, with a POST request. For filling request body, there are two modes: JSON, and raw (default).
+
+In JSON mode, the HTTP POST body request will contain a JSON dump of log line, containing all fields. Content-Type will be set to ``text/plain``.
+
+In raw mode, the HTTP POST body request will contain the log line. Content-Type will be set to ``application/json``.
+
+Example 1: Send data to [Loggly](http://loggly.com/): ``output://http_post://logs.loggly.com:80?path=/inputs/YOUR_INPUT_KEY``
+
+Parameters:
+
+* ``path``: the path to use in the HTTP request
+* ``proto``: ``http`` or ``https``. Default value: ``http``
+* ``output_type``: ``raw`` or ``json``. Default is ``raw``.
+* ``format``: Log format for ``raw`` mode. Default is ``#{@message}``.
 
 Filters
 ===
