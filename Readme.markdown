@@ -108,6 +108,8 @@ Parameters:
 * ``start_index``: add ``?start_index=0`` to reread files from begining. Without this params, only new lines are read.
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=nginx_error_log``.
 
+Note: this plugin can be used on FIFO pipes.
+
 ZeroMQ
 ---
 

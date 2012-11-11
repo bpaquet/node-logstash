@@ -3,6 +3,7 @@ var vows = require('vows'),
     os = require('os'),
     fs = require('fs');
     path = require('path'),
+    child_process = require('child_process'),
     log = require('log4node'),
     monitor_file = require('monitor_file');
 
@@ -39,6 +40,14 @@ function TestMonitor(file, options) {
   this.monitor.on('closed', function(err) {
     this.closed_counter ++;
   }.bind(this));
+}
+
+function run(command, args, exit_callback) {
+  var child = child_process.spawn(command, args);
+  child.on('error', function(err) {
+    assert.ifError(err);
+  });
+  child.on('exit', exit_callback);
 }
 
 function create_test(start_callback, check_callback, path, options) {
@@ -528,6 +537,37 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m1.changed_counter, 1);
       assert.deepEqual(m2.lines, ['line6', 'line7']);
       assert.equal(m2.changed_counter, 1);
+    }
+  }
+}).addBatch({
+  'Monitor fifo': {
+    topic: function() {
+      var callback = this.callback;
+      run('mkfifo', ['toto'], function(exitCode) {
+        assert.equal(0, exitCode);
+        var m = new TestMonitor('toto', {});
+        m.monitor.start();
+        setTimeout(function() {
+          run('sh', ['-c', 'echo x1 > toto'], function(exitCode) {
+            assert.equal(0, exitCode);
+            run('sh', ['-c', 'echo x2 > toto'], function(exitCode) {
+              assert.equal(0, exitCode);
+              setTimeout(function() {
+                m.monitor.close(function() {
+                  callback(undefined, m);
+                });
+              }, 200);
+            });
+          });
+        }, 50);
+      });
+    },
+
+    check: function(err, m) {
+      assert.ifError(err);
+      fs.unlinkSync('toto');
+      no_error(m);
+      assert.deepEqual(m.lines, ['x1', 'x2']);
     }
   }
 }).export(module);
