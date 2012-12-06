@@ -1,6 +1,5 @@
 var vows = require('vows'),
     assert = require('assert'),
-    os = require('os'),
     moment = require('moment'),
     patterns_loader = require('../lib/lib/patterns_loader'),
     filter_helper = require('./filter_helper');
