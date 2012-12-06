@@ -1,0 +1,5 @@
+{
+  "regex": "^<(\\S+)>(\\S+\\s+\\S+\\s+\\d+:\\d+:\\d+) (\\S+) ([^:\\[]+)\\[?(\\d*)\\]?:\\s+(.*)$",
+  "fields": "syslog_priority,timestamp,@source_host,syslog_program,syslog_pid,@message",
+  "date_format": "MMM DD HH:mm:ss"
+}

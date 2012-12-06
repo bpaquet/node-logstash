@@ -1,8 +1,11 @@
 var vows = require('vows'),
     assert = require('assert'),
     os = require('os'),
+    moment = require('moment'),
     patterns_loader = require('../lib/lib/patterns_loader'),
     filter_helper = require('./filter_helper');
+
+var n = moment();
 
 patterns_loader.add('/toto');
 patterns_loader.add('/tata');
@@ -70,7 +73,22 @@ vows.describe('Filter regex ').addBatch({
   ], [
     {'@message': '31/Jul/2012:18:02:28 +0200', '@fields': {}, '@timestamp': '2012-07-31T16:02:28+00:00'},
     {'@message': '31/Jul/2012', '@fields': {}, '@timestamp': '2012-07-31T00:00:00+00:00'},
-    {'@message': 'toto', '@fields': {}, '@timestamp': '0000-01-01T00:00:00+00:00'},
+    {'@message': 'toto', '@fields': {}},
+  ]),
+  'missing fields in date': filter_helper.create('regex', '?regex=^(.*)$&fields=timestamp&date_format=HH:mm:ss ZZ', [
+    {'@message': '18:02:28'},
+  ], [
+    {'@message': '18:02:28', '@fields': {}, '@timestamp': n.year() + '-01-01T18:02:28+00:00'},
+  ]),
+  'change message': filter_helper.create('regex', '?regex=^abcd(.*)efgh$&fields=@message', [
+    {'@message': 'abcd12345efgh'},
+  ], [
+    {'@message': '12345', '@fields': {}},
+  ]),
+  'change source host': filter_helper.create('regex', '?regex=^(abcd)(.*)efgh$&fields=a,@source_host', [
+    {'@message': 'abcd12345efgh'},
+  ], [
+    {'@message': 'abcd12345efgh', '@fields': {'a': 'abcd'}, '@source_host': '12345'},
   ]),
   'nginx parsing': filter_helper.create('regex', '?regex=^(\\S+) - (\\S*) ?- \\[([^\\]]+)\\] "([^"]+)" (\\d+) (\\d+) "([^"]*)" "([^"]*)"&fields=ip,user,timestamp,request,status,bytes_sent,referer,user_agent&date_format=DD/MMMM/YYYY:HH:mm:ss ZZ', [
     {'@message': '127.0.0.1 - - [31/Jul/2012:18:02:28 +0200] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2"'},
