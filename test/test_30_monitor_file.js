@@ -301,17 +301,19 @@ vows.describe('Monitor ').addBatch({
       var m2 = new TestMonitor(randomFile());
       m1.monitor.start();
       m2.monitor.start();
-      fs.appendFileSync(m1.file, 'line1\n');
       setTimeout(function() {
-        fs.appendFileSync(m2.file, 'line10\n');
+        fs.appendFileSync(m1.file, 'line1\n');
         setTimeout(function() {
-          fs.appendFileSync(m1.file, 'line2\n');
+          fs.appendFileSync(m2.file, 'line10\n');
           setTimeout(function() {
-            m1.monitor.close(function() {
-              m2.monitor.close(function() {
-                callback(undefined, m1, m2);
+            fs.appendFileSync(m1.file, 'line2\n');
+            setTimeout(function() {
+              m1.monitor.close(function() {
+                m2.monitor.close(function() {
+                  callback(undefined, m1, m2);
+                });
               });
-            });
+            }, 200);
           }, 200);
         }, 200);
       }, 200);
@@ -330,16 +332,23 @@ vows.describe('Monitor ').addBatch({
     }
   }
 }).addBatch({
-  'Wrong file path': create_test(function(m, callback) {
+  'File path does not exists': create_test(function(m, callback) {
     m.monitor.start(0);
-    setTimeout(callback, 200);
-    }, function check(m) {
-      assert.equal(m.errors.length, 0);
-      assert.equal(m.init_errors.length, 1);
-      assert.equal(m.lines.length, 0);
-    },
-  '/toto_does_not_exists/toto.log'),
-}).addBatch({
+    setTimeout(function() {
+      no_error(m);
+      assert.equal(m.dir_watcher, undefined);
+      fs.mkdirSync(path.dirname(m.file));
+      fs.writeFileSync(m.file, 'line1\nline2\n');
+      setTimeout(callback, 1200);
+    }, 200);
+  }, function check(m) {
+    fs.unlinkSync(m.file);
+    fs.rmdirSync(path.dirname(m.file));
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }, path.join(os.tmpDir(), '___node-logstash_test___' + Math.random()))
+})
+.addBatch({
   'Simple logrotate simulation': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(function() {
@@ -559,7 +568,7 @@ vows.describe('Monitor ').addBatch({
               }, 200);
             });
           });
-        }, 50);
+        }, 200);
       });
     },
 

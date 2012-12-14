@@ -135,16 +135,18 @@ vows.describe('Integration :').addBatch({
         'input://file://input2.txt?type=input2',
         'output://file://output1.txt?output_type=json',
         'output://file://output2.txt?output_type=json',
-        ], function(agent) {
-        fs.appendFileSync('input1.txt', 'line1\n');
+      ], function(agent) {
         setTimeout(function() {
-          fs.appendFileSync('input2.txt', 'line2\n');
+          fs.appendFileSync('input1.txt', 'line1\n');
           setTimeout(function() {
-            fs.appendFileSync('input1.txt', 'line3\n');
+            fs.appendFileSync('input2.txt', 'line2\n');
             setTimeout(function() {
-              agent.close(function() {
-                callback(null);
-              });
+              fs.appendFileSync('input1.txt', 'line3\n');
+              setTimeout(function() {
+                agent.close(function() {
+                  callback(null);
+                });
+              }, 200);
             }, 200);
           }, 200);
         }, 200);
@@ -474,12 +476,14 @@ vows.describe('Integration :').addBatch({
         'input://file://input.txt',
         'filter://multiline://?start_line_regex=^1234',
         'output://file://output.txt?output_type=json',
-        ], function(agent) {
-        fs.appendFileSync('input.txt', 'line1\nline2\n1234line3\n1234line4\nline5\n');
+      ], function(agent) {
         setTimeout(function() {
-          agent.close(function() {
-            callback(null);
-          });
+          fs.appendFileSync('input.txt', 'line1\nline2\n1234line3\n1234line4\nline5\n');
+          setTimeout(function() {
+            agent.close(function() {
+              callback(null);
+            });
+          }, 200);
         }, 200);
       });
     },
@@ -511,11 +515,6 @@ vows.describe('Integration :').addBatch({
   'wrong port in tcp module': check_error_init([
     'input://tcp://0.0.0.0:abcd'
     ], 'Unable to extract port'),
-}).addBatch({
- 'input_file_error': check_error_module([
-   'input://file:///path_which_does_not_exist/input1.txt',
-   'output://stdout://'
-   ], 'init_error', 'Error: watch ENOENT', 'input_file'),
 }).addBatch({
   'wrong_output_file_module': check_error_module([
     'output://file:///path_which_does_not_exist/titi.txt'
