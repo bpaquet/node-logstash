@@ -74,6 +74,15 @@ vows.describe('Filter regex ').addBatch({
     {'@message': '31/Jul/2012', '@fields': {}, '@timestamp': '2012-07-31T00:00:00+00:00'},
     {'@message': 'toto', '@fields': {}},
   ]),
+  'date parsing with output date format': filter_helper.create('regex', '?regex=^(.*)$&fields=timestamp&date_format=DD/MMMM/YYYY:HH:mm:ss.SSS ZZ&output_date_format=YYYY-MM-DDTHH:mm:ss.SSSZ', [
+    {'@message': '31/Jul/2012:18:02:28.123 +0200'},
+    {'@message': '31/Jul/2012'},
+    {'@message': 'toto'},
+  ], [
+    {'@message': '31/Jul/2012:18:02:28.123 +0200', '@fields': {}, '@timestamp': '2012-07-31T18:02:28.123+02:00'},
+    {'@message': '31/Jul/2012', '@fields': {}, '@timestamp': '2012-07-31T02:00:00.000+02:00'},
+    {'@message': 'toto', '@fields': {}, '@timestamp': '2012-01-01T01:00:00.000+01:00'},
+  ]),
   'missing fields in date': filter_helper.create('regex', '?regex=^(.*)$&fields=timestamp&date_format=HH:mm:ss ZZ', [
     {'@message': '18:02:28'},
   ], [
