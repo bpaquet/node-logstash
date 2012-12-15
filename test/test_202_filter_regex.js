@@ -70,14 +70,14 @@ vows.describe('Filter regex ').addBatch({
     {'@message': '31/Jul/2012'},
     {'@message': 'toto'},
   ], [
-    {'@message': '31/Jul/2012:18:02:28 +0200', '@fields': {}, '@timestamp': '2012-07-31T16:02:28+00:00'},
-    {'@message': '31/Jul/2012', '@fields': {}, '@timestamp': '2012-07-31T00:00:00+00:00'},
+    {'@message': '31/Jul/2012:18:02:28 +0200', '@fields': {}, '@timestamp': '2012-07-31T16:02:28.000+0000'},
+    {'@message': '31/Jul/2012', '@fields': {}, '@timestamp': '2012-07-31T00:00:00.000+0000'},
     {'@message': 'toto', '@fields': {}},
   ]),
   'missing fields in date': filter_helper.create('regex', '?regex=^(.*)$&fields=timestamp&date_format=HH:mm:ss ZZ', [
     {'@message': '18:02:28'},
   ], [
-    {'@message': '18:02:28', '@fields': {}, '@timestamp': n.year() + '-01-01T18:02:28+00:00'},
+    {'@message': '18:02:28', '@fields': {}, '@timestamp': n.year() + '-01-01T18:02:28.000+0000'},
   ]),
   'change message': filter_helper.create('regex', '?regex=^abcd(.*)efgh$&fields=@message', [
     {'@message': 'abcd12345efgh'},
@@ -103,7 +103,7 @@ vows.describe('Filter regex ').addBatch({
         user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1215.0 Safari/537.2',
         referer: '-',
       },
-      '@timestamp': '2012-07-31T16:02:28+00:00'
+      '@timestamp': '2012-07-31T16:02:28.000+0000'
     },
     {
       '@message': '127.0.0.1 - - [31/Jul/2012:18:02:48 +0200] "-" 400 0 "-" "-"',
@@ -115,7 +115,7 @@ vows.describe('Filter regex ').addBatch({
         user_agent: '-',
         referer: '-',
       },
-      '@timestamp': '2012-07-31T16:02:48+00:00'
+      '@timestamp': '2012-07-31T16:02:48.000+0000'
     },
   ], function(r) {
     assert.equal(typeof(r[0]['@fields'].status), 'number');
@@ -137,7 +137,7 @@ vows.describe('Filter regex ').addBatch({
         referer: '-',
         user: '-',
       },
-      '@timestamp': '2012-07-31T16:02:28+00:00'
+      '@timestamp': '2012-07-31T16:02:28.000+0000'
     },
     {
       '@message': '88.178.233.127 - cdv [12/Oct/2012:14:23:28 +0000] "GET /public/utils/ejam.jar HTTP/1.1" 304 172 "-" "Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07"',
@@ -150,7 +150,7 @@ vows.describe('Filter regex ').addBatch({
         user_agent: 'Mozilla/4.0 (Windows 7 6.1) Java/1.7.0_07',
         request: 'GET /public/utils/ejam.jar HTTP/1.1'
       },
-      '@timestamp': '2012-10-12T14:23:28+00:00'
+      '@timestamp': '2012-10-12T14:23:28.000+0000'
     }
   ]),
   'http vhost combined with predefined type': filter_helper.create('regex', 'http_vhost_combined', [
@@ -169,7 +169,7 @@ vows.describe('Filter regex ').addBatch({
         request: 'GET /public/utils/ejam.jar HTTP/1.1',
         vhost: 'ip-10-62-95-254.eu-west-1.compute.internal:80',
       },
-      '@timestamp': '2012-10-12T14:23:28+00:00'
+      '@timestamp': '2012-10-12T14:23:28.000+0000'
     },
     {
       '@message': 'www.skillstar.com:80 86.221.21.138 - - [13/Oct/2012:09:04:42 +0200] "GET /favicon.ico HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20100101 Firefox/15.0.1"',
@@ -183,7 +183,7 @@ vows.describe('Filter regex ').addBatch({
         user_agent: 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:15.0) Gecko/20100101 Firefox/15.0.1',
         request: 'GET /favicon.ico HTTP/1.1'
       },
-      '@timestamp': '2012-10-13T07:04:42+00:00'
+      '@timestamp': '2012-10-13T07:04:42.000+0000'
     }
   ]),
 }).export(module);
