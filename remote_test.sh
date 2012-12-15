@@ -14,4 +14,4 @@ if [ "$TEST" != "" ]; then
 fi
 
 rsync -avh --delete --exclude=.git --exclude=node_modules ../node-logstash/ $TARGET:node-logstash/
-ssh $TARGET "source .nvm/nvm.sh && nvm use 0.8.7 && cd node-logstash && $COMMAND"
+ssh $TARGET "source .nvm/nvm.sh && nvm use default && cd node-logstash && $COMMAND"

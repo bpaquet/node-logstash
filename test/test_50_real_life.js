@@ -62,13 +62,13 @@ function input_file_test(args, topic_callback, check_callback) {
         'input://file://output.txt' + args,
         'output://udp://localhost:17881',
         ], function(agent) {
-        run('node', ['50_real_life/run.js', '--file=output.txt', '--count=500', '--period=1'], 'process.pid', function(exitCode) {
+        run('node', ['50_real_life/run.js', '--file=output.txt', '--count=1500', '--period=1'], 'process.pid', function(exitCode) {
           setTimeout(function() {
             socket.close();
             agent.close(function() {
               callback(undefined, exitCode, datas);
             });
-          }, 100);
+          }, 200);
         });
       });
       topic_callback();
@@ -80,7 +80,7 @@ function input_file_test(args, topic_callback, check_callback) {
       fs.unlinkSync('process.pid');
       check_callback();
       assert.equal(0, exitCode);
-      assert.equal(500, datas.length);
+      assert.equal(1500, datas.length);
     }
   }
 }
@@ -134,7 +134,7 @@ vows.describe('Real life :').addBatch({
     }
   ),
 }).addBatch({
-  'logrotate test, short wait_delay_after_renaming': input_file_test('?wait_delay_after_renaming=100',
+  'logrotate test, short_wait_delay_after_renaming': input_file_test('?wait_delay_after_renaming=100',
     function() {
       whereis('logrotate', function(err, logrotate) {
         if (err) {
@@ -147,7 +147,6 @@ vows.describe('Real life :').addBatch({
           });
         }, 500);
         setTimeout(function() {
-          console.log(logrotate);
           run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
@@ -173,7 +172,6 @@ vows.describe('Real life :').addBatch({
           });
         }, 500);
         setTimeout(function() {
-          console.log(logrotate);
           run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
