@@ -24,8 +24,8 @@
     "test": "./test-runner.sh"
   },
   "dependencies": {
-    "log4node": "0.1.0",
-    "zmq": "2.1.0",
+    "log4node": "0.1.2",
+    "zmq": "2.2.0",
     "optimist": "0.3.4",
     "moment": "1.7.0"
   },
