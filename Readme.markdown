@@ -52,10 +52,16 @@ Installation
 ---
 
 * Install NodeJS, version > 0.8.
-* Install zmq dev libraries: `apt-get install libzmq1`. This is required to build the [node zeromq module](https://github.com/JustinTulloss/zeromq.node).
-* Install node-logstash: `npm install node-logstash`
+* Install build tools
+  * Debian based system: `apt-get install build-essential`
+  * Centos system: `yum install gcc gcc-c++ make`
+* Install zmq dev libraries: This is required to build the [node zeromq module](https://github.com/JustinTulloss/zeromq.node).
+  * Debian based system: `apt-get install libzmq1`. Under recent releases, this package is present in default repositories. On ubuntu lucid, use this [ppa](https://launchpad.net/~chris-lea/+archive/zeromq). On debian squeeze, use [backports](http://backports-master.debian.org/Instructions/).
+  * Centos 6: `yum install zeromq zeromq-devel`. Before, you have to add the rpm zeromq repo : `curl http://download.opensuse.org/repositories/home:/fengshuo:/zeromq/CentOS_CentOS-6/home:fengshuo:zeromq.repo > /etc/yum.repos.d/zeromq.repo`
+* Clone repository: `git clone git://github.com/bpaquet/node-logstash.git && cd node-logstash`
+* Install dependencies: `npm install`.
 
-The executable is in ``node_modules/node-logstash/bin/node-logstash-agent``
+The executable is in ``bin/node-logstash-agent``
 
 You have scripts in ``dists`` folder to build packages. Actually, only debian is supported.
 
