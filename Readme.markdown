@@ -34,8 +34,8 @@ How it's work ?
 
 The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules:
 
-* [inputs plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
-* [filter plugin](https://github.com/bpaquet/node-logstash/tree/master/lib/filters): extract fields from logs, like timestamps. Example: regex plugin
+* [inputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
+* [filter plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/filters): extract fields from logs, like timestamps. Example: regex plugin
 * [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
 
 
@@ -243,7 +243,7 @@ Example 1: Send data to [Loggly](http://loggly.com/): ``output://http_post://log
 
 Parameters:
 
-* ``path``: the path to use in the HTTP request. Can reference log line properties (see above).
+* ``path``: path to use in the HTTP request. Can reference log line properties (see above).
 * ``proto``: ``http`` or ``https``. Default value: ``http``.
 * ``output_type``: ``raw`` or ``json``. Default is ``raw``.
 * ``format``: Log format for ``raw`` mode. Default is ``#{@message}``. Can reference log line properties (see above).
@@ -260,12 +260,16 @@ Example 1: ``filter://regex://?regex=^(\S)+ &fields=toto``, to extract the first
 
 Example 2: ``filter://regex://http_combined?only_type=nginx``, to extract fields following configuration into the http_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
 
+Example 3: ``filter://regex://?regex=(\d+|-)&fields=a&numerical_fields=a``, to force number extraction. If the macthed string is not a number but ``-``, the field ``a`` will not be set.
+
 Parameters:
 
-* ``regex``: the regex to apply.
-* ``fields``: the name of fields which wil receive the pattern extracted (see below for the special field timestamp).
-* ``type``: if this field is set, only the lines of logs with the same type will be processed by this filter.
-* ``date\_format``: if date_format is specified and a ``timestamp`` field is extracted, the plugin will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
+* ``regex``: regex to apply.
+* ``fields``: name of fields which will receive the pattern extracted (see below for the special field @timestamp).
+* ``numerical_fields``: name of fields which have to contain a numerical value. If value is not numerical, field will not be set.
+* ``date\_format``: if date_format is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
+
+Note: fields with empty values will not be set.
 
 Mutate replace
 ---
@@ -276,8 +280,8 @@ Example: ``filter://mutate_replace?toto&from=\\.&to=-`` replace all ``.`` in ``t
 
 Parameters:
 
-* ``from``: the regex to find pattern which will be replaced. You have to escape special characters.
-* ``to``: the replacement string.
+* ``from``: regex to find pattern which will be replaced. You have to escape special characters.
+* ``to``: replacement string.
 
 Grep
 ---
@@ -292,7 +296,7 @@ Example 3: ``filter://grep://?type=nginx&regex=abc`` remove all lines with type 
 
 Parameters:
 
-* ``regex``: the regex to be matched. You have to escape special characters.
+* ``regex``: regex to be matched. You have to escape special characters.
 * ``invert``: if ``true``, remove lines which match. Default value: false.
 
 Compute field
@@ -306,7 +310,7 @@ Example 2: ``filter://compute_field://toto?value=abc#{titi}`` add a field named 
 
 Parameters:
 
-* ``value``: the value to place in the given field.
+* ``value``: value to be placed in the given field.
 
 Compute date field
 ---
@@ -317,7 +321,7 @@ Example 1: ``filter://compute_date_field://toto?date_format=DD/MMMM/YYYY`` add a
 
 Parameters:
 
-* ``date_format``: the date format string, using [moment](http://momentjs.com/docs/#/parsing/string-format/)
+* ``date_format``: date format string, using [moment](http://momentjs.com/docs/#/parsing/string-format/)
 
 Split
 ---
@@ -328,7 +332,7 @@ Example 1: ``filter://split://?delimiter=|`` split all lines of logs on ``|`` ch
 
 Parameters:
 
-* ``delimiter``: the delimiter used to split.
+* ``delimiter``: delimiter used to split.
 
 Multiline
 ---
@@ -339,7 +343,7 @@ Example 1: ``filter://multiline?start_line_regex=^\\d{4}-\\d{2}-\\d{2}`` will re
 
 Parameters:
 
-* ``start_line_regex``: the regular expression which is used to find lines which start blocks. You have to escape special characters.
+* ``start_line_regex``: egular expression which is used to find lines which start blocks. You have to escape special characters.
 * ``max_delay``: delay to wait the end of a block. Default value: 50 ms. Softwares which write logs by block usually write blocks in one time, this parameter is used to send lines without waiting the next matching start line.
 
 License

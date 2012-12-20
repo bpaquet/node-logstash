@@ -65,6 +65,13 @@ vows.describe('Filter regex ').addBatch({
   ], [
     {'@message': 'abcd efgh ijk', '@fields': {fa: 'abcd'}},
   ]),
+  'numerical_fields': filter_helper.create('regex', '?regex=^(\\S+) (\\d+|-)&fields=fa,fb&numerical_fields=fb', [
+    {'@message': 'abcd 123 ijk'},
+    {'@message': 'abcd - ijk'},
+  ], [
+    {'@message': 'abcd 123 ijk', '@fields': {fa: 'abcd', fb: 123}},
+    {'@message': 'abcd - ijk', '@fields': {fa: 'abcd'}},
+  ]),
   'date parsing': filter_helper.create('regex', '?regex=^(.*)$&fields=timestamp&date_format=DD/MMMM/YYYY:HH:mm:ss ZZ', [
     {'@message': '31/Jul/2012:18:02:28 +0200'},
     {'@message': '31/Jul/2012'},
