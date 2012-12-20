@@ -96,7 +96,7 @@ Config file for an agent:
 Config file for log server:
 
     input://zeromq://tcp://0.0.0.0:5555
-    filter://regex://?load_config=http_combined
+    filter://regex://http_combined
     output://elasticsearch://localhost:9001
 
 Inputs plugins
