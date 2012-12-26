@@ -29,7 +29,7 @@ Moreover it's written in NodeJS, which is a perfect language for programs with m
 
 node-logstash is compatible with logstash. You can replace a node-logstash node by a logstash one. The data are formatted in the same way to be compatible with logstash UIs.
 
-How it's work ?
+How it's works ?
 ===
 
 The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules:
@@ -267,7 +267,7 @@ Parameters:
 * ``regex``: regex to apply.
 * ``fields``: name of fields which will receive the pattern extracted (see below for the special field @timestamp).
 * ``numerical_fields``: name of fields which have to contain a numerical value. If value is not numerical, field will not be set.
-* ``date\_format``: if date_format is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
+* ``date_format``: if ``date_format` is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
 
 Note: fields with empty values will not be set.
 
