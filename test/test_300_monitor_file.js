@@ -7,7 +7,7 @@ var vows = require('vows'),
     log = require('log4node'),
     monitor_file = require('monitor_file');
 
-// log.setLogLevel('debug');
+log.setLogLevel('debug');
 
 function randomFile(pathname) {
   return path.join(pathname || os.tmpDir(), '___node-logstash_test___' + Math.random());
@@ -26,9 +26,11 @@ function TestMonitor(file, options) {
     this.lines.push(data);
   }.bind(this));
   this.monitor.on('error', function(err) {
+    log.error(err);
     this.errors.push(err);
   }.bind(this));
   this.monitor.on('init_error', function(err) {
+    log.error(err);
     this.init_errors.push(err);
   }.bind(this));
   this.monitor.on('renamed', function(err) {
@@ -381,6 +383,40 @@ vows.describe('Monitor ').addBatch({
       fs.unlinkSync(m.file + '.1');
       no_error(m);
       assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4', 'line5', 'line6']);
+      assert.equal(m.closed_counter, 2);
+    },
+  undefined, {wait_delay_after_renaming: 500}),
+}).addBatch({
+  'Complex logrotate simulation with permission pb': create_test(function(m, callback) {
+    m.monitor.start(0);
+    setTimeout(function() {
+      fs.writeFileSync(m.file, 'line1\nline2\n');
+      setTimeout(function() {
+        assert.deepEqual(m.lines, ['line1', 'line2']);
+        fs.renameSync(m.file, m.file + '.1');
+        setTimeout(function() {
+          run('/bin/sh', ['-c', 'umask 777 && touch ' + m.file], function(exit_code) {
+            assert.equal(exit_code, 0);
+            setTimeout(function() {
+              run('/bin/sh', ['-c', 'chmod 644 ' + m.file], function(exit_code) {
+                assert.equal(exit_code, 0);
+                setTimeout(function() {
+                  fs.writeFileSync(m.file, 'line3\nline4\n');
+                  setTimeout(callback, 200);
+                }, 100);
+              });
+            }, 100);
+          });
+        }, 100);
+      }, 200);
+    }, 200);
+    }, function check(m) {
+      fs.unlinkSync(m.file);
+      fs.unlinkSync(m.file + '.1');
+      assert.equal(m.init_errors.length, 0);
+      assert(m.errors.length >= 1);
+      assert(m.errors[0].toString().match(/EACCES/), m.errors[0].toString() + " should contain EACCESS");
+      assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
       assert.equal(m.closed_counter, 2);
     },
   undefined, {wait_delay_after_renaming: 500}),
