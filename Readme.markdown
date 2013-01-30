@@ -299,6 +299,17 @@ Parameters:
 * ``regex``: regex to be matched. You have to escape special characters.
 * ``invert``: if ``true``, remove lines which match. Default value: false.
 
+Reverse DNS
+---
+
+The reverse dns filter replace an ip in `@source_host` by the hostname, performing a dns resolution. This is useful with syslog.
+
+Example 1: ``filter://reverse_dns://`` 
+
+Parameters:
+
+* ``only_hostname``: after dns resolution, the filter will keep only the first word of dns name. Example : 'www.free.fr' will be transformed to 'www'. Default value: true
+
 Compute field
 ---
 
