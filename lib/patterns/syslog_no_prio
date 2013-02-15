@@ -1,0 +1,6 @@
+{
+  "regex": "^(\\S+\\s+\\S+\\s+\\d+:\\d+:\\d+) (\\S+) ([^:\\[]+)\\[?(\\d*)\\]?:\\s+(.*)$",
+  "fields": "timestamp,@source_host,syslog_program,syslog_pid,@message",
+  "numerical_fields": "syslog_pid",
+  "date_format": "MMM DD HH:mm:ss Z"
+}

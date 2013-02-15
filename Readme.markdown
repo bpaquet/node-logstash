@@ -132,6 +132,11 @@ parse timestamp, and will replace ``@source_host`` and ``@message`` field.
 
 The second filter will extract from ``syslog_priority`` field severity and facility.
 
+You can also use the regex ``syslog_no_prio`` if there is no timestamp in syslog lines
+
+* ``input://udp://0.0.0.0:514?type=syslog``
+* ``filter://regex://syslog_no_prio?only_type=syslog``
+
 ZeroMQ
 ---
 
