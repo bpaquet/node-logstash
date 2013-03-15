@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "log4node": "0.1.2",
-    "zmq": "2.2.0",
+    "zmq": "2.3.x",
     "optimist": "0.3.4",
     "moment": "1.7.0"
   },
