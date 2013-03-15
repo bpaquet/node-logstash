@@ -7,8 +7,6 @@ var vows = require('vows'),
     log = require('log4node'),
     monitor_file = require('monitor_file');
 
-log.setLogLevel('debug');
-
 function randomFile(pathname) {
   return path.join(pathname || os.tmpDir(), '___node-logstash_test___' + Math.random());
 }

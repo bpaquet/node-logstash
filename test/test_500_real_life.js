@@ -79,8 +79,8 @@ function input_file_test(args, topic_callback, check_callback) {
       fs.unlinkSync('output.txt');
       fs.unlinkSync('process.pid');
       check_callback();
-      assert.equal(0, exitCode);
-      assert.equal(1500, datas.length);
+      assert.equal(exitCode, 0);
+      assert.equal(datas.length, 1500);
     }
   }
 }
@@ -141,13 +141,13 @@ vows.describe('Real life :').addBatch({
           return console.log(err);
         }
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
           });
         }, 500);
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
           });
@@ -166,15 +166,40 @@ vows.describe('Real life :').addBatch({
           return console.log(err);
         }
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
           });
         }, 500);
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
-            assert.equal(0, exitCode);
+            assert.equal(exitCode, 0);
+          });
+        }, 1000);
+      });
+    }, function() {
+      fs.unlinkSync('output.txt.1');
+      fs.unlinkSync('output.txt.2');
+    }
+  ),
+}).addBatch({
+  'logrotate copy_truncate test': input_file_test('?use_tail=true',
+    function() {
+      whereis('logrotate', function(err, logrotate) {
+        if (err) {
+          return console.log(err);
+        }
+        setTimeout(function() {
+          run(logrotate, ['-f', '50_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+            console.log('Logrotate exit code', exitCode);
+            assert.equal(exitCode, 0);
+          });
+        }, 500);
+        setTimeout(function() {
+          run(logrotate, ['-f', '50_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+            console.log('Logrotate exit code', exitCode);
+            assert.equal(exitCode, 0);
           });
         }, 1000);
       });
@@ -189,8 +214,8 @@ vows.describe('Real life :').addBatch({
     }, function(exitCode) {
       var output = fs.readFileSync('output.txt').toString().trim().split('\n');
       fs.unlinkSync('output.txt');
-      assert.equal(1, exitCode);
-      assert.equal(500, output.length);
+      assert.equal(exitCode, 1);
+      assert.equal(output.length, 500);
       var i = 500;
       output.forEach(function(k) {
         assert.equal("line " + i, k);
@@ -206,9 +231,9 @@ vows.describe('Real life :').addBatch({
           if (err) {
             return console.log(err);
           }
-          run(logrotate, ['-f', '50_real_life/logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
-            assert.equal(0, exitCode);
+            assert.equal(exitCode, 0);
           });
         });
       }, 500);
@@ -218,13 +243,13 @@ vows.describe('Real life :').addBatch({
       var output = (o1 + o2).trim().split('\n');
       fs.unlinkSync('output.txt');
       fs.unlinkSync('output.txt.1');
-      assert.equal(1, exitCode);
+      assert.equal(exitCode, 1);
       assert(o1.length > 0);
       assert(o2.length > 0);
-      assert.equal(500, output.length);
+      assert.equal(output.length, 500);
       var i = 500;
       output.forEach(function(k) {
-        assert.equal("line " + i, k);
+        assert.equal(k, "line " + i);
         i --;
       }
     );
