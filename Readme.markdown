@@ -152,13 +152,13 @@ This plugin is used on log server to receive logs from redis channels. json_even
 
 Example:
 
-* ``input://redis://localhost:6379?key=logstash_channel&type=redis&data_type=channel``
+* ``input://redis://localhost:6379?channel=logstash_channel``
 
 Parameters:
 
-* ``key``: Redis channel/pattern to subscribe/psubscribe to
-* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
-* ``data_type``: either channel, or pattern_channel
+* ``channel``: Redis channel to subscribe/psubscribe to
+* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
+* ``pattern_channel``: use channel as pattern. Default value : false
 
 Outputs and filter, commons parameters
 ===
@@ -268,6 +268,21 @@ Parameters:
 * ``proto``: ``http`` or ``https``. Default value: ``http``.
 * ``output_type``: ``raw`` or ``json``. Default is ``raw``.
 * ``format``: Log format for ``raw`` mode. Default is ``#{@message}``. Can reference log line properties (see above).
+
+Redis
+---
+
+This plugin is used to sent data on a Redis channel.
+
+Example:
+
+* ``output://redis://localhost:6379?channel=logstash_channel``
+
+Parameters:
+
+* ``channel``: Redis channel to subscribe/psubscribe to
+* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
+* ``pattern_channel``: use channel as pattern. Default value : false
 
 Filters
 ===

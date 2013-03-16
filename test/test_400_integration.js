@@ -11,6 +11,7 @@ var vows = require('vows'),
 
 function checkResult(line, target) {
   var parsed = JSON.parse(line);
+  delete parsed['@fields'];
   delete parsed['@timestamp'];
   target['@source_host'] = os.hostname();
   assert.deepEqual(parsed, target);
@@ -520,6 +521,10 @@ vows.describe('Integration :').addBatch({
   'wrong_output_file_module': check_error_module([
     'output://file:///path_which_does_not_exist/titi.txt'
   ], 'error', 'ENOENT', 'output_file'),
+}).addBatch({
+  'redis channel transport': file2x2x2file(['output://redis://localhost:6379?channel=toto&db=2'], ['input://redis://localhost:6379?channel=toto&db=4']),
+}).addBatch({
+  'redis pattern channel transport': file2x2x2file(['output://redis://localhost:6379?channel=pouet_toto'], ['input://redis://localhost:6379?channel=*toto&pattern_channel=true']),
 }).addBatch({
   'file transport': file2x2x2file(['output://file://main_middle.txt?output_type=json'], ['input://file://main_middle.txt'], function() { fs.unlinkSync('main_middle.txt'); }),
 }).addBatch({
