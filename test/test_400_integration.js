@@ -423,6 +423,7 @@ vows.describe('Integration :').addBatch({
       gelf.bind(17874);
       createAgent([
         'input://file://input1.txt?type=toto',
+        'filter://compute_field://a?only_type=toto&value=b',
         'input://file://input2.txt',
         'filter://regex://?regex=^\\[(.*)\\]&fields=timestamp&date_format=DD/MMMM/YYYY:HH:mm:ss ZZ',
         'output://gelf://localhost:17874'
@@ -453,7 +454,8 @@ vows.describe('Integration :').addBatch({
         timestamp: (new Date('2012-07-31T16:02:28+00:00')).getTime() / 1000,
         host: os.hostname(),
         facility: 'toto',
-        level: '6'
+        level: '6',
+        _a: 'b',
        },
        {
         version: '1.0',
