@@ -17,7 +17,7 @@
     }
   ],
   "devDependencies": {
-    "vows": "0.6.x",
+    "vows": "0.7.0",
     "whereis": "0.0.2"
   },
   "scripts": {
@@ -25,13 +25,12 @@
   },
   "dependencies": {
     "log4node": "0.1.2",
-    "zmq": "2.2.0",
+    "zmq": "2.3.x",
     "optimist": "0.3.4",
     "moment": "1.7.0"
   },
   "directories": {
     "test": "./test",
     "bin": "./bin"
-  },
-  "engines": { "node": ">= 0.8.0" }
+  }
 }
