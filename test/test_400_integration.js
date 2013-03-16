@@ -39,6 +39,9 @@ function createAgent(urls, callback, error_callback) {
 function file2x2x2file(config1, config2, clean_callback) {
   return {
     topic: function() {
+      if (clean_callback) {
+        clean_callback();
+      }
       monitor_file.setFileStatus({});
       var callback = this.callback;
       createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
@@ -60,6 +63,10 @@ function file2x2x2file(config1, config2, clean_callback) {
     check: function(err) {
       assert.ifError(err);
 
+      if (clean_callback) {
+        clean_callback();
+      }
+
       var c = fs.readFileSync('main_output.txt').toString();
       fs.unlinkSync('main_input.txt');
       fs.unlinkSync('main_output.txt');
@@ -68,9 +75,6 @@ function file2x2x2file(config1, config2, clean_callback) {
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
       checkResult(splitted[0], {'@source': 'main_input.txt', '@message': '234 tgerhe grgh', '@type': 'test'});
-      if (clean_callback) {
-        clean_callback();
-      }
     }
   }
 }
@@ -528,7 +532,7 @@ vows.describe('Integration :').addBatch({
 }).addBatch({
   'redis pattern channel transport': file2x2x2file(['output://redis://localhost:6379?channel=pouet_toto'], ['input://redis://localhost:6379?channel=*toto&pattern_channel=true']),
 }).addBatch({
-  'file transport': file2x2x2file(['output://file://main_middle.txt?output_type=json'], ['input://file://main_middle.txt'], function() { fs.unlinkSync('main_middle.txt'); }),
+  'file transport': file2x2x2file(['output://file://main_middle.txt?output_type=json'], ['input://file://main_middle.txt'], function() { if (fs.existsSync('main_middle.txt')) { fs.unlinkSync('main_middle.txt'); }}),
 }).addBatch({
   'tcp transport': file2x2x2file(['output://tcp://localhost:17874'], ['input://tcp://0.0.0.0:17874']),
 }).addBatch({
