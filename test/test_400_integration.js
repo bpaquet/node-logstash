@@ -189,8 +189,8 @@ vows.describe('Integration :').addBatch({
             res.writeHead(201);
             res.end();
             if (reqs.length == 2) {
-              es_server.close(function() {
-                agent.close(function() {
+              agent.close(function() {
+                es_server.close(function() {
                   callback(null, reqs);
                 });
               });
@@ -242,8 +242,8 @@ vows.describe('Integration :').addBatch({
             res.writeHead(204);
             res.end();
             if (reqs.length == 1) {
-              http_server.close(function() {
-                agent.close(function() {
+              agent.close(function() {
+                http_server.close(function() {
                   callback(null, reqs);
                 });
               });
