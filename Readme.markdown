@@ -145,6 +145,21 @@ This plugin is used on log server to receive logs from agents.
 
 Example: ``input://zeromq://tcp://0.0.0.0:5555``, to open a zeromq socket on port 5555.
 
+Redis
+---
+
+This plugin is used on log server to receive logs from redis channels. json_event format is expected.
+
+Example:
+
+* ``input://redis://localhost:6379?key=logstash_channel&type=redis&data_type=channel``
+
+Parameters:
+
+* ``key``: Redis channel/pattern to subscribe/psubscribe to
+* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
+* ``data_type``: either channel, or pattern_channel
+
 Outputs and filter, commons parameters
 ===
 
