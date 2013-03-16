@@ -232,6 +232,7 @@ Parameters:
 * ``facility``: ``facility`` field. Default value: ``#{@type}``, the line type. ``no_facility`` if no value. Can reference log line properties (see above).
 * ``level``: ``level`` field. Default value: ``6``. Can reference log line properties (see above).
 * ``version``: ``version`` field. Default value: ``1.0``.
+* ``additional_fields``: ``additional_fields`` field. Default value: ``@fields``, add additional fields to GELF message.
 
 File
 ---
