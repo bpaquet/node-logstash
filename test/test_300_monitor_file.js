@@ -121,6 +121,18 @@ vows.describe('Monitor ').addBatch({
     }
   ),
 }).addBatch({
+  'Not empty file start index 6': create_test(
+    function(m, callback) {
+      fs.writeFileSync(m.file, 'line1\nline2\n');
+      m.monitor.start(3);
+      setTimeout(callback, 200);
+    }, function(m) {
+      fs.unlinkSync(m.file);
+      no_error(m);
+      assert.deepEqual(m.lines, ['e1', 'line2']);
+    }
+  ),
+}).addBatch({
   'Not empty file start index 0, big buffer, and empty line removal': create_test(
     function(m, callback) {
       fs.writeFileSync(m.file, fs.readFileSync(__filename).toString());
