@@ -99,6 +99,15 @@ Config file for log server:
     filter://regex://http_combined
     output://elasticsearch://localhost:9001
 
+Changelog
+===
+
+0.0.2
+---
+
+* Add redis input and output plugin
+* Add tail -f input file plugin
+
 Inputs plugins
 ===
 
