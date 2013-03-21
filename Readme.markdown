@@ -402,6 +402,30 @@ Parameters:
 * ``start_line_regex``: egular expression which is used to find lines which start blocks. You have to escape special characters.
 * ``max_delay``: delay to wait the end of a block. Default value: 50 ms. Softwares which write logs by block usually write blocks in one time, this parameter is used to send lines without waiting the next matching start line.
 
+Misc
+===
+
+Force fields typing in Elastic Search
+---
+
+If you have a custom field with an hashcode, and if the first hashcode of the day contains only digits, Elastic Search will guess the field type and will choose integer. Following insert with a real hash code with letter will failed, with a beautiful exception in Elastic Search. To avoid that, add `default-mapping.json` file in Elastic Search config directory :
+
+```json
+{
+  "_default_": {
+    "properties": {
+      "@fields": {
+        "properties": {
+          "my_string_field": {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
 License
 ===
 
