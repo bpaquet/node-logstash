@@ -408,7 +408,11 @@ Misc
 Force fields typing in Elastic Search
 ---
 
-If you have a custom field with an hashcode, and if the first hashcode of the day contains only digits, Elastic Search will guess the field type and will choose integer. Following insert with a real hash code with letter will failed, with a beautiful exception in Elastic Search. To avoid that, add `default-mapping.json` file in Elastic Search config directory :
+If you have a custom field with an hashcode
+- if the first hashcode of the day contains only digits, Elastic Search will guess the field type and will choose integer and it will fail to index the next values that contains letters.
+- by default elastic search will tokenize it like some real text instead of treating it like a blob, it won't impact tools like kibana but may prevent you from doing custom queries.
+
+For both cases you should add a `default-mapping.json` file in Elastic Search config directory :
 
 ```json
 {
@@ -416,8 +420,9 @@ If you have a custom field with an hashcode, and if the first hashcode of the da
     "properties": {
       "@fields": {
         "properties": {
-          "my_string_field": {
-            "type" : "string"
+          "my_hash_field": {
+            "type" : "string",
+            "index" : "not_analyzed"
           }
         }
       }
@@ -429,7 +434,7 @@ If you have a custom field with an hashcode, and if the first hashcode of the da
 License
 ===
 
-Copyright 2012 Bertrand Paquet
+Copyright 2012 - 2013 Bertrand Paquet
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
