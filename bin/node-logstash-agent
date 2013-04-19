@@ -21,16 +21,23 @@ function help() {
   console.log('- output://file:///tmp/toto.txt');
 }
 
+function log_error() {
+  if (argv.log_file) {
+    console.log.apply(console, arguments);
+  }
+  logger.error.apply(logger, arguments);
+}
+
 if (argv.help) {
   help();
   process.exit(0);
 }
 
 process.on('uncaughtException', function (err) {
-  logger.error('Exception has been catch, it\' a bug');
-  logger.error('Please submit an issue on https://github.com/bpaquet/node-logstash');
-  logger.error('Exception:', err);
-  logger.error(err.stack);
+  log_error('Exception has been catch, it\' a bug');
+  log_error('Please submit an issue on https://github.com/bpaquet/node-logstash');
+  log_error('Exception:', err);
+  log_error(err.stack);
 });
 
 if (argv.log_file) {
@@ -60,7 +67,7 @@ a.on('error', function(module_name, error) {
 });
 
 a.on('init_error', function(module_name, error) {
-  logger.error('[' + module_name + '] ' + error);
+  log_error('[' + module_name + '] ' + error);
   setTimeout(function() {
     process.exit(1);
   }, 50);
@@ -83,10 +90,10 @@ function load_config_file(config) {
     logger.info('Loading config file : ' + argv.config_file);
     file_loader.loadFile(argv.config_file, function(err, result) {
       if (err) {
-        logger.error('Unable to load config file : ' + err.toString());
+        log_error('Unable to load config file : ' + err.toString());
         setTimeout(function() {
           process.exit(1);
-        });
+        }, 50);
         return;
       }
       logger.info('File loaded, ' + result.length + ' urls found');
@@ -103,7 +110,7 @@ function after_config_file(config) {
     logger.info('Loading config files from : ' + argv.config_dir);
     file_loader.loadDirectory(argv.config_dir, function(err, result) {
       if (err) {
-        logger.error('Unable to load config from directory : ' + err.toString());
+        log_error('Unable to load config from directory : ' + err.toString());
         setTimeout(function() {
           process.exit(1);
         }, 50);
@@ -123,7 +130,7 @@ function after_config_directory(config) {
 
   a.loadUrls(config, function(err) {
     if (err) {
-      logger.error('Unable to load urls : ' + err);
+      log_error('Unable to load urls : ' + err);
       setTimeout(function() {
         process.exit(2);
       }, 50);
@@ -139,7 +146,7 @@ function close() {
     if (argv.db_file) {
       fs.writeFile(argv.db_file, JSON.stringify(monitor_file.getFileStatus()), function(err) {
         if (err) {
-          logger.error('Error while writing', argv.db_file, ':', err);
+          log_error('Error while writing', argv.db_file, ':', err);
         }
         setTimeout(function() {
           process.exit(1);
@@ -173,7 +180,7 @@ if (argv.db_file) {
     else {
       fs.readFile(argv.db_file, function(err, data) {
         if (err) {
-          logger.error('Error while reading', argv.db_file, ':', err);
+          log_error('Error while reading', argv.db_file, ':', err);
         }
         else {
           monitor_file.setFileStatus(JSON.parse(data));
