@@ -97,7 +97,7 @@ vows.describe('Monitor ').addBatch({
       m.monitor.start();
       setTimeout(function() {
         fs.appendFileSync(m.file, 'line1\nline2\n');
-        setTimeout(callback, 200);
+        setTimeout(callback, 1000);
       }, 200);
     }, function(m) {
       fs.unlinkSync(m.file);
@@ -126,7 +126,7 @@ vows.describe('Monitor ').addBatch({
         fs.appendFileSync(m.file, 'line1\n');
         setTimeout(function() {
           fs.appendFileSync(m.file, 'line2\n');
-          setTimeout(callback, 200);
+          setTimeout(callback, 1000);
         }, 200);
       }, 200);
     }, function(m) {
@@ -145,7 +145,7 @@ vows.describe('Monitor ').addBatch({
           setTimeout(function() {
             fs.appendFile(m.file, 'line2\n', function(err) {
               assert.ifError(err);
-              setTimeout(callback, 200);
+              setTimeout(callback, 1000);
             });
           }, 200);
         });
