@@ -9,11 +9,13 @@ var vows = require('vows'),
     zlib = require('zlib'),
     monitor_file = require('../lib/lib/monitor_file');
 
-function checkResult(line, target) {
+function checkResult(line, target, not_override_source_host) {
   var parsed = JSON.parse(line);
   delete parsed['@fields'];
   delete parsed['@timestamp'];
-  target['@source_host'] = os.hostname();
+  if (! not_override_source_host) {
+    target['@source_host'] = os.hostname();
+  }
   assert.deepEqual(parsed, target);
 }
 
@@ -172,6 +174,51 @@ vows.describe('Integration :').addBatch({
       checkResult(splitted[0], {'@source': 'input1.txt', '@message': 'line1'});
       checkResult(splitted[1], {'@source': 'input2.txt', '@message': 'line2', '@type': 'input2'});
       checkResult(splitted[2], {'@source': 'input1.txt', '@message': 'line3'});
+    }
+  },
+}).addBatch({
+  'json_logstash_event': {
+    topic: function() {
+      monitor_file.setFileStatus({});
+      var callback = this.callback;
+      createAgent([
+        'input://udp://0.0.0.0:67854',
+        'output://file://output.txt?output_type=json',
+        ], function(agent) {
+        var socket = dgram.createSocket('udp4');
+        var udp_send = function(s) {
+          var buffer = new Buffer(s);
+          socket.send(buffer, 0, buffer.length, 67854, 'localhost', function(err, bytes) {
+            if (err || bytes != buffer.length) {
+            }
+          })
+        };
+        setTimeout(function() {
+          udp_send('toto');
+          setTimeout(function() {
+            udp_send('{"tata":"toto","@message":"titi"}');
+            setTimeout(function() {
+              udp_send('{"tata":"toto","@message":"titi", "@source": "test42", "@type": "pouet"}');
+              setTimeout(function() {
+                socket.close();
+                callback(null)
+              }, 200);
+            }, 50);
+          }, 50);
+        }, 50);
+      }.bind(this));
+    },
+
+    check: function(err) {
+      assert.ifError(err);
+      var c = fs.readFileSync('output.txt').toString();
+      fs.unlinkSync('output.txt');
+      var splitted = c.split('\n');
+      assert.equal(splitted.length, 4);
+      assert.equal("", splitted[splitted.length - 1]);
+      checkResult(splitted[0], {'@source': 'udp_0.0.0.0_67854', '@source_host': '127.0.0.1', '@message': 'toto'}, true);
+      checkResult(splitted[1], {'@source': 'udp_0.0.0.0_67854', '@source_host': '127.0.0.1', '@message': '{"tata":"toto","@message":"titi"}'}, true);
+      checkResult(splitted[2], {'@source': 'test42', '@source_host': '127.0.0.1', '@type': 'pouet', 'tata': 'toto', '@message': 'titi'});
     }
   },
 }).addBatch({
