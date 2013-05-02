@@ -2,6 +2,7 @@ var vows = require('vows'),
     assert = require('assert'),
     fs = require('fs');
     path = require('path'),
+    spawn = require('child_process').spawn,
     directory_detector = require('../lib/lib/directory_detector');
 
 function TestDirectoryDetector(directory) {
@@ -168,6 +169,25 @@ vows.describe('Directory detector ').addBatch({
     fs.rmdirSync('toto45/12/45');
     fs.rmdirSync('toto45/12');
     fs.rmdirSync('toto45');
+    check(detector, 1, 1, 0);
+  }),
+}).addBatch({
+  '4 subdirectory mkdir -p': create_test(path.resolve('.') + '/toto49/12/45/87', function(callback, detector) {
+    setTimeout(function() {
+      check(detector, 0, 1, 0);
+      child = spawn('mkdir', ['-p', 'toto49/12/45/87']);
+      child.on('exit', function(exit_code) {
+        assert.equal(0, exit_code);
+        setTimeout(function() {
+          callback();
+        }, 50);
+      })
+    }, 50);
+  }, function(detector) {
+    fs.rmdirSync('toto49/12/45/87');
+    fs.rmdirSync('toto49/12/45');
+    fs.rmdirSync('toto49/12');
+    fs.rmdirSync('toto49');
     check(detector, 1, 1, 0);
   }),
 }).export(module);
