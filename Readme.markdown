@@ -102,6 +102,8 @@ Config file for log server:
 Changelog
 ===
 
+* Allow to use input file plugin on non existent directory
+
 0.0.2
 ---
 

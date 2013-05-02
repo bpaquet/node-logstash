@@ -35,7 +35,7 @@ function createAgent(urls, callback, error_callback) {
   a.loadUrls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(error) {
     assert.ifError(error);
     callback(a);
-  }, 200);
+  });
 }
 
 function file2x2x2file(config1, config2, clean_callback) {
@@ -49,16 +49,18 @@ function file2x2x2file(config1, config2, clean_callback) {
       createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
         createAgent(config2.concat(['output://file://main_output.txt?output_type=json']), function(a2) {
           setTimeout(function() {
-            fs.appendFileSync('main_input.txt', '234 tgerhe grgh\n');
-            setTimeout(function() {
-              a1.close(function() {
-                a2.close(function() {
-                  callback(null);
+            fs.appendFile('main_input.txt', '234 tgerhe grgh\n', function(err) {
+              assert.ifError(err);
+              setTimeout(function() {
+                a1.close(function() {
+                  a2.close(function() {
+                    callback(null);
+                  });
                 });
-              });
-            }, 200);
+              }, 200);
+            });
           }, 200);
-        });
+        }, 200);
       });
     },
 
@@ -143,17 +145,25 @@ vows.describe('Integration :').addBatch({
         'output://file://output1.txt?output_type=json',
         'output://file://output2.txt?output_type=json',
         ], function(agent) {
-        fs.appendFileSync('input1.txt', 'line1\n');
         setTimeout(function() {
-          fs.appendFileSync('input2.txt', 'line2\n');
-          setTimeout(function() {
-            fs.appendFileSync('input1.txt', 'line3\n');
+          fs.appendFile('input1.txt', 'line1\n', function(err) {
+            assert.ifError(err);
             setTimeout(function() {
-              agent.close(function() {
-                callback(null);
+              fs.appendFile('input2.txt', 'line2\n', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  fs.appendFile('input1.txt', 'line3\n', function(err) {
+                    assert.ifError(err);
+                    setTimeout(function() {
+                      agent.close(function() {
+                        callback(null);
+                      });
+                    }, 200);
+                  });
+                }, 200);
               });
             }, 200);
-          }, 200);
+          });
         }, 200);
       });
     },
@@ -174,6 +184,58 @@ vows.describe('Integration :').addBatch({
       checkResult(splitted[0], {'@source': 'input1.txt', '@message': 'line1'});
       checkResult(splitted[1], {'@source': 'input2.txt', '@message': 'line2', '@type': 'input2'});
       checkResult(splitted[2], {'@source': 'input1.txt', '@message': 'line3'});
+    }
+  },
+}).addBatch({
+  'file2file not exising dir': {
+    topic: function() {
+      monitor_file.setFileStatus({});
+      var callback = this.callback;
+      createAgent([
+        'input://file://toto/56/87/input.txt',
+        'output://file://output.txt?output_type=json',
+        ], function(agent) {
+        setTimeout(function() {
+          fs.mkdir('toto', function(err) {
+            assert.ifError(err);
+            fs.mkdir('toto/56', function(err) {
+              assert.ifError(err);
+              fs.mkdir('toto/56/87', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  fs.appendFile('toto/56/87/input.txt', 'line1\n', function(err) {
+                    assert.ifError(err);
+                    fs.appendFile('toto/56/87/input.txt', 'line2\n', function(err) {
+                      assert.ifError(err);
+                      setTimeout(function() {
+                        agent.close(function() {
+                          callback(null);
+                        });
+                      }, 200);
+                    });
+                  });
+                });
+              });
+            });
+          });
+        }, 500);
+      });
+    },
+
+    check: function(err) {
+      assert.ifError(err);
+      var c = fs.readFileSync('output.txt').toString();
+      fs.unlinkSync('toto/56/87/input.txt');
+      fs.rmdirSync('toto/56/87');
+      fs.rmdirSync('toto/56');
+      fs.rmdirSync('toto');
+      fs.unlinkSync('output.txt');
+
+      var splitted = c.split('\n');
+      assert.equal(splitted.length, 3);
+      assert.equal("", splitted[splitted.length - 1]);
+      checkResult(splitted[0], {'@source': 'toto/56/87/input.txt', '@message': 'line1'});
+      checkResult(splitted[1], {'@source': 'toto/56/87/input.txt', '@message': 'line2'});
     }
   },
 }).addBatch({
@@ -376,25 +438,35 @@ vows.describe('Integration :').addBatch({
         'output://statsd://127.0.0.1:17874?metric_type=gauge&metric_key=toto.gauge&metric_value=45&only_type=toto',
         ], function(agent) {
         setTimeout(function() {
-          fs.appendFileSync('input1.txt', 'line1\n');
-          setTimeout(function() {
-            fs.appendFileSync('input2.txt', 'line2\n');
+          fs.appendFile('input1.txt', 'line1\n', function(err) {
+            assert.ifError(err);
             setTimeout(function() {
-              fs.appendFileSync('input3.txt', '10\n');
-              setTimeout(function() {
-                fs.appendFileSync('input4.txt', '45_123\n');
+              fs.appendFile('input2.txt', 'line2\n', function(err) {
+                assert.ifError(err);
                 setTimeout(function() {
-                  fs.appendFileSync('input5.txt', 'line3\n');
-                  setTimeout(function() {
-                    agent.close(function() {
-                      statsd.close();
-                      callback(undefined, received);
-                    });
-                  }, 200);
+                  fs.appendFile('input3.txt', '10\n', function(err) {
+                    assert.ifError(err);
+                    setTimeout(function() {
+                      fs.appendFile('input4.txt', '45_123\n', function(err) {
+                        assert.ifError(err);
+                        setTimeout(function() {
+                          fs.appendFile('input5.txt', 'line3\n', function(err) {
+                            assert.ifError(err);
+                            setTimeout(function() {
+                              agent.close(function() {
+                                statsd.close();
+                                callback(undefined, received);
+                              });
+                            }, 200);
+                          });
+                        }, 200);
+                      });
+                    }, 200);
+                  });
                 }, 200);
-              }, 200);
+              });
             }, 200);
-          }, 200);
+          });
         }, 200);
       });
     },
@@ -437,14 +509,18 @@ vows.describe('Integration :').addBatch({
         'output://statsd://127.0.0.1:17874?metric_type=increment&metric_key=toto.bouh.#{unknown_field}',
         ], function(agent) {
         setTimeout(function() {
-          fs.appendFileSync('input1.txt', 'line1\n');
-          fs.appendFileSync('input1.txt', 'line2\n');
-          setTimeout(function() {
-            agent.close(function() {
-              statsd.close();
-              callback(errors, received);
+          fs.appendFile('input1.txt', 'line1\n', function(err) {
+            assert.ifError(err);
+            fs.appendFile('input1.txt', 'line2\n', function(err) {
+              assert.ifError(err);
+              setTimeout(function() {
+                agent.close(function() {
+                  statsd.close();
+                  callback(errors, received);
+                });
+              }, 200);
             });
-          }, 200);
+          });
         }, 200);
       }, function(error) {
         errors.push(error);
@@ -480,16 +556,20 @@ vows.describe('Integration :').addBatch({
         'output://gelf://localhost:17874'
         ], function(agent) {
         setTimeout(function() {
-          fs.appendFileSync('input1.txt', '[31/Jul/2012:18:02:28 +0200] line1\n');
-          setTimeout(function() {
-            fs.appendFileSync('input2.txt', '[31/Jul/2012:20:02:28 +0200] line2\n');
+          fs.appendFile('input1.txt', '[31/Jul/2012:18:02:28 +0200] line1\n', function(err) {
+            assert.ifError(err);
             setTimeout(function() {
-              agent.close(function() {
-                gelf.close();
-                callback(undefined, received);
+              fs.appendFile('input2.txt', '[31/Jul/2012:20:02:28 +0200] line2\n', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  agent.close(function() {
+                    gelf.close();
+                    callback(undefined, received);
+                  });
+                }, 200);
               });
             }, 200);
-          }, 200);
+          });
         }, 200);
       });
     },
@@ -529,10 +609,14 @@ vows.describe('Integration :').addBatch({
         'filter://multiline://?start_line_regex=^1234',
         'output://file://output.txt?output_type=json',
         ], function(agent) {
-        fs.appendFileSync('input.txt', 'line1\nline2\n1234line3\n1234line4\nline5\n');
         setTimeout(function() {
-          agent.close(function() {
-            callback(null);
+          fs.appendFile('input.txt', 'line1\nline2\n1234line3\n1234line4\nline5\n', function(err) {
+            assert.ifError(err);
+            setTimeout(function() {
+              agent.close(function() {
+                callback(null);
+              });
+            }, 200);
           });
         }, 200);
       });
@@ -566,10 +650,10 @@ vows.describe('Integration :').addBatch({
     'input://tcp://0.0.0.0:abcd'
     ], 'Unable to extract port'),
 }).addBatch({
- 'input_file_error': check_error_module([
-   'input://file:///path_which_does_not_exist/input1.txt',
+ 'input_file_error : root directory not readable': check_error_module([
+   'input://file:///root/toto/43input1.txt',
    'output://stdout://'
-   ], 'init_error', 'Error: watch ENOENT', 'input_file'),
+   ], 'init_error', 'Error: watch EACCES', 'input_file'),
 }).addBatch({
   'wrong_output_file_module': check_error_module([
     'output://file:///path_which_does_not_exist/titi.txt'
