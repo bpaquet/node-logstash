@@ -28,7 +28,8 @@
     "zmq": "2.3.x",
     "optimist": "0.3.4",
     "moment": "1.7.0",
-    "redis": "0.8.x"
+    "redis": "0.8.x",
+    "msgpack": "0.1.8"
   },
   "directories": {
     "test": "./test",
