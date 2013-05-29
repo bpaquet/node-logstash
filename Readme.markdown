@@ -102,6 +102,7 @@ Config file for log server:
 Changelog
 ===
 
+* Add serializer and unserializer support
 * Allow to use input file plugin on non existent directory
 
 0.0.2
@@ -112,6 +113,13 @@ Changelog
 
 Inputs plugins
 ===
+
+Unserializers :
+
+Some inputs plugins supports the ``unserializer`` params.
+Supported unserializer for input plugin :
+
+* ``json_logstash``: the unserializer try to parse data as a json object. If fail, raw data is returned. Some input plugins can not accept raw data.
 
 File
 ---
@@ -125,6 +133,7 @@ Parameters:
 * ``start_index``: add ``?start_index=0`` to reread files from begining. Without this params, only new lines are read.
 * ``use_tail``: use system ``tail -f`` command to monitor file, instead of built in file monitoring. Should be used with logrotate and copytuncate option. Defaut value: false.
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=nginx_error_log``.
+* ``unserializer``: please see above. Default value to ``json_logstash``.
 
 Note: this plugin can be used on FIFO pipes.
 
@@ -156,6 +165,9 @@ This plugin is used on log server to receive logs from agents.
 
 Example: ``input://zeromq://tcp://0.0.0.0:5555``, to open a zeromq socket on port 5555.
 
+Parameters :
+* ``unserializer``: please see above. Default value to ``json_logstash``. This plugin does not support raw data.
+
 Redis
 ---
 
@@ -170,6 +182,7 @@ Parameters:
 * ``channel``: Redis channel to subscribe/psubscribe to
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
 * ``pattern_channel``: use channel as pattern. Default value : false
+* ``unserializer``: please see above. Default value to ``json_logstash``.
 
 Outputs and filter, commons parameters
 ===
@@ -191,12 +204,25 @@ Some params are string, which can reference line log properties:
 Ouputs plugins
 ===
 
+Serializer :
+
+Some outputs plugins support the ``serializer`` params.
+Supported serializer for output plugin :
+
+* ``json_logstash``: this serializer dumps the log line to a JSON Object.
+* ``raw``: this serializer dumps the log line to a string, given in the ``format`` parameter. The ``format`` string can reference log lines properties (see above). Default ``format`` value is ``#{message}``.
+
 ZeroMQ
 ---
 
 This plugin is used on agents to send logs to logs servers.
 
 Example: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
+
+Parameters:
+
+* ``serializer``: please see above. Default value to ``json_logstash``.
+* ``format``: please see above. Used by the ``raw``serializer.
 
 Elastic search
 ---
@@ -259,8 +285,8 @@ Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each 
 
 Parameters:
 
-* ``output_type``: ``raw`` or ``json``. Default is ``raw``.
-* ``format``: Log format for ``raw`` mode. Default is ``#{@message}``. Can reference log line properties (see above).
+* ``serializer``: please see above. Default value to ``raw``.
+* ``format``: please see above. Used by the ``raw``serializer.
 
 HTTP Post
 ---
@@ -277,8 +303,8 @@ Parameters:
 
 * ``path``: path to use in the HTTP request. Can reference log line properties (see above).
 * ``proto``: ``http`` or ``https``. Default value: ``http``.
-* ``output_type``: ``raw`` or ``json``. Default is ``raw``.
-* ``format``: Log format for ``raw`` mode. Default is ``#{@message}``. Can reference log line properties (see above).
+* ``serializer``: please see above. Default value to ``json_logstash``.
+* ``format``: please see above. Used by the ``raw``serializer.
 
 Redis
 ---
@@ -294,6 +320,8 @@ Parameters:
 * ``channel``: Redis channel to subscribe/psubscribe to
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
 * ``pattern_channel``: use channel as pattern. Default value : false
+* ``serializer``: please see above. Default value to ``json_logstash``.
+* ``format``: please see above. Used by the ``raw``serializer.
 
 Filters
 ===

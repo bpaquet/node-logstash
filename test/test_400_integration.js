@@ -47,7 +47,7 @@ function file2x2x2file(config1, config2, clean_callback) {
       monitor_file.setFileStatus({});
       var callback = this.callback;
       createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
-        createAgent(config2.concat(['output://file://main_output.txt?output_type=json']), function(a2) {
+        createAgent(config2.concat(['output://file://main_output.txt?serializer=json_logstash']), function(a2) {
           setTimeout(function() {
             fs.appendFile('main_input.txt', '234 tgerhe grgh\n', function(err) {
               assert.ifError(err);
@@ -142,8 +142,9 @@ vows.describe('Integration :').addBatch({
       createAgent([
         'input://file://input1.txt',
         'input://file://input2.txt?type=input2',
-        'output://file://output1.txt?output_type=json',
-        'output://file://output2.txt?output_type=json',
+        'output://file://output1.txt?serializer=json_logstash',
+        'output://file://output2.txt?serializer=json_logstash',
+        'output://file://output3.txt?serializer=raw&format=_#{@message}_',
         ], function(agent) {
         setTimeout(function() {
           fs.appendFile('input1.txt', 'line1\n', function(err) {
@@ -172,10 +173,12 @@ vows.describe('Integration :').addBatch({
       assert.ifError(err);
       var c1 = fs.readFileSync('output1.txt').toString();
       var c2 = fs.readFileSync('output2.txt').toString();
+      var c3 = fs.readFileSync('output3.txt').toString();
       fs.unlinkSync('input1.txt');
       fs.unlinkSync('input2.txt');
       fs.unlinkSync('output1.txt');
       fs.unlinkSync('output2.txt');
+      fs.unlinkSync('output3.txt');
 
       assert.equal(c1, c2);
       var splitted = c1.split('\n');
@@ -184,6 +187,8 @@ vows.describe('Integration :').addBatch({
       checkResult(splitted[0], {'@source': 'input1.txt', '@message': 'line1'});
       checkResult(splitted[1], {'@source': 'input2.txt', '@message': 'line2', '@type': 'input2'});
       checkResult(splitted[2], {'@source': 'input1.txt', '@message': 'line3'});
+
+      assert.equal("_line1_\n_line2_\n_line3_\n", c3);
     }
   },
 }).addBatch({
@@ -193,7 +198,7 @@ vows.describe('Integration :').addBatch({
       var callback = this.callback;
       createAgent([
         'input://file://toto/56/87/input.txt',
-        'output://file://output.txt?output_type=json',
+        'output://file://output.txt?serializer=json_logstash',
         ], function(agent) {
         setTimeout(function() {
           fs.mkdir('toto', function(err) {
@@ -245,7 +250,7 @@ vows.describe('Integration :').addBatch({
       var callback = this.callback;
       createAgent([
         'input://udp://0.0.0.0:67854',
-        'output://file://output.txt?output_type=json',
+        'output://file://output.txt?serializer=json_logstash',
         ], function(agent) {
         var socket = dgram.createSocket('udp4');
         var udp_send = function(s) {
@@ -386,7 +391,7 @@ vows.describe('Integration :').addBatch({
       var callback = this.callback;
       createAgent([
         'input://tcp://localhost:17874?type=2',
-        'output://file://output.txt?output_type=json',
+        'output://file://output.txt?serializer=json_logstash',
         ], function(agent) {
         var c = net.createConnection({port: 17874}, function() {
           c.write("toto");
@@ -607,7 +612,7 @@ vows.describe('Integration :').addBatch({
       createAgent([
         'input://file://input.txt',
         'filter://multiline://?start_line_regex=^1234',
-        'output://file://output.txt?output_type=json',
+        'output://file://output.txt?serializer=json_logstash',
         ], function(agent) {
         setTimeout(function() {
           fs.appendFile('input.txt', 'line1\nline2\n1234line3\n1234line4\nline5\n', function(err) {
@@ -663,7 +668,7 @@ vows.describe('Integration :').addBatch({
 }).addBatch({
   'redis pattern channel transport': file2x2x2file(['output://redis://localhost:6379?channel=pouet_toto'], ['input://redis://localhost:6379?channel=*toto&pattern_channel=true']),
 }).addBatch({
-  'file transport': file2x2x2file(['output://file://main_middle.txt?output_type=json'], ['input://file://main_middle.txt'], function() { if (fs.existsSync('main_middle.txt')) { fs.unlinkSync('main_middle.txt'); }}),
+  'file transport': file2x2x2file(['output://file://main_middle.txt?serializer=json_logstash'], ['input://file://main_middle.txt'], function() { if (fs.existsSync('main_middle.txt')) { fs.unlinkSync('main_middle.txt'); }}),
 }).addBatch({
   'tcp transport': file2x2x2file(['output://tcp://localhost:17874'], ['input://tcp://0.0.0.0:17874']),
 }).addBatch({
