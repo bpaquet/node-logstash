@@ -407,7 +407,11 @@ Parameters:
 Json Fields
 ---
 
-The json fields filter is used to parse the message payload as a JSON object, and merge it to the ``@fields`` attribute. This allows to automatically index fields for messages that already contain a well-formatted JSON payload. The JSON object is parsed starting from the first ``{`` character found in the message. Filter does nothing in case of error while parsing the message. Existing attributes in ``@fields`` are kept, but overwritten if they conflict with attributes from the parsed payload.
+The json fields filter is used to parse the message payload as a JSON object, and merge it to the ``@fields`` attribute.
+
+This allows to automatically index fields for messages that already contain a well-formatted JSON payload. The JSON object is parsed starting from the first ``{`` character found in the message. 
+
+Filter does nothing in case of error while parsing the message. Existing attributes in ``@fields`` are kept, but overwritten if they conflict with attributes from the parsed payload.
 
 Example 1: ``filter://json_fields://?only_type=json_stream`` will parse, as JSON, the given stream of messages which ``@type`` matches ``json_stream``, and fill the ``@fields`` attribute using the messages content.
 
