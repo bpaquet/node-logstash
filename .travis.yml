@@ -1,7 +1,9 @@
 language: node_js
+services:
+  - redis-server
 node_js:
   - "0.10"
   - "0.8"
 before_install:
- - sudo apt-get install libzmq3-dev
- - sudo apt-get install redis-server 
+  - sudo apt-get install libzmq3-dev
+  - sudo apt-get install logrotate
