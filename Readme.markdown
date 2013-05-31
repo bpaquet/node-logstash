@@ -1,7 +1,7 @@
 node-logstash
 ====
 
-![Build Status](https://travis-ci.org/bpaquet/node-logstash.png)
+[![Build Status](https://travis-ci.org/bpaquet/node-logstash.png)](https://travis-ci.org/bpaquet/node-logstash)
 
 What is it ?
 ---
