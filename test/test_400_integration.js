@@ -134,7 +134,7 @@ function check_error_module(urls, type, expected_message_pattern, expected_modul
   }
 }
 
-vows.describe('Integration :').addBatch({
+vows.describe('Integration :').addBatchRetry({
   'file2file': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -191,7 +191,7 @@ vows.describe('Integration :').addBatch({
       assert.equal("_line1_\n_line2_\n_line3_\n", c3);
     }
   },
-}).addBatchRetry({
+}, 5, 20000).addBatchRetry({
   'file2file not exising dir': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -243,7 +243,7 @@ vows.describe('Integration :').addBatch({
       checkResult(splitted[1], {'@source': 'toto/56/87/input.txt', '@message': 'line2'});
     }
   },
-}, 5, 10000).addBatch({
+}, 5, 20000).addBatchRetry({
   'json_logstash_event': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -288,7 +288,7 @@ vows.describe('Integration :').addBatch({
       checkResult(splitted[2], {'@source': 'test42', '@source_host': '127.0.0.1', '@type': 'pouet', 'tata': 'toto', '@message': 'titi'});
     }
   },
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'elastic_search test': {
     topic: function() {
       var callback = this.callback;
@@ -342,7 +342,7 @@ vows.describe('Integration :').addBatch({
       checkResult(reqs[1].body, {'@message': 'titi', '@source': 'tcp_0.0.0.0_17875'});
     }
  },
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'http_post test': {
     topic: function() {
       var callback = this.callback;
@@ -385,7 +385,7 @@ vows.describe('Integration :').addBatch({
       assert.equal(reqs[0].body, "toto");
     }
  },
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'net2file': {
     topic: function() {
       var callback = this.callback;
@@ -418,7 +418,7 @@ vows.describe('Integration :').addBatch({
       checkResult(splitted[0], {'@source': 'tcp_localhost_17874', '@message': 'toto', '@type': '2'});
     }
  },
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'file2statsd': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -493,10 +493,10 @@ vows.describe('Integration :').addBatch({
         'toto.bouh:1|c',
         'toto.bouh:1|c',
         'toto.gauge:45|g',
-      ].sort());
-    }
- },
- }).addBatch({
+        ].sort());
+      }
+   },
+ }, 5, 20000).addBatchRetry({
   'file2statsd_missing_field': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -538,7 +538,7 @@ vows.describe('Integration :').addBatch({
       assert.equal(errors.length, 0);
     }
  },
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'file2gelf': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -604,7 +604,7 @@ vows.describe('Integration :').addBatch({
       ].sort());
     }
   },
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'multiline simple test': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -641,7 +641,7 @@ vows.describe('Integration :').addBatch({
       assert.equal(JSON.parse(splitted[2])['@message'], "1234line4\nline5");
     }
   },
-}, 5, 10000).addBatch({
+}, 5, 20000).addBatch({
   'non_existent_module': check_error_init([
     'input://non_existent_module://'
     ], 'Cannot find module'),
@@ -663,18 +663,18 @@ vows.describe('Integration :').addBatch({
   'wrong_output_file_module': check_error_module([
     'output://file:///path_which_does_not_exist/titi.txt'
   ], 'error', 'ENOENT', 'output_file'),
-}).addBatch({
+}).addBatchRetry({
   'redis channel transport': file2x2x2file(['output://redis://localhost:6379?channel=toto&db=2'], ['input://redis://localhost:6379?channel=toto&db=4']),
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'redis pattern channel transport': file2x2x2file(['output://redis://localhost:6379?channel=pouet_toto'], ['input://redis://localhost:6379?channel=*toto&pattern_channel=true']),
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'file transport': file2x2x2file(['output://file://main_middle.txt?serializer=json_logstash'], ['input://file://main_middle.txt'], function() { if (fs.existsSync('main_middle.txt')) { fs.unlinkSync('main_middle.txt'); }}),
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'tcp transport': file2x2x2file(['output://tcp://localhost:17874'], ['input://tcp://0.0.0.0:17874']),
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:17874'], ['input://zeromq://tcp://*:17874']),
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'unix socket transport': file2x2x2file(['output://unix:///tmp/test_socket'], ['input://unix:///tmp/test_socket']),
-}).addBatch({
+}, 5, 20000).addBatchRetry({
   'udp transport': file2x2x2file(['output://udp://localhost:17874'], ['input://udp://127.0.0.1:17874']),
-}).export(module);
+}, 5, 20000).export(module);
