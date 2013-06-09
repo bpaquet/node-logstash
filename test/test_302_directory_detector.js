@@ -1,4 +1,4 @@
-var vows = require('vows'),
+var vows = require('vows-batch-retry'),
     assert = require('assert'),
     fs = require('fs');
     path = require('path'),
@@ -46,7 +46,7 @@ function create_test(directory, start_callback, check_callback) {
   }
 }
 
-vows.describe('Directory detector ').addBatch({
+vows.describe('Directory detector ').addBatchRetry({
   'current directory exists': create_test(path.resolve('.'), function(callback) {
     setTimeout(function() {
       callback();
@@ -54,7 +54,7 @@ vows.describe('Directory detector ').addBatch({
   }, function(detector) {
     check(detector, 1, 0, 0);
   }),
-}).addBatch({
+}, 5, 10000).addBatchRetry({
   'directory does not exists at startup': create_test(path.resolve('.') + '/toto32', function(callback) {
     setTimeout(function() {
       callback();
@@ -62,7 +62,7 @@ vows.describe('Directory detector ').addBatch({
   }, function(detector) {
     check(detector, 0, 1, 0);
   }),
-}).addBatch({
+}, 5, 10000).addBatchRetry({
   'directory does not exists at startup, parent = /': create_test('/toto32', function(callback) {
     setTimeout(function() {
       callback();
@@ -70,7 +70,7 @@ vows.describe('Directory detector ').addBatch({
   }, function(detector) {
     check(detector, 0, 1, 0);
   }),
-}).addBatch({
+}, 5, 10000).addBatchRetry({
   'strange directory name': create_test('//////toto56', function(callback) {
     setTimeout(function() {
       callback();
@@ -78,7 +78,7 @@ vows.describe('Directory detector ').addBatch({
   }, function(detector) {
     check(detector, 0, 1, 0);
   }),
-}).addBatch({
+}, 5, 10000).addBatchRetry({
   'strange directory name 2': create_test('/#&toto56', function(callback) {
     setTimeout(function() {
       callback();
@@ -86,7 +86,7 @@ vows.describe('Directory detector ').addBatch({
   }, function(detector) {
     check(detector, 0, 1, 0);
   }),
-}).addBatch({
+}, 5, 10000).addBatchRetry({
   'directory does not exists at startup, parent not readable': create_test('/root/toto87/uio', function(callback) {
     setTimeout(function() {
       callback();
@@ -96,7 +96,7 @@ vows.describe('Directory detector ').addBatch({
     console.log(detector.errors);
     assert(detector.errors[0].toString().match(/EACCES/), detector.errors[0].toString() + " should contain EACCESS");
   }),
-}).addBatch({
+}, 5, 10000).addBatchRetry({
   '1 subdirectory': create_test(path.resolve('.') + '/toto44', function(callback, detector) {
     setTimeout(function() {
       check(detector, 0, 1, 0);
@@ -111,7 +111,7 @@ vows.describe('Directory detector ').addBatch({
     fs.rmdirSync('toto44');
     check(detector, 1, 1, 0);
   }),
-}).addBatch({
+}, 5, 10000).addBatchRetry({
   '2 subdirectory, file manipulation': create_test(path.resolve('.') + '/toto48/yuo', function(callback, detector) {
     setTimeout(function() {
       check(detector, 0, 1, 0);
@@ -144,7 +144,7 @@ vows.describe('Directory detector ').addBatch({
     fs.rmdirSync('toto48');
     check(detector, 1, 1, 0);
   }),
-}).addBatch({
+}, 5, 10000).addBatchRetry({
   '4 subdirectory': create_test(path.resolve('.') + '/toto45/12/45/87', function(callback, detector) {
     setTimeout(function() {
       check(detector, 0, 1, 0);
@@ -171,7 +171,7 @@ vows.describe('Directory detector ').addBatch({
     fs.rmdirSync('toto45');
     check(detector, 1, 1, 0);
   }),
-}).addBatch({
+}, 5, 10000).addBatchRetry({
   '4 subdirectory mkdir -p': create_test(path.resolve('.') + '/toto49/12/45/87', function(callback, detector) {
     setTimeout(function() {
       check(detector, 0, 1, 0);
@@ -190,4 +190,4 @@ vows.describe('Directory detector ').addBatch({
     fs.rmdirSync('toto49');
     check(detector, 1, 1, 0);
   }),
-}).export(module);
+}, 5, 10000).export(module);
