@@ -224,7 +224,7 @@ vows.describe('Monitor ').addBatch({
       assert.deepEqual(m2.lines, ['line10']);
     }
   }
-}, 3, 10000).addBatch({
+}, 5, 10000).addBatch({
   'Wrong file path': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(callback, 200);

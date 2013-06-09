@@ -341,7 +341,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}, 3, 10000).addBatch({
+}, 5, 10000).addBatch({
   'Wrong file path': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(callback, 200);
@@ -371,7 +371,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m.closed_counter, 2);
     },
   undefined, {wait_delay_after_renaming: 1}),
-}, 3, 10000).addBatchRetry({
+}, 5, 10000).addBatchRetry({
   'Complex logrotate simulation': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(function() {
@@ -396,7 +396,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m.closed_counter, 2);
     },
   undefined, {wait_delay_after_renaming: 500}),
-}, 3, 10000).addBatch({
+}, 5, 10000).addBatch({
   'Complex logrotate simulation with permission pb': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(function() {
@@ -430,7 +430,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m.closed_counter, 2);
     },
   undefined, {wait_delay_after_renaming: 500}),
-}, 3, 10000).addBatchRetry({
+}, 5, 10000).addBatchRetry({
   'Monitor restart': {
     topic: function() {
       var callback = this.callback;
@@ -466,7 +466,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}, 3, 10000).addBatchRetry({
+}, 5, 10000).addBatchRetry({
   'Monitor restart with write while restart': {
     topic: function() {
       var callback = this.callback;
@@ -505,7 +505,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}, 3, 10000).addBatchRetry({
+}, 5, 10000).addBatchRetry({
   'Monitor restart with write while restart, in a new file, too short': {
     topic: function() {
       var callback = this.callback;
@@ -545,7 +545,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}, 3, 10000).addBatchRetry({
+}, 5, 10000).addBatchRetry({
   'Monitor restart with write while restart, in a new file, content not correct': {
     topic: function() {
       var callback = this.callback;
@@ -585,7 +585,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}, 3, 10000).addBatch({
+}, 5, 10000).addBatch({
   'Monitor fifo': {
     topic: function() {
       var callback = this.callback;

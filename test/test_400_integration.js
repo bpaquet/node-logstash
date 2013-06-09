@@ -243,7 +243,7 @@ vows.describe('Integration :').addBatch({
       checkResult(splitted[1], {'@source': 'toto/56/87/input.txt', '@message': 'line2'});
     }
   },
-}, 3, 10000).addBatch({
+}, 5, 10000).addBatch({
   'json_logstash_event': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -641,7 +641,7 @@ vows.describe('Integration :').addBatch({
       assert.equal(JSON.parse(splitted[2])['@message'], "1234line4\nline5");
     }
   },
-}, 3, 10000).addBatch({
+}, 5, 10000).addBatch({
   'non_existent_module': check_error_init([
     'input://non_existent_module://'
     ], 'Cannot find module'),

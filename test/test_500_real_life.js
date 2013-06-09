@@ -133,7 +133,7 @@ vows.describe('Real life :').addBatchRetry({
     }, function() {
     }
   ),
-}, 3, 20000).addBatchRetry({
+}, 5, 20000).addBatchRetry({
   'logrotate test, short_wait_delay_after_renaming': input_file_test('?wait_delay_after_renaming=100',
     function() {
       whereis('logrotate', function(err, logrotate) {
@@ -158,7 +158,7 @@ vows.describe('Real life :').addBatchRetry({
       fs.unlinkSync('output.txt.2');
     }
   ),
-}, 3, 20000).addBatchRetry({
+}, 5, 20000).addBatchRetry({
   'logrotate test': input_file_test('',
     function() {
       whereis('logrotate', function(err, logrotate) {
@@ -183,7 +183,7 @@ vows.describe('Real life :').addBatchRetry({
       fs.unlinkSync('output.txt.2');
     }
   ),
-}, 3, 20000).addBatchRetry({
+}, 5, 20000).addBatchRetry({
   'logrotate copy_truncate test': input_file_test('?use_tail=true',
     function() {
       whereis('logrotate', function(err, logrotate) {
@@ -208,7 +208,7 @@ vows.describe('Real life :').addBatchRetry({
       fs.unlinkSync('output.txt.2');
     }
   ),
-}, 3, 20000).addBatchRetry({
+}, 5, 20000).addBatchRetry({
   'file output test': output_file_test(
     function() {
     }, function(exitCode) {
@@ -223,7 +223,7 @@ vows.describe('Real life :').addBatchRetry({
       }
     );
   }),
-}, 3, 20000).addBatchRetry({
+}, 5, 20000).addBatchRetry({
   'file output test with logrotate': output_file_test(
     function() {
       setTimeout(function() {
@@ -254,4 +254,4 @@ vows.describe('Real life :').addBatchRetry({
       }
     );
   }),
-}, 3, 20000).export(module);
+}, 5, 20000).export(module);
