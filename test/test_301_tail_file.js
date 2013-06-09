@@ -190,7 +190,7 @@ vows.describe('Monitor ').addBatch({
       assert.deepEqual(m.lines, ['line1', 'line2']);
     },
   undefined, {wait_delay_after_renaming: 100}),
-}).addBatch({
+}).addBatchRetry({
   'Double monitoring same directory': {
     topic: function() {
       var callback = this.callback;
@@ -224,7 +224,7 @@ vows.describe('Monitor ').addBatch({
       assert.deepEqual(m2.lines, ['line10']);
     }
   }
-}).addBatch({
+}, 3, 10000).addBatch({
   'Wrong file path': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(callback, 200);
