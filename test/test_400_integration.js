@@ -191,7 +191,7 @@ vows.describe('Integration :').addBatch({
       assert.equal("_line1_\n_line2_\n_line3_\n", c3);
     }
   },
-}).addBatch({
+}).addBatchRetry({
   'file2file not exising dir': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -243,7 +243,7 @@ vows.describe('Integration :').addBatch({
       checkResult(splitted[1], {'@source': 'toto/56/87/input.txt', '@message': 'line2'});
     }
   },
-}).addBatch({
+}, 3, 10000).addBatch({
   'json_logstash_event': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -641,7 +641,7 @@ vows.describe('Integration :').addBatch({
       assert.equal(JSON.parse(splitted[2])['@message'], "1234line4\nline5");
     }
   },
-}).addBatch({
+}, 3, 10000).addBatch({
   'non_existent_module': check_error_init([
     'input://non_existent_module://'
     ], 'Cannot find module'),
