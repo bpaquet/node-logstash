@@ -585,7 +585,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}, 5, 10000).addBatch({
+}, 5, 10000).addBatchRetry({
   'Monitor fifo': {
     topic: function() {
       var callback = this.callback;
@@ -616,5 +616,5 @@ vows.describe('Monitor ').addBatch({
       assert.deepEqual(m.lines, ['x1', 'x2']);
     }
   }
-}).export(module);
+}, 5, 10000).export(module);
 // Do not remove empty line, this file is used during test
