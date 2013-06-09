@@ -1,4 +1,4 @@
-var vows = require('vows'),
+var vows = require('vows-batch-retry'),
     assert = require('assert'),
     os = require('os'),
     fs = require('fs');
@@ -305,7 +305,7 @@ vows.describe('Monitor ').addBatch({
       assert.deepEqual(m.lines, ['line1', 'line2']);
     }
   ),
-}).addBatch({
+}).addBatchRetry({
   'Double monitoring same directory': {
     topic: function() {
       var callback = this.callback;
@@ -341,7 +341,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}).addBatch({
+}, 3, 10000).addBatch({
   'Wrong file path': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(callback, 200);
@@ -351,7 +351,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m.lines.length, 0);
     },
   '/toto_does_not_exists/toto.log'),
-}).addBatch({
+}).addBatchRetry({
   'Simple logrotate simulation': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(function() {
@@ -371,7 +371,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m.closed_counter, 2);
     },
   undefined, {wait_delay_after_renaming: 1}),
-}).addBatch({
+}, 3, 10000).addBatchRetry({
   'Complex logrotate simulation': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(function() {
@@ -396,7 +396,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m.closed_counter, 2);
     },
   undefined, {wait_delay_after_renaming: 500}),
-}).addBatch({
+}, 3, 10000).addBatch({
   'Complex logrotate simulation with permission pb': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(function() {
@@ -430,7 +430,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m.closed_counter, 2);
     },
   undefined, {wait_delay_after_renaming: 500}),
-}).addBatch({
+}, 3, 10000).addBatchRetry({
   'Monitor restart': {
     topic: function() {
       var callback = this.callback;
@@ -466,7 +466,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}).addBatch({
+}, 3, 10000).addBatchRetry({
   'Monitor restart with write while restart': {
     topic: function() {
       var callback = this.callback;
@@ -505,7 +505,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}).addBatch({
+}, 3, 10000).addBatchRetry({
   'Monitor restart with write while restart, in a new file, too short': {
     topic: function() {
       var callback = this.callback;
@@ -545,7 +545,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}).addBatch({
+}, 3, 10000).addBatchRetry({
   'Monitor restart with write while restart, in a new file, content not correct': {
     topic: function() {
       var callback = this.callback;
@@ -585,7 +585,7 @@ vows.describe('Monitor ').addBatch({
       assert.equal(m2.changed_counter, 1);
     }
   }
-}).addBatch({
+}, 3, 10000).addBatch({
   'Monitor fifo': {
     topic: function() {
       var callback = this.callback;

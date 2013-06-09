@@ -1,4 +1,4 @@
-var vows = require('vows'),
+var vows = require('vows-batch-retry'),
     assert = require('assert'),
     os = require('os'),
     fs = require('fs');
