@@ -263,7 +263,7 @@ vows.describe('Integration :').addBatchRetry({
         setTimeout(function() {
           udp_send('toto');
           setTimeout(function() {
-            udp_send('{"tata":"toto","@message":"titi"}');
+            udp_send('{"tata":"toto","@type":"titi"}');
             setTimeout(function() {
               udp_send('{"tata":"toto","@message":"titi", "@source": "test42", "@type": "pouet"}');
               setTimeout(function() {
@@ -284,7 +284,7 @@ vows.describe('Integration :').addBatchRetry({
       assert.equal(splitted.length, 4);
       assert.equal("", splitted[splitted.length - 1]);
       checkResult(splitted[0], {'@source': 'udp_0.0.0.0_67854', '@source_host': '127.0.0.1', '@message': 'toto'}, true);
-      checkResult(splitted[1], {'@source': 'udp_0.0.0.0_67854', '@source_host': '127.0.0.1', '@message': '{"tata":"toto","@message":"titi"}'}, true);
+      checkResult(splitted[1], {'@source': 'udp_0.0.0.0_67854', '@source_host': '127.0.0.1', '@message': '{"tata":"toto","@type":"titi"}'}, true);
       checkResult(splitted[2], {'@source': 'test42', '@source_host': '127.0.0.1', '@type': 'pouet', 'tata': 'toto', '@message': 'titi'});
     }
   },
