@@ -10,10 +10,10 @@ vows.describe('Filter replace ').addBatch({
   'type_filtering': filter_helper.create(
     'mutate_replace',
     'toto?only_type=titi&from=\\.&to=-', [
-      {'@type': 'titi', '@fields': {'toto': 'my.domain.com'}},
+      {'type': 'titi', '@fields': {'toto': 'my.domain.com'}},
       {'@fields': {'toto': 'my.domain2.com'}}
     ], [
-      {'@type': 'titi',  '@fields': {'toto': 'my-domain-com'}},
+      {'type': 'titi',  '@fields': {'toto': 'my-domain-com'}},
       {'@fields': {'toto': 'my.domain2.com'}}
     ]),
 }).export(module);
