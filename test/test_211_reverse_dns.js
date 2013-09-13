@@ -29,17 +29,17 @@ function unmock_dns() {
 
 vows.describe('Filter reverse dns').addBatch({
   'no_only_hostname': filter_helper.create('reverse_dns', '?only_hostname=false', [
-    {'@message': 'abcc'},
-    {'@source_host': 'www.free.fr'},
-    {'@source_host': 'www.free.fr2'},
-    {'@source_host': '212.27.48.10'},
-    {'@source_host': '212.27.48.11'},
+    {'message': 'abcc'},
+    {'source_host': 'www.free.fr'},
+    {'source_host': 'www.free.fr2'},
+    {'source_host': '212.27.48.10'},
+    {'source_host': '212.27.48.11'},
   ], [
-    {'@message': 'abcc'},
-    {'@source_host': 'www.free.fr'},
-    {'@source_host': 'www.free.fr2'},
-    {'@source_host': 'www.free.fr'},
-    {'@source_host': 'toto'},
+    {'message': 'abcc'},
+    {'source_host': 'www.free.fr'},
+    {'source_host': 'www.free.fr2'},
+    {'source_host': 'www.free.fr'},
+    {'source_host': 'toto'},
   ], function() {}, function(callback) {
     mock_dns();
     callback();
@@ -48,17 +48,17 @@ vows.describe('Filter reverse dns').addBatch({
   }),
 }).addBatch({
   'only_hostname': filter_helper.create('reverse_dns', '?', [
-    {'@message': 'abcc'},
-    {'@source_host': 'www.free.fr'},
-    {'@source_host': 'www.free.fr2'},
-    {'@source_host': '212.27.48.10'},
-    {'@source_host': '212.27.48.11'},
+    {'message': 'abcc'},
+    {'source_host': 'www.free.fr'},
+    {'source_host': 'www.free.fr2'},
+    {'source_host': '212.27.48.10'},
+    {'source_host': '212.27.48.11'},
   ], [
-    {'@message': 'abcc'},
-    {'@source_host': 'www.free.fr'},
-    {'@source_host': 'www.free.fr2'},
-    {'@source_host': 'www'},
-    {'@source_host': 'toto'},
+    {'message': 'abcc'},
+    {'source_host': 'www.free.fr'},
+    {'source_host': 'www.free.fr2'},
+    {'source_host': 'www'},
+    {'source_host': 'toto'},
   ], function() {}, function(callback) {
     mock_dns();
     callback();
