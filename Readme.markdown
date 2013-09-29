@@ -107,6 +107,11 @@ Changelog
 * Add serializer and unserializer support
 * Allow to use input file plugin on non existent directory
 
+0.0.3
+---
+
+* Use the 1.2 logstash json format
+
 0.0.2
 ---
 
