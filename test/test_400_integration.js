@@ -9,12 +9,15 @@ var vows = require('vows-batch-retry'),
     zlib = require('zlib'),
     monitor_file = require('../lib/lib/monitor_file');
 
-function checkResult(line, target, not_override_source_host) {
+function checkResult(line, target, not_override_host) {
   var parsed = JSON.parse(line);
-  delete parsed['@fields'];
   delete parsed['@timestamp'];
-  if (! not_override_source_host) {
-    target['source_host'] = os.hostname();
+  delete parsed['redis_channel'];
+  if (parsed['host'].match(/127\.0\.0\.1:(\d+)/)) {
+    parsed['host'] = '127.0.0.1:xxxx'
+  }
+  if (! not_override_host) {
+    target['host'] = os.hostname();
   }
   assert.deepEqual(parsed, target);
 }
@@ -32,7 +35,7 @@ function createAgent(urls, callback, error_callback) {
     console.log("Error agent detected, " + module_name + " : " + error);
     error_callback(error);
   });
-  a.loadUrls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(error) {
+  a.loadUrls(['filter://add_host://', 'filter://add_timestamp://', 'filter://add_version://'].concat(urls), function(error) {
     assert.ifError(error);
     callback(a);
   });
@@ -78,7 +81,7 @@ function file2x2x2file(config1, config2, clean_callback) {
       var splitted = c.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'source': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test'});
+      checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'});
     }
   }
 }
@@ -184,15 +187,15 @@ vows.describe('Integration :').addBatchRetry({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 4);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'source': 'input1.txt', 'message': 'line1'});
-      checkResult(splitted[1], {'source': 'input2.txt', 'message': 'line2', 'type': 'input2'});
-      checkResult(splitted[2], {'source': 'input1.txt', 'message': 'line3'});
+      checkResult(splitted[0], {'@version': '1', 'path': 'input1.txt', 'message': 'line1'});
+      checkResult(splitted[1], {'@version': '1', 'path': 'input2.txt', 'message': 'line2', 'type': 'input2'});
+      checkResult(splitted[2], {'@version': '1', 'path': 'input1.txt', 'message': 'line3'});
 
       assert.equal("_line1_\n_line2_\n_line3_\n", c3);
     }
   },
 }, 5, 20000).addBatchRetry({
-  'file2file not exising dir': {
+  'file2file not existing dir': {
     topic: function() {
       monitor_file.setFileStatus({});
       var callback = this.callback;
@@ -239,8 +242,8 @@ vows.describe('Integration :').addBatchRetry({
       var splitted = c.split('\n');
       assert.equal(splitted.length, 3);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'source': 'toto/56/87/input.txt', 'message': 'line1'});
-      checkResult(splitted[1], {'source': 'toto/56/87/input.txt', 'message': 'line2'});
+      checkResult(splitted[0], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line1'});
+      checkResult(splitted[1], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line2'});
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -283,9 +286,9 @@ vows.describe('Integration :').addBatchRetry({
       var splitted = c.split('\n');
       assert.equal(splitted.length, 4);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'source': 'udp_0.0.0.0_67854', 'source_host': '127.0.0.1', 'message': 'toto'}, true);
-      checkResult(splitted[1], {'source': 'udp_0.0.0.0_67854', 'source_host': '127.0.0.1', 'message': '{"tata":"toto","type":"titi"}'}, true);
-      checkResult(splitted[2], {'source': 'test42', 'source_host': '127.0.0.1', 'type': 'pouet', 'tata': 'toto', 'message': 'titi'});
+      checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1:xxxx', 'message': 'toto'}, true);
+      checkResult(splitted[1], {'@version': '1', 'host': '127.0.0.1:xxxx', 'message': '{"tata":"toto","type":"titi"}'}, true);
+      checkResult(splitted[2], {'@version': '1', 'host': '127.0.0.1:xxxx', 'source': 'test42', 'type': 'pouet', 'tata': 'toto', 'message': 'titi'});
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -335,11 +338,11 @@ vows.describe('Integration :').addBatchRetry({
 
       assert.equal(reqs[0].req.method, 'POST');
       assert(reqs[0].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[0].req.url + ' does not match regex');
-      checkResult(reqs[0].body, {'message': 'toto', 'source': 'tcp_0.0.0.0_17874', 'type': 'nginx'});
+      checkResult(reqs[0].body, {'@version': '1', 'message': 'toto', 'host': '127.0.0.1:xxxx', 'type': 'nginx'}, true);
 
       assert.equal(reqs[1].req.method, 'POST');
       assert(reqs[1].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[1].req.url + ' does not match regex');
-      checkResult(reqs[1].body, {'message': 'titi', 'source': 'tcp_0.0.0.0_17875'});
+      checkResult(reqs[1].body, {'@version': '1', 'message': 'titi', 'host': '127.0.0.1:xxxx'}, true);
     }
  },
 }, 5, 20000).addBatchRetry({
@@ -415,7 +418,7 @@ vows.describe('Integration :').addBatchRetry({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'source': 'tcp_localhost_17874', 'message': 'toto', 'type': '2'});
+      checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1:xxxx', 'message': 'toto', 'type': '2'}, true);
     }
  },
 }, 5, 20000).addBatchRetry({
@@ -592,6 +595,8 @@ vows.describe('Integration :').addBatchRetry({
         facility: 'toto',
         level: '6',
         _a: 'b',
+        _path: 'input1.txt',
+        _type: 'toto',
        },
        {
         version: '1.0',
@@ -599,7 +604,8 @@ vows.describe('Integration :').addBatchRetry({
         timestamp: (new Date('2012-07-31T18:02:28+00:00')).getTime() / 1000,
         host: os.hostname(),
         facility: 'no_facility',
-        level: '6'
+        level: '6',
+        _path: 'input2.txt',
        }
       ].sort());
     }

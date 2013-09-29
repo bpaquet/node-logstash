@@ -152,7 +152,7 @@ Example:
 * ``filter://syslog_pri://?only_type=syslog``
 
 The first filter will parse the syslog line, and extract ``syslog_priority``, ``syslog_program``, ``syslog_pid`` fields,
-parse timestamp, and will replace ``source_host`` and ``message`` field.
+parse timestamp, and will replace ``host`` and ``message`` field.
 
 The second filter will extract from ``syslog_priority`` field severity and facility.
 
@@ -381,7 +381,7 @@ Parameters:
 Reverse DNS
 ---
 
-The reverse dns filter replace an ip in `source_host` by the hostname, performing a dns resolution. This is useful with syslog.
+The reverse dns filter replace an ip in `host` by the hostname, performing a dns resolution. This is useful with syslog.
 
 Example 1: ``filter://reverse_dns://``
 
@@ -439,13 +439,13 @@ Parameters:
 Json Fields
 ---
 
-The json fields filter is used to parse the message payload as a JSON object, and merge it to the ``@fields`` attribute.
+The json fields filter is used to parse the message payload as a JSON object, and merge it into current object.
 
 This allows to automatically index fields for messages that already contain a well-formatted JSON payload. The JSON object is parsed starting from the first ``{`` character found in the message.
 
-Filter does nothing in case of error while parsing the message. Existing attributes in ``@fields`` are kept, but overwritten if they conflict with attributes from the parsed payload.
+Filter does nothing in case of error while parsing the message. Existing attributes in current line are kept, but overwritten if they conflict with attributes from the parsed payload.
 
-Example 1: ``filter://json_fields://?only_type=json_stream`` will parse, as JSON, the given stream of messages which ``type`` matches ``json_stream``, and fill the ``@fields`` attribute using the messages content.
+Example 1: ``filter://json_fields://?only_type=json_stream`` will parse, as JSON, the given stream of messages which ``type`` matches ``json_stream``.
 
 Misc
 ===
@@ -463,13 +463,9 @@ For both cases you should add a `default-mapping.json` file in Elastic Search co
 {
   "_default_": {
     "properties": {
-      "@fields": {
-        "properties": {
-          "my_hash_field": {
-            "type" : "string",
-            "index" : "not_analyzed"
-          }
-        }
+      "my_hash_field": {
+        "type" : "string",
+        "index" : "not_analyzed"
       }
     }
   }

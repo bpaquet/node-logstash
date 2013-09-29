@@ -20,7 +20,7 @@ function createAgent(urls, callback, error_callback) {
     console.log("Error agent detected, " + module_name + " : " + error);
     error_callback(error);
   });
-  a.loadUrls(['filter://add_source_host://', 'filter://add_timestamp://'].concat(urls), function(error) {
+  a.loadUrls(['filter://add_host://', 'filter://add_timestamp://', 'filter://add_version://'].concat(urls), function(error) {
     assert.ifError(error);
     callback(a);
   }, 200);
