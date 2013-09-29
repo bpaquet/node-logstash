@@ -152,7 +152,7 @@ Example:
 * ``filter://syslog_pri://?only_type=syslog``
 
 The first filter will parse the syslog line, and extract ``syslog_priority``, ``syslog_program``, ``syslog_pid`` fields,
-parse timestamp, and will replace ``@source_host`` and ``@message`` field.
+parse timestamp, and will replace ``source_host`` and ``message`` field.
 
 The second filter will extract from ``syslog_priority`` field severity and facility.
 
@@ -199,8 +199,8 @@ Access to line log properties
 
 Some params are string, which can reference line log properties:
 
-* ``#{@message}`` will contain the full log line
-* ``#{@type}`` will contain the type of log line
+* ``#{message}`` will contain the full log line
+* ``#{type}`` will contain the type of log line
 * ``#{toto}`` will contain the value of the field ``toto``, which have to be extracted with a regex filter
 * ``2#{toto}`` will contain ``2`` followed by the value of the field ``toto``.
 
@@ -269,8 +269,8 @@ Example: ``output://gelf://192.168.1.1:12201``, to send logs to 192.168.1.1 port
 
 Parameters:
 
-* ``message``: ``short_message`` field. Default value: ``#{@message}``, the line of log. Can reference log line properties (see above).
-* ``facility``: ``facility`` field. Default value: ``#{@type}``, the line type. ``no_facility`` if no value. Can reference log line properties (see above).
+* ``message``: ``short_message`` field. Default value: ``#{message}``, the line of log. Can reference log line properties (see above).
+* ``facility``: ``facility`` field. Default value: ``#{type}``, the line type. ``no_facility`` if no value. Can reference log line properties (see above).
 * ``level``: ``level`` field. Default value: ``6``. Can reference log line properties (see above).
 * ``version``: ``version`` field. Default value: ``1.0``.
 
@@ -281,7 +281,7 @@ This plugin is used to write data into files. There are two modes: JSON, and raw
 
 In JSON mode, each line of log is dumped to target file as JSON object, containing all fields.
 
-In raw mode, each line of log is dumped to target file as specified in ``format`` parameter. Default format is ``#{@message}``, which means the original log line.
+In raw mode, each line of log is dumped to target file as specified in ``format`` parameter. Default format is ``#{message}``, which means the original log line.
 
 Note: target files can be reopened by sending USR signal to node-logstash.
 
@@ -381,9 +381,9 @@ Parameters:
 Reverse DNS
 ---
 
-The reverse dns filter replace an ip in `@source_host` by the hostname, performing a dns resolution. This is useful with syslog.
+The reverse dns filter replace an ip in `source_host` by the hostname, performing a dns resolution. This is useful with syslog.
 
-Example 1: ``filter://reverse_dns://`` 
+Example 1: ``filter://reverse_dns://``
 
 Parameters:
 
@@ -405,7 +405,7 @@ Parameters:
 Compute date field
 ---
 
-The compute date field filter is used to compute a date field from ``@timestamp``field, using using [moment](http://momentjs.com/docs/#/parsing/string-format/) date format.
+The compute date field filter is used to compute a date field from ``timestamp``field, using using [moment](http://momentjs.com/docs/#/parsing/string-format/) date format.
 
 Example 1: ``filter://compute_date_field://toto?date_format=DD/MMMM/YYYY`` add a field named ``toto``, containing timestamp formated with ``DD/MMMM/YYYY``
 
@@ -441,11 +441,11 @@ Json Fields
 
 The json fields filter is used to parse the message payload as a JSON object, and merge it to the ``@fields`` attribute.
 
-This allows to automatically index fields for messages that already contain a well-formatted JSON payload. The JSON object is parsed starting from the first ``{`` character found in the message. 
+This allows to automatically index fields for messages that already contain a well-formatted JSON payload. The JSON object is parsed starting from the first ``{`` character found in the message.
 
 Filter does nothing in case of error while parsing the message. Existing attributes in ``@fields`` are kept, but overwritten if they conflict with attributes from the parsed payload.
 
-Example 1: ``filter://json_fields://?only_type=json_stream`` will parse, as JSON, the given stream of messages which ``@type`` matches ``json_stream``, and fill the ``@fields`` attribute using the messages content.
+Example 1: ``filter://json_fields://?only_type=json_stream`` will parse, as JSON, the given stream of messages which ``type`` matches ``json_stream``, and fill the ``@fields`` attribute using the messages content.
 
 Misc
 ===

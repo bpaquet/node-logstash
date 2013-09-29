@@ -32,7 +32,7 @@ socket.connect(target);
 setInterval(function() {
   kk ++;
   for(var i = 0; i < count; i ++) {
-    socket.send(JSON.stringify({'@type': type, '@timestamp': (new Date()).toISOString(), '@message': 'message ' + kk + ' ' + i}));
+    socket.send(JSON.stringify({'type': type, '@timestamp': (new Date()).toISOString(), 'message': 'message ' + kk + ' ' + i}));
     e.emit('msg');
   }
   if (max == kk) {
