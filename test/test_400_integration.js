@@ -9,14 +9,11 @@ var vows = require('vows-batch-retry'),
     zlib = require('zlib'),
     monitor_file = require('../lib/lib/monitor_file');
 
-function checkResult(line, target, not_override_host) {
+function checkResult(line, target, override_host) {
   var parsed = JSON.parse(line);
   delete parsed['@timestamp'];
   delete parsed['redis_channel'];
-  if (parsed['host'].match(/127\.0\.0\.1:(\d+)/)) {
-    parsed['host'] = '127.0.0.1:xxxx'
-  }
-  if (! not_override_host) {
+  if (override_host) {
     target['host'] = os.hostname();
   }
   assert.deepEqual(parsed, target);
@@ -81,7 +78,7 @@ function file2x2x2file(config1, config2, clean_callback) {
       var splitted = c.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'});
+      checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'}, true);
     }
   }
 }
@@ -187,9 +184,9 @@ vows.describe('Integration :').addBatchRetry({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 4);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@version': '1', 'path': 'input1.txt', 'message': 'line1'});
-      checkResult(splitted[1], {'@version': '1', 'path': 'input2.txt', 'message': 'line2', 'type': 'input2'});
-      checkResult(splitted[2], {'@version': '1', 'path': 'input1.txt', 'message': 'line3'});
+      checkResult(splitted[0], {'@version': '1', 'path': 'input1.txt', 'message': 'line1'}, true);
+      checkResult(splitted[1], {'@version': '1', 'path': 'input2.txt', 'message': 'line2', 'type': 'input2'}, true);
+      checkResult(splitted[2], {'@version': '1', 'path': 'input1.txt', 'message': 'line3'}, true);
 
       assert.equal("_line1_\n_line2_\n_line3_\n", c3);
     }
@@ -242,8 +239,8 @@ vows.describe('Integration :').addBatchRetry({
       var splitted = c.split('\n');
       assert.equal(splitted.length, 3);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line1'});
-      checkResult(splitted[1], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line2'});
+      checkResult(splitted[0], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line1'}, true);
+      checkResult(splitted[1], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line2'}, true);
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -268,7 +265,7 @@ vows.describe('Integration :').addBatchRetry({
           setTimeout(function() {
             udp_send('{"tata":"toto","type":"titi"}');
             setTimeout(function() {
-              udp_send('{"tata":"toto","message":"titi", "source": "test42", "type": "pouet"}');
+              udp_send('{"tata":"toto","message":"titi", "source": "test42", "type": "pouet", "host": "toto"}');
               setTimeout(function() {
                 socket.close();
                 callback(null)
@@ -286,9 +283,9 @@ vows.describe('Integration :').addBatchRetry({
       var splitted = c.split('\n');
       assert.equal(splitted.length, 4);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1:xxxx', 'message': 'toto'}, true);
-      checkResult(splitted[1], {'@version': '1', 'host': '127.0.0.1:xxxx', 'message': '{"tata":"toto","type":"titi"}'}, true);
-      checkResult(splitted[2], {'@version': '1', 'host': '127.0.0.1:xxxx', 'source': 'test42', 'type': 'pouet', 'tata': 'toto', 'message': 'titi'});
+      checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 67854, 'message': 'toto'});
+      checkResult(splitted[1], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 67854, 'message': '{"tata":"toto","type":"titi"}'});
+      checkResult(splitted[2], {'@version': '1', 'host': 'toto', 'source': 'test42', 'type': 'pouet', 'tata': 'toto', 'message': 'titi'});
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -338,11 +335,11 @@ vows.describe('Integration :').addBatchRetry({
 
       assert.equal(reqs[0].req.method, 'POST');
       assert(reqs[0].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[0].req.url + ' does not match regex');
-      checkResult(reqs[0].body, {'@version': '1', 'message': 'toto', 'host': '127.0.0.1:xxxx', 'type': 'nginx'}, true);
+      checkResult(reqs[0].body, {'@version': '1', 'message': 'toto', 'host': '127.0.0.1', 'type': 'nginx', 'tcp_port': 17874});
 
       assert.equal(reqs[1].req.method, 'POST');
       assert(reqs[1].req.url.match('^\/logstash-' + (new Date()).getFullYear() + '\\.\\d\\d\\.\\d\\d\/data'), reqs[1].req.url + ' does not match regex');
-      checkResult(reqs[1].body, {'@version': '1', 'message': 'titi', 'host': '127.0.0.1:xxxx'}, true);
+      checkResult(reqs[1].body, {'@version': '1', 'message': 'titi', 'host': '127.0.0.1', 'tcp_port': 17875});
     }
  },
 }, 5, 20000).addBatchRetry({
@@ -418,7 +415,7 @@ vows.describe('Integration :').addBatchRetry({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal("", splitted[splitted.length - 1]);
-      checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1:xxxx', 'message': 'toto', 'type': '2'}, true);
+      checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'tcp_port': 17874, 'message': 'toto', 'type': '2'});
     }
  },
 }, 5, 20000).addBatchRetry({
