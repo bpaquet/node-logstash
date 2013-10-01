@@ -110,7 +110,7 @@ Changelog
 0.0.3
 ---
 
-* Add [logio](http://logio.org) output
+* Add [Log.io](http://logio.org) output
 * Use the 1.2 logstash json format
 
 0.0.2
@@ -336,7 +336,7 @@ Parameters:
 Logio
 ---
 
-This plugin is used to sent data to a Logio server.
+This plugin is used to sent data to a [Log.io](http://logio.org) server.
 
 Example:
 
