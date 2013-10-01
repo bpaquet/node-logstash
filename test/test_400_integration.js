@@ -504,6 +504,7 @@ vows.describe('Integration :').addBatchRetry({
         'input://file://main_input.txt',
         'input://file://main_input.txt?type=toto',
         'output://logio://localhost:17874',
+        'output://logio://localhost:17874?priority=#{type}',
         ], function(agent) {
         setTimeout(function() {
           fs.appendFile('main_input.txt', 'line 1\n', function(err) {
@@ -525,7 +526,9 @@ vows.describe('Integration :').addBatchRetry({
       fs.unlinkSync('main_input.txt');
       assert.deepEqual(reqs.sort(), [
         '+log|' + os.hostname() + '|no_type|info|line 1',
+        '+log|' + os.hostname() + '|no_type|undefined|line 1',
         '+log|' + os.hostname() + '|toto|info|line 1',
+        '+log|' + os.hostname() + '|toto|toto|line 1',
       ]);
     }
  },
