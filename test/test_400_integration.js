@@ -485,6 +485,45 @@ vows.describe('Integration :').addBatchRetry({
     }
  },
 }, 5, 20000).addBatchRetry({
+  'logio': {
+    topic: function() {
+      monitor_file.setFileStatus({});
+      var callback = this.callback;
+      var reqs = [];
+      var server = net.createServer(function(c) {
+        c.on('data', function(data) {
+          reqs.push(data.toString());
+        });
+      });
+      server.listen(17874);
+      createAgent([
+        'input://file://main_input.txt',
+        'output://logio://localhost:17874',
+        ], function(agent) {
+        setTimeout(function() {
+          fs.appendFile('main_input.txt', 'line 1\n', function(err) {
+            assert.ifError(err);
+            setTimeout(function() {
+              agent.close(function() {
+                server.close(function() {
+                  callback(null, reqs);
+                });
+              });
+            }, 200);
+          });
+        }, 200);
+      });
+    },
+
+    check: function(err, reqs) {
+      assert.ifError(err);
+      fs.unlinkSync('main_input.txt');
+      assert.deepEqual(reqs, [
+        '+log|ubuntu12-build|no_type|info|line 1\r\n',
+      ]);
+    }
+ },
+}, 5, 20000).addBatchRetry({
   'file2statsd': {
     topic: function() {
       monitor_file.setFileStatus({});

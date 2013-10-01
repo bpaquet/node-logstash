@@ -110,6 +110,7 @@ Changelog
 0.0.3
 ---
 
+* Add [logio](http://logio.org) output
 * Use the 1.2 logstash json format
 
 0.0.2
@@ -331,6 +332,15 @@ Parameters:
 * ``pattern_channel``: use channel as pattern. Default value : false
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
+
+Logio
+---
+
+This plugin is used to sent data to a Logio server.
+
+Example:
+
+* ``output://logio://localhost:28777``
 
 Filters
 ===
