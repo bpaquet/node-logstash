@@ -492,12 +492,17 @@ vows.describe('Integration :').addBatchRetry({
       var reqs = [];
       var server = net.createServer(function(c) {
         c.on('data', function(data) {
-          reqs.push(data.toString());
+          data.toString().split("\r\n").forEach(function(s) {
+            if (s != "") {
+              reqs.push(s);
+            }
+          });
         });
       });
       server.listen(17874);
       createAgent([
         'input://file://main_input.txt',
+        'input://file://main_input.txt?type=toto',
         'output://logio://localhost:17874',
         ], function(agent) {
         setTimeout(function() {
@@ -518,8 +523,9 @@ vows.describe('Integration :').addBatchRetry({
     check: function(err, reqs) {
       assert.ifError(err);
       fs.unlinkSync('main_input.txt');
-      assert.deepEqual(reqs, [
-        '+log|ubuntu12-build|no_type|info|line 1\r\n',
+      assert.deepEqual(reqs.sort(), [
+        '+log|' + os.hostname() + '|no_type|info|line 1',
+        '+log|' + os.hostname() + '|toto|info|line 1',
       ]);
     }
  },
