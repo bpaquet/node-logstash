@@ -342,6 +342,11 @@ Example:
 
 * ``output://logio://localhost:28777``
 
+Others params:
+
+* ``--priority`` to change the line priority. Can reference log line properties. Default value: ``info``.
+
+
 Filters
 ===
 
