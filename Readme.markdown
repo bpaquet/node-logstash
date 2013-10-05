@@ -47,6 +47,11 @@ On agent, node-logstash is configured whith inputs plugins to get logs from your
 
 On log server, logs come trough a zeromq input plugin, are processed (fields and timestamps extraction), and send to elastic search.
 
+How to get help ?
+===
+
+Please mail the users groups : node-logstash-users@googlegroups.com, or open an [issue](https://github.com/bpaquet/node-logstash/issues).
+
 How to use it ?
 ===
 
