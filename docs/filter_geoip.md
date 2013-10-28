@@ -3,7 +3,7 @@ Installation
 
 go into the node-logstash directory and execute `npm install geoip-lite`
 
-This install the (geoip-lite)[https://github.com/bluesmoon/node-geoip] package.
+This install the [geoip-lite](https://github.com/bluesmoon/node-geoip) package.
 
 Updating/retrieving the geoip databases is simple. cd to `node_modules/geoip-lite/` and execute `npm run-script updatedb`.
 this will fetch the latest maxmind database files.
