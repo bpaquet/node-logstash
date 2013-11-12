@@ -305,6 +305,30 @@ vows.describe('Monitor ').addBatch({
       assert.deepEqual(m.lines, ['line1', 'line2']);
     }
   ),
+}).addBatch({
+  'Utf8 encoding': create_test(
+    function(m, callback) {
+      fs.writeFileSync(m.file, 'é\nline2\n');
+      m.monitor.start(0);
+      setTimeout(callback, 200);
+    }, function(m) {
+      fs.unlinkSync(m.file);
+      no_error(m);
+      assert.deepEqual(m.lines, ['é', 'line2']);
+    }
+  ),
+}).addBatch({
+  'ascii encoding': create_test(
+    function(m, callback) {
+      fs.writeFileSync(m.file, 'é\nline2\n');
+      m.monitor.start(0);
+      setTimeout(callback, 200);
+    }, function(m) {
+      fs.unlinkSync(m.file);
+      no_error(m);
+      assert.deepEqual(m.lines, ['C)', 'line2']);
+    }
+  , undefined, {buffer_encoding: 'ascii'}),
 }).addBatchRetry({
   'Double monitoring same directory': {
     topic: function() {
