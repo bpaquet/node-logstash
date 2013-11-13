@@ -306,7 +306,7 @@ vows.describe('Monitor ').addBatch({
     }
   ),
 }).addBatch({
-  'Utf8 encoding': create_test(
+  'utf8 encoding': create_test(
     function(m, callback) {
       fs.writeFileSync(m.file, 'é\nline2\n');
       m.monitor.start(0);
@@ -326,7 +326,13 @@ vows.describe('Monitor ').addBatch({
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
-      assert.deepEqual(m.lines, ['C)', 'line2']);
+      // buffer.toString('ascii') is bugged with old node version
+      if (process.versions['node'].split('.')[1] < 10) {
+        assert.deepEqual(m.lines, ['é', 'line2']);
+      }
+      else {
+        assert.deepEqual(m.lines, ['C)', 'line2']);
+      }
     }
   , undefined, {buffer_encoding: 'ascii'}),
 }).addBatchRetry({
