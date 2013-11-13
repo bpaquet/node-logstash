@@ -111,6 +111,7 @@ Changelog
 
 * Add serializer and unserializer support
 * Allow to use input file plugin on non existent directory
+* Utf-8 is now the default encoding for input file plugin
 
 0.0.3
 ---
