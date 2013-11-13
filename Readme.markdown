@@ -338,6 +338,11 @@ Parameters:
 * ``proto``: ``http`` or ``https``. Default value: ``http``.
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
+* ``proxy``: url of a proxy that the http post request should be tunneled through. The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` which gives support for:
+ * http and https proxies
+ * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``)
+ * proxy port
+
 
 Redis
 ---
