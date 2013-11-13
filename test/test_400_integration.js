@@ -783,7 +783,7 @@ vows.describe('Integration :').addBatchRetry({
     'output://file:///path_which_does_not_exist/titi.txt'
   ], 'error', 'ENOENT', 'output_file'),
 }).addBatchRetry({
-  'redis channel transport': file2x2x2file(['output://redis://localhost:6379?channel=toto&db=2'], ['input://redis://localhost:6379?channel=toto&db=4']),
+  'redis channel transport': file2x2x2file(['output://redis://localhost:6379?channel=toto'], ['input://redis://localhost:6379?channel=toto']),
 }, 5, 20000).addBatchRetry({
   'redis pattern channel transport': file2x2x2file(['output://redis://localhost:6379?channel=pouet_toto'], ['input://redis://localhost:6379?channel=*toto&pattern_channel=true']),
 }, 5, 20000).addBatchRetry({
