@@ -33,7 +33,8 @@
     "moment": "1.7.0",
     "redis": "0.8.x",
     "msgpack": "0.1.8",
-    "geoip-lite": "1.1.x"
+    "geoip-lite": "1.1.x",
+    "tunnel": "0.0.2"
   },
   "directories": {
     "test": "./test",
