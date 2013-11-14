@@ -473,6 +473,24 @@ Filter does nothing in case of error while parsing the message. Existing attribu
 
 Example 1: ``filter://json_fields://?only_type=json_stream`` will parse, as JSON, the given stream of messages which ``type`` matches ``json_stream``.
 
+Geoip
+---
+
+The geoip filter is used to perform a geoip lookup from a given field, and store teh result into current object.
+
+After installing, to update the geoip database from maxmind, go to `node_modules/geoip-lite/` and execute `npm run-script updatedb`.
+
+The reverse dns filter can be used before geop filter to resolve hostname.
+
+Example 1: ``filter://geoip://ip`` will lookup for ``ip`` field in the geoip database. The resulting object will contains following fields: ``ip_geo_country``, ``ip_geo_region``, ``ip_geo_city``, ``ip_geo_lonlat``, filled with geoip lookup result.
+
+Parameters:
+
+* ``country_field``: field in which to store the geo ip country result. Default value : ``ip_geo_country``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip country result will not be stored.
+* ``region_field``: field in which to store the geo ip region result. Default value : ``ip_geo_region``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip region result will not be stored.
+* ``city_field``: field in which to store the geo ip city result. Default value : ``ip_geo_city``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip city result will not be stored.
+* ``lonlat_field``: field in which to store the geo ip longitude and latitude result. Default value : ``ip_geo_lonlat`, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip longitude and latitude result will not be stored.
+
 Misc
 ===
 
