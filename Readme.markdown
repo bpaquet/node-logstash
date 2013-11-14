@@ -216,7 +216,7 @@ Parameters:
 
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=http``. No default value.
 * ``unserializer``: please see above. Default value to ``json_logstash``.
-* ``ssl``: enable SSL mode. See above for SSL parameters. Default : false
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 
 Outputs and filter, commons parameters
 ===
@@ -265,6 +265,12 @@ Elastic search
 This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
 
 Example: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
+
+Parameters:
+
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
+
 
 Elastic search ZeroMQ
 ---
@@ -337,14 +343,10 @@ Example 1: Send data to [Loggly](http://loggly.com/): ``output://http_post://log
 Parameters:
 
 * ``path``: path to use in the HTTP request. Can reference log line properties (see above).
-* ``ssl``: enable SSL mode. See above for SSL parameters. Default : false
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
-* ``proxy``: url of a proxy that the http post request should be tunneled through. The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` which gives support for:
- * http and https proxies
- * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``)
- * proxy port
-
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
 Redis
 ---
@@ -375,7 +377,8 @@ Example:
 Others params:
 
 * ``--priority`` to change the line priority. Can reference log line properties. Default value: ``info``.
-
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
 Filters
 ===
@@ -529,6 +532,16 @@ For example, for a HTTPS server : ``ssl=true&ssl_cert=/path/to/cert&ssl_key=/pat
 For using a Certificate authority, add ``&ssl_ca=/path/to/ca``.
 
 For changing SSL ciphers, add ``ssl_ciphers=AES128-GCM-SHA256``.
+
+HTTP Proxy
+---
+
+The proxy parameter allow to use an http proxy.
+
+The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` which gives support for:
+  * http and https proxies
+  * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``)
+  * proxy port
 
 Force fields typing in Elastic Search
 ---
