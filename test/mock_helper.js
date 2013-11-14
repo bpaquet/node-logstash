@@ -15,7 +15,7 @@ function mock(modules) {
   // console.log('Wrapping original loader');
   original_loader = m._load;
   original_cache = m._cache;
-  
+
   m._load = mocked_loader;
   m._cache = {};
   mocked_modules = modules
