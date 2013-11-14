@@ -109,6 +109,8 @@ Config file for log server:
 Changelog
 ===
 
+* Add input HTTP plugin
+* Refactor SSL management
 * Add GeopIP filter, thx to @subutux
 * Add serializer and unserializer support
 * Allow to use input file plugin on non existent directory
@@ -203,8 +205,8 @@ Parameters:
 HTTP
 ---
 
-This plugin is used on log server to receive logs from an HTTP/HTTPS stream. This is useful in case the agent can only
-output logs through an HTTP/HTTPS channel.
+This plugin is used on log server to receive logs from an HTTP/HTTPS stream. This is useful
+in case the agent can only output logs through an HTTP/HTTPS channel.
 
 Example:
 
@@ -214,9 +216,7 @@ Parameters:
 
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=http``. No default value.
 * ``unserializer``: please see above. Default value to ``json_logstash``.
-* ``proto``: the protocol to use (http or https)
-* ``private``: full path to a private key (only valid in https protocol)
-* ``public``: full path to a public certificate (only valid in https protocol)
+* ``ssl``: enable SSL mode. See above for SSL parameters. Default : false
 
 Outputs and filter, commons parameters
 ===
@@ -337,7 +337,7 @@ Example 1: Send data to [Loggly](http://loggly.com/): ``output://http_post://log
 Parameters:
 
 * ``path``: path to use in the HTTP request. Can reference log line properties (see above).
-* ``proto``: ``http`` or ``https``. Default value: ``http``.
+* ``ssl``: enable SSL mode. See above for SSL parameters. Default : false
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
 * ``proxy``: url of a proxy that the http post request should be tunneled through. The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` which gives support for:
@@ -517,6 +517,18 @@ Parameters:
 
 Misc
 ===
+
+SSL Params
+---
+
+When you are in SSL mode (client or server), you can use [all the parameters using by node for SSL / TLS](http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener), prefixed by ``ssl_``.
+You have to give path for certificate and key params, node-logstash will load them before initializing SSL / TLS stack.
+
+For example, for a HTTPS server : ``ssl=true&ssl_cert=/path/to/cert&ssl_key=/path/to/key``
+
+For using a Certificate authority, add ``&ssl_ca=/path/to/ca``.
+
+For changing SSL ciphers, add ``ssl_ciphers=AES128-GCM-SHA256``.
 
 Force fields typing in Elastic Search
 ---

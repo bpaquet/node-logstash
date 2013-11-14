@@ -66,4 +66,6 @@ vows.describe('Integration file2x2x2file :').addBatchRetry({
   'udp transport': file2x2x2file(['output://udp://localhost:17874'], ['input://udp://127.0.0.1:17874']),
 }, 5, 20000).addBatchRetry({
   'http transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash'], ['input://http://127.0.0.1:17874']),
+}, 5, 20000).addBatchRetry({
+  'https transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt']),
 }, 5, 20000).export(module);
