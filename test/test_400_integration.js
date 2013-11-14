@@ -9,9 +9,11 @@ var vows = require('vows-batch-retry'),
     zlib = require('zlib'),
     monitor_file = require('../lib/lib/monitor_file');
 
-function checkResult(line, target, override_host) {
+function checkResult(line, target, override_host, keep_timestamp) {
   var parsed = JSON.parse(line);
-  delete parsed['@timestamp'];
+  if (!keep_timestamp) {
+    delete parsed['@timestamp'];
+  }
   delete parsed['redis_channel'];
   if (override_host) {
     target['host'] = os.hostname();
@@ -263,9 +265,9 @@ vows.describe('Integration :').addBatchRetry({
         setTimeout(function() {
           udp_send('toto');
           setTimeout(function() {
-            udp_send('{"tata":"toto","type":"titi"}');
+            udp_send('{"tata":"toto","type":"titi","message":"oups"}');
             setTimeout(function() {
-              udp_send('{"tata":"toto","message":"titi", "source": "test42", "type": "pouet", "host": "toto"}');
+              udp_send('{"tata":"toto","message":"titi", "source": "test42", "type": "pouet", "host": "toto","@timestamp":"abc"}');
               setTimeout(function() {
                 socket.close();
                 callback(null)
@@ -284,8 +286,8 @@ vows.describe('Integration :').addBatchRetry({
       assert.equal(splitted.length, 4);
       assert.equal("", splitted[splitted.length - 1]);
       checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 67854, 'message': 'toto'});
-      checkResult(splitted[1], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 67854, 'message': '{"tata":"toto","type":"titi"}'});
-      checkResult(splitted[2], {'@version': '1', 'host': 'toto', 'source': 'test42', 'type': 'pouet', 'tata': 'toto', 'message': 'titi'});
+      checkResult(splitted[1], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 67854, 'message': '{"tata":"toto","type":"titi","message":"oups"}'});
+      checkResult(splitted[2], {'@version': '1', 'host': 'toto', 'source': 'test42', 'type': 'pouet', 'tata': 'toto', 'message': 'titi', '@timestamp': "abc"}, undefined, true);
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -781,7 +783,7 @@ vows.describe('Integration :').addBatchRetry({
     'output://file:///path_which_does_not_exist/titi.txt'
   ], 'error', 'ENOENT', 'output_file'),
 }).addBatchRetry({
-  'redis channel transport': file2x2x2file(['output://redis://localhost:6379?channel=toto&db=2'], ['input://redis://localhost:6379?channel=toto&db=4']),
+  'redis channel transport': file2x2x2file(['output://redis://localhost:6379?channel=toto'], ['input://redis://localhost:6379?channel=toto']),
 }, 5, 20000).addBatchRetry({
   'redis pattern channel transport': file2x2x2file(['output://redis://localhost:6379?channel=pouet_toto'], ['input://redis://localhost:6379?channel=*toto&pattern_channel=true']),
 }, 5, 20000).addBatchRetry({
