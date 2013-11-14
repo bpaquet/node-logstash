@@ -48,7 +48,7 @@ function file2x2x2file(config1, config2, clean_callback) {
   }
 }
 
-vows.describe('Integration multiline :').addBatchRetry({
+vows.describe('Integration file2x2x2file :').addBatchRetry({
   'redis channel transport': file2x2x2file(['output://redis://localhost:6379?channel=toto'], ['input://redis://localhost:6379?channel=toto']),
 }, 5, 20000).addBatchRetry({
   'redis pattern channel transport': file2x2x2file(['output://redis://localhost:6379?channel=pouet_toto'], ['input://redis://localhost:6379?channel=*toto&pattern_channel=true']),
@@ -64,4 +64,6 @@ vows.describe('Integration multiline :').addBatchRetry({
   'unix socket transport': file2x2x2file(['output://unix:///tmp/test_socket'], ['input://unix:///tmp/test_socket']),
 }, 5, 20000).addBatchRetry({
   'udp transport': file2x2x2file(['output://udp://localhost:17874'], ['input://udp://127.0.0.1:17874']),
+}, 5, 20000).addBatchRetry({
+  'http transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash'], ['input://http://127.0.0.1:17874']),
 }, 5, 20000).export(module);
