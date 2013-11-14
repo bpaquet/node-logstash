@@ -32,7 +32,8 @@
     "zmq": "2.3.x",
     "moment": "1.7.0",
     "redis": "0.8.x",
-    "msgpack": "0.1.8"
+    "msgpack": "0.1.8",
+    "tunnel": "0.0.2"
   },
   "directories": {
     "test": "./test",

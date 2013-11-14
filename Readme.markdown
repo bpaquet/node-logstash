@@ -199,6 +199,24 @@ Parameters:
 * ``pattern_channel``: use channel as pattern. Default value : false
 * ``unserializer``: please see above. Default value to ``json_logstash``.
 
+HTTP
+---
+
+This plugin is used on log server to receive logs from an HTTP/HTTPS stream. This is useful in case the agent can only
+output logs through an HTTP/HTTPS channel.
+
+Example:
+
+* ``input://http://localhost:8080``
+
+Parameters:
+
+* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=http``. No default value.
+* ``unserializer``: please see above. Default value to ``json_logstash``.
+* ``proto``: the protocol to use (http or https)
+* ``private``: full path to a private key (only valid in https protocol)
+* ``public``: full path to a public certificate (only valid in https protocol)
+
 Outputs and filter, commons parameters
 ===
 
@@ -321,6 +339,11 @@ Parameters:
 * ``proto``: ``http`` or ``https``. Default value: ``http``.
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
+* ``proxy``: url of a proxy that the http post request should be tunneled through. The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` which gives support for:
+ * http and https proxies
+ * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``)
+ * proxy port
+
 
 Redis
 ---
