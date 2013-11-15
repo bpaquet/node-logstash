@@ -218,26 +218,21 @@ Parameters:
 * ``unserializer``: please see above. Default value to ``json_logstash``.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 
-TLS
+TCP / TLS
 ---
-This plugin is used on log server to receive data over TCP with SSL/TLS encryption.
+This plugin is used on log server to receive data over TCP, optionnaly with SSL/TLS encryption.
 
-Example:
+Examples:
 
-* ``input://tls://0.0.0.0:443?key=/etc/ssl/private/logstash-server.key&cert=/etc/ssl/private/logstash-server.crt&requestCert=true&rejectUnauthorized=true``
+* TCP mode: ``input://tcp://0.0.0.0:12345``
+* SSL mode: ``input://tcp://0.0.0.0:443?ssl=true&ssl_key=/etc/ssl/private/logstash-server.key&ssl_cert=/etc/ssl/private/logstash-server.crt&ssl_requestCert=true&ssl_rejectUnauthorized=true``
 
 Parameters:
 
-* ``key``: Required. Path to private key in PEM format.
-* ``cert``: Required. Path to SSL certificate in PEM format.
-* ``ca``: Optional. Path to trusted CA certificate file in PEM format. Uses the trusted system CA certificates if omitted/null. Used to authorize client certificates when requestCert and rejectUnauthorized options are true. Default: null
-* ``requestCert``: Optional. If true the server will request a certificate from clients that connect and attempt to verify that certificate. Default: true.
-* ``rejectUnauthorized``: Optional. If true the server will reject any connection which is not authorized with the list of supplied CAs. This option only has an effect if requestCert is true. Default: true.
-* ``appendPeerCert``: Optional. Adds details of the peer certificate to the @tls field if the peer certificate was received from the client using requestCert option. Default: true
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``appendPeerCert``: Optional. In SSL mode, adds details of the peer certificate to the @tls field if the peer certificate was received from the client using requestCert option. Default: true in SSL mode
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
-
-For more information and examples using SSL certs, refer to the node.js TLS documentation [here](http://nodejs.org/api/tls.html#tls_tls_ssl)
 
 Outputs and filter, commons parameters
 ===
@@ -401,26 +396,21 @@ Others params:
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
-TLS
+TCP / TLS
 ---
 
-This plugin is used on log clients to send data over TCP with SSL/TLS encryption.
+This plugin is used on log clients to send data over TCP, optionnaly with SSL/TLS encryption.
 
 Example:
 
-* ``output://tls://192.168.1.1:443?key=/etc/ssl/private/logstash-client.key&cert=/etc/ssl/private/logstash-client.crt&rejectUnauthorized=true``
+* TCP mode:  ``output://tcp://192.168.1.1:12345``
+* SSL Mode: ``output://tcp://192.168.1.1:443?ssl=true&ssl_key=/etc/ssl/private/logstash-client.key&ssl_cert=/etc/ssl/private/logstash-client.crt&ssl_rejectUnauthorized=true``
 
 Parameters:
 
-* ``key``: Required. Path to private key in PEM format.
-* ``cert``: Required. Path to SSL certificate in PEM format.
-* ``ca``: Optional. Path to trusted CA certificate file in PEM format. Uses the trusted system CA certificates if omitted/null. Used to authorize the server certificate when rejectUnauthorized option is true. Default: null
-* ``rejectUnauthorized``: Optional. If true the client will abort connection to the server if the server certificate is not authorized with the list of supplied CAs. Default: true.
-* ``secureProtocol``: Optional. The SSL method to use, e.g. SSLv3\_method to force SSL version 3. The possible values depend on your installation of OpenSSL and are defined in the constant [SSL_METHODS](http://www.openssl.org/docs/ssl/ssl.html#DEALING_WITH_PROTOCOL_METHODS). Default: SSLv3\_method
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 * ``format``: Optional. Please see above. Used by the ``raw``serializer.
-
-For more information and examples using SSL certs, refer to the node.js TLS documentation [here](http://nodejs.org/api/tls.html#tls_tls_ssl)
 
 Filters
 ===
