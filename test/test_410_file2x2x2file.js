@@ -68,4 +68,6 @@ vows.describe('Integration file2x2x2file :').addBatchRetry({
   'http transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash'], ['input://http://127.0.0.1:17874']),
 }, 5, 20000).addBatchRetry({
   'https transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt']),
+}, 5, 20000).addBatchRetry({
+  'https transport with ca': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=ssl/root-ca.crt'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt']),
 }, 5, 20000).export(module);
