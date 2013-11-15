@@ -1,0 +1,60 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=FR, ST=Node-Logstash, O=Node-Logstash, CN=ca.node-logstash.testing
+        Validity
+            Not Before: Nov 15 10:02:44 2013 GMT
+            Not After : Nov 13 10:02:44 2023 GMT
+        Subject: C=FR, ST=Node-Logstash, O=Node-Logstash, CN=client_name
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:f6:2a:c2:5c:a9:77:1e:10:ae:a7:b2:54:4f:23:
+                    a0:51:d8:94:02:44:0b:ce:0e:4e:a0:3b:a3:ac:78:
+                    bb:12:f7:37:2d:31:e7:ff:d7:1a:9b:50:07:fd:59:
+                    ea:7c:e6:5a:f1:c3:90:b5:eb:62:f9:43:cd:26:fb:
+                    8c:ee:4e:59:4a:b8:bd:f8:78:dc:bb:2b:e3:0e:4c:
+                    ad:59:5e:6a:f6:16:84:81:95:bb:0b:d7:41:66:e0:
+                    44:ac:22:9a:cd:de:b7:ea:10:9f:eb:95:b1:4f:85:
+                    53:c6:36:06:63:1e:8c:ba:dc:58:0d:b8:8e:00:36:
+                    a9:c8:80:e5:55:1c:9c:13:21
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                98:25:3D:7C:3F:F0:39:02:05:90:33:8E:EF:9A:13:C8:66:8E:6B:3A
+            X509v3 Authority Key Identifier: 
+                keyid:F2:D4:B0:88:61:AA:6D:17:EB:05:D4:86:CE:42:46:B1:6A:C3:0F:17
+
+    Signature Algorithm: sha1WithRSAEncryption
+        98:c1:de:1c:18:d9:e3:75:79:2b:4e:4c:ed:90:0a:e9:b3:69:
+        6a:6f:bf:c4:49:b2:be:5d:b6:31:33:06:0e:13:e9:40:ad:03:
+        7f:0b:ae:90:50:77:84:5e:a3:82:ee:45:4b:6b:7f:6b:40:44:
+        e1:d6:fe:50:2c:14:52:d9:5e:ec:03:3f:bf:29:74:5b:3d:d8:
+        8f:6a:a5:28:48:49:44:5b:de:d9:1f:46:23:88:98:b0:ca:68:
+        d9:e8:1e:10:e6:71:65:87:dc:3f:e5:9d:51:5f:a7:85:67:1a:
+        cb:02:8e:9f:68:41:53:37:7c:1c:41:3d:54:6c:b4:de:69:21:
+        5f:c3
+-----BEGIN CERTIFICATE-----
+MIICpDCCAg2gAwIBAgIBATANBgkqhkiG9w0BAQUFADBgMQswCQYDVQQGEwJGUjEW
+MBQGA1UECBMNTm9kZS1Mb2dzdGFzaDEWMBQGA1UEChMNTm9kZS1Mb2dzdGFzaDEh
+MB8GA1UEAxMYY2Eubm9kZS1sb2dzdGFzaC50ZXN0aW5nMB4XDTEzMTExNTEwMDI0
+NFoXDTIzMTExMzEwMDI0NFowUzELMAkGA1UEBhMCRlIxFjAUBgNVBAgTDU5vZGUt
+TG9nc3Rhc2gxFjAUBgNVBAoTDU5vZGUtTG9nc3Rhc2gxFDASBgNVBAMUC2NsaWVu
+dF9uYW1lMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD2KsJcqXceEK6nslRP
+I6BR2JQCRAvODk6gO6OseLsS9zctMef/1xqbUAf9Wep85lrxw5C162L5Q80m+4zu
+TllKuL34eNy7K+MOTK1ZXmr2FoSBlbsL10Fm4ESsIprN3rfqEJ/rlbFPhVPGNgZj
+Hoy63FgNuI4ANqnIgOVVHJwTIQIDAQABo3sweTAJBgNVHRMEAjAAMCwGCWCGSAGG
++EIBDQQfFh1PcGVuU1NMIEdlbmVyYXRlZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQU
+mCU9fD/wOQIFkDOO75oTyGaOazowHwYDVR0jBBgwFoAU8tSwiGGqbRfrBdSGzkJG
+sWrDDxcwDQYJKoZIhvcNAQEFBQADgYEAmMHeHBjZ43V5K05M7ZAK6bNpam+/xEmy
+vl22MTMGDhPpQK0DfwuukFB3hF6jgu5FS2t/a0BE4db+UCwUUtle7AM/vyl0Wz3Y
+j2qlKEhJRFve2R9GI4iYsMpo2egeEOZxZYfcP+WdUV+nhWcaywKOn2hBUzd8HEE9
+VGy03mkhX8M=
+-----END CERTIFICATE-----
