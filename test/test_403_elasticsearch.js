@@ -6,7 +6,7 @@ var vows = require('vows-batch-retry'),
     helper = require('./integration_helper.js'),
     monitor_file = require('../lib/lib/monitor_file');
 
-vows.describe('Integration Json logstash event :').addBatchRetry({
+vows.describe('Integration Elastic search event :').addBatchRetry({
   'elastic_search test': {
     topic: function() {
       var callback = this.callback;
