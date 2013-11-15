@@ -109,7 +109,8 @@ Config file for log server:
 Changelog
 ===
 
-* Add input HTTP plugin
+* Add TCP / TLS plugin, thx to @dlanderson
+* Add input HTTP plugin, thx to @fujifish
 * Refactor SSL management
 * Add GeopIP filter, thx to @subutux
 * Add serializer and unserializer support
