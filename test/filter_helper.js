@@ -17,7 +17,7 @@ function createWithCallback(filter_name, filter_config, inputs, number_of_events
       var callback = this.callback;
       if (!init_callback) {
         init_callback = function(callback) {callback()};
-      } 
+      }
       init_callback(function() {
         var m = require('../lib/filters/filter_' + filter_name).create();
         var result = [];
