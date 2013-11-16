@@ -14,4 +14,10 @@ vows.describe('Filter grep ').addBatch({
   ], [
     {'message': 'abd5'},
   ]),
+  'invert': filter_helper.create('grep', '?regex=abc&invert=true', [
+    {'message': 'abcd'},
+    {'message': 'abd'},
+  ], [
+    {'message': 'abd'},
+  ]),
 }).export(module);
