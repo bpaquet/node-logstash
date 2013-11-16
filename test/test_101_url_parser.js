@@ -1,6 +1,6 @@
 var vows = require('vows'),
     assert = require('assert'),
-    url_parser = require('url_parser');
+    url_parser = require('lib/url_parser');
 
 function testExtractProtocol(url, target) {
   return {

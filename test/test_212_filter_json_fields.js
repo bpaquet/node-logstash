@@ -1,5 +1,5 @@
 var vows = require('vows'),
-    patterns_loader = require('../lib/lib/patterns_loader'),
+    patterns_loader = require('lib/patterns_loader'),
     filter_helper = require('./filter_helper');
 
 patterns_loader.add('/toto');

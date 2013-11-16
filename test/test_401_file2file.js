@@ -2,7 +2,7 @@ var vows = require('vows-batch-retry'),
     fs = require('fs'),
     assert = require('assert'),
     helper = require('./integration_helper.js'),
-    monitor_file = require('../lib/lib/monitor_file');
+    monitor_file = require('lib/monitor_file');
 
 vows.describe('Integration file 2 file :').addBatchRetry({
   'file2file': {

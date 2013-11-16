@@ -4,7 +4,7 @@ var vows = require('vows-batch-retry'),
     net = require('net'),
     assert = require('assert'),
     helper = require('./integration_helper.js'),
-    monitor_file = require('../lib/lib/monitor_file');
+    monitor_file = require('lib/monitor_file');
 
 vows.describe('Integration log io :').addBatchRetry({
   'logio': {

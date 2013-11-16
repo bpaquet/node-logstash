@@ -5,7 +5,7 @@ var vows = require('vows-batch-retry'),
     path = require('path'),
     child_process = require('child_process'),
     log = require('log4node'),
-    monitor_file = require('monitor_file');
+    monitor_file = require('lib/monitor_file');
 
 function randomFile(pathname) {
   return path.join(pathname || os.tmpDir(), '___node-logstash_test___' + Math.random());

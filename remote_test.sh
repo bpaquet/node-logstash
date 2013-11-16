@@ -14,11 +14,19 @@ fi
 COMMAND="npm test"
 
 if [ "$TEST" != "" ]; then
-  COMMAND="TEST='$TEST' npm test"
+  COMMAND="TEST='$TEST' $COMMAND"
+fi
+
+if [ "$COVER" != "" ]; then
+  COMMAND="COVER=$COVER $COMMAND"
 fi
 
 echo "Using node version $NODE_VERSION"
-rsync -avh --delete --exclude=.git --exclude=node_modules ../node-logstash/ $TARGET:node-logstash_$NODE_VERSION/
+rsync -avh --delete --exclude=.git --exclude=node_modules --exclude=coverage ../node-logstash/ $TARGET:node-logstash_$NODE_VERSION/
 ssh $TARGET "source .nvm/nvm.sh && nvm use v$NODE_VERSION && cd node-logstash_$NODE_VERSION && echo $NODE_VERSION > .node_version && $COMMAND"
+
+if [ "$COVER" != "" ]; then
+  rsync -avh --delete $TARGET:node-logstash_$NODE_VERSION/coverage/ coverage/
+fi
 
 ./jshint.sh

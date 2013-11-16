@@ -2,7 +2,7 @@ var vows = require('vows-batch-retry'),
     assert = require('assert'),
     fs = require('fs'),
     helper = require('./integration_helper.js'),
-    monitor_file = require('../lib/lib/monitor_file');
+    monitor_file = require('lib/monitor_file');
 
 function file2x2x2file(config1, config2, clean_callback) {
   return {
@@ -68,13 +68,13 @@ vows.describe('Integration file2x2x2file :').addBatchRetry({
 }, 5, 20000).addBatchRetry({
   'http transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash'], ['input://http://127.0.0.1:17874']),
 }, 5, 20000).addBatchRetry({
-  'https transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt']),
+  'https transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
 }, 5, 20000).addBatchRetry({
-  'https transport with ca': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=ssl/root-ca.crt'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt']),
+  'https transport with ca': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
 }, 5, 20000).addBatchRetry({
-  'https transport with ca and client side certificate': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=ssl/root-ca.crt&ssl_key=ssl/client.key&ssl_cert=ssl/client.crt'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt&ssl_requestCert=true&ssl_ca=ssl/root-ca.crt&ssl_rejectUnauthorized=true']),
+  'https transport with ca and client side certificate': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt&ssl_requestCert=true&ssl_ca=test/ssl/root-ca.crt&ssl_rejectUnauthorized=true']),
 }, 5, 20000).addBatchRetry({
-  'tls': file2x2x2file(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt']),
+  'tls': file2x2x2file(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
 }, 5, 20000).addBatchRetry({
-  'tls with ca': file2x2x2file(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=ssl/root-ca.crt&ssl_key=ssl/client.key&ssl_cert=ssl/client.crt'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt&ssl_requestCert=true&ssl_ca=ssl/root-ca.crt&ssl_rejectUnauthorized=true']),
+  'tls with ca': file2x2x2file(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt&ssl_requestCert=true&ssl_ca=test/ssl/root-ca.crt&ssl_rejectUnauthorized=true']),
 }, 5, 20000).export(module);

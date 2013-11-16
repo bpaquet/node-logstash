@@ -3,7 +3,7 @@ var vows = require('vows-batch-retry'),
     fs = require('fs'),
     path = require('path'),
     spawn = require('child_process').spawn,
-    directory_detector = require('../lib/lib/directory_detector');
+    directory_detector = require('lib/directory_detector');
 
 function TestDirectoryDetector(directory) {
   this.exists = 0;

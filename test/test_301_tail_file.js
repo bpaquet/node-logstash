@@ -4,7 +4,7 @@ var vows = require('vows-batch-retry'),
     fs = require('fs'),
     path = require('path'),
     log = require('log4node'),
-    tail = require('tail_file');
+    tail = require('lib/tail_file');
 
 function randomFile(pathname) {
   return path.join(pathname || os.tmpDir(), '___node-logstash_test___' + Math.random());

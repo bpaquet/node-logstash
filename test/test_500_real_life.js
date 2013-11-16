@@ -62,7 +62,7 @@ function input_file_test(args, topic_callback, check_callback) {
         'input://file://output.txt' + args,
         'output://udp://localhost:17881',
       ], function(agent) {
-        run('node', ['50_real_life/run.js', '--file=output.txt', '--count=1500', '--period=1'], 'process.pid', function(exitCode) {
+        run('node', ['test/50_real_life/run.js', '--file=output.txt', '--count=1500', '--period=1'], 'process.pid', function(exitCode) {
           setTimeout(function() {
             socket.close();
             agent.close(function() {
@@ -90,7 +90,7 @@ function output_file_test(topic_callback, check_callback) {
     topic: function() {
       var callback = this.callback;
       var socket = dgram.createSocket('udp4');
-      run('node', ['../bin/node-logstash-agent', 'input://udp://localhost:17874', 'output://file://output.txt'], 'process.pid', function(exitCode) {
+      run('node', ['bin/node-logstash-agent', 'input://udp://localhost:17874', 'output://file://output.txt'], 'process.pid', function(exitCode) {
         setTimeout(function() {
           socket.close();
           callback(undefined, exitCode);
@@ -140,13 +140,13 @@ vows.describe('Real life :').addBatchRetry({
           return console.log(err);
         }
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
           });
         }, 500);
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
           });
@@ -165,13 +165,13 @@ vows.describe('Real life :').addBatchRetry({
           return console.log(err);
         }
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
           });
         }, 500);
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(exitCode, 0);
           });
@@ -190,13 +190,13 @@ vows.describe('Real life :').addBatchRetry({
           return console.log(err);
         }
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/50_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(exitCode, 0);
           });
         }, 500);
         setTimeout(function() {
-          run(logrotate, ['-f', '50_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/50_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(exitCode, 0);
           });
@@ -230,7 +230,7 @@ vows.describe('Real life :').addBatchRetry({
         if (err) {
           return console.log(err);
         }
-        run(logrotate, ['-f', '50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+        run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
           console.log('Logrotate exit code', exitCode);
           assert.equal(exitCode, 0);
         });

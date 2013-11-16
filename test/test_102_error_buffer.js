@@ -1,7 +1,7 @@
 var vows = require('vows'),
     assert = require('assert'),
     events = require('events'),
-    error_buffer = require('error_buffer');
+    error_buffer = require('lib/error_buffer');
 
 vows.describe('Error buffer').addBatch({
   'standard check': {

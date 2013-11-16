@@ -9,12 +9,12 @@ vows.describe('Integration tls appendpeercert:').addBatchRetry({
     topic: function() {
       var callback = this.callback;
       helper.createAgent([
-        'input://tcp://localhost:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt&ssl_requestCert=true&ssl_ca=ssl/root-ca.crt&ssl_rejectUnauthorized=true',
+        'input://tcp://localhost:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt&ssl_requestCert=true&ssl_ca=test/ssl/root-ca.crt&ssl_rejectUnauthorized=true',
         'output://file://output.txt?serializer=json_logstash',
       ], function(agent) {
         helper.createAgent([
           'input://tcp://localhost:17873',
-          'output://tcp://localhost:17874?serializer=raw&ssl=true&ssl_ca=ssl/root-ca.crt&ssl_key=ssl/client.key&ssl_cert=ssl/client.crt',
+          'output://tcp://localhost:17874?serializer=raw&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt',
         ], function(agent2) {
           var c = net.createConnection({port: 17873}, function() {
             c.write('toto');
@@ -69,12 +69,12 @@ vows.describe('Integration tls appendpeercert:').addBatchRetry({
     topic: function() {
       var callback = this.callback;
       helper.createAgent([
-        'input://tcp://localhost:17874?ssl=true&ssl_key=ssl/server.key&ssl_cert=ssl/server.crt&ssl_requestCert=true&ssl_ca=ssl/root-ca.crt&ssl_rejectUnauthorized=true&appendPeerCert=false',
+        'input://tcp://localhost:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt&ssl_requestCert=true&ssl_ca=test/ssl/root-ca.crt&ssl_rejectUnauthorized=true&appendPeerCert=false',
         'output://file://output.txt?serializer=json_logstash',
       ], function(agent) {
         helper.createAgent([
           'input://tcp://localhost:17873',
-          'output://tcp://localhost:17874?serializer=raw&ssl=true&ssl_ca=ssl/root-ca.crt&ssl_key=ssl/client.key&ssl_cert=ssl/client.crt',
+          'output://tcp://localhost:17874?serializer=raw&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt',
         ], function(agent2) {
           var c = net.createConnection({port: 17873}, function() {
             c.write('toto');
