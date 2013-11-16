@@ -13,6 +13,7 @@ export NODE_PATH="test:lib:$NODE_PATH"
 echo "Launching test : $TEST"
 
 if [ "$COVER" != "" ]; then
+  rm -rf coverage
   istanbul cover node_modules/.bin/vows -- $TEST --spec
 else
   vows $TEST --spec
