@@ -1,6 +1,4 @@
 var vows = require('vows'),
-    assert = require('assert'),
-    os = require('os'),
     mock_helper = require('./mock_helper'),
     filter_helper = require('./filter_helper');
 
@@ -8,16 +6,16 @@ function mock_dns() {
   mock_helper.mock({
     'dns': {
       reverse: function(s, cb) {
-        if (s == 'www.free.fr') {
+        if (s === 'www.free.fr') {
           return cb({code: 'ENOTFOUND', errno: 'ENOTFOUND', syscall: 'getHostByAddr'});
         }
-        if (s == '212.27.48.10') {
+        if (s === '212.27.48.10') {
           return cb(null, ['www.free.fr']);
         }
-        if (s == '212.27.48.11') {
+        if (s === '212.27.48.11') {
           return cb(null, ['toto']);
         }
-        throw new Error("toto2");
+        throw new Error('toto2');
       }
     }
   });

@@ -12,9 +12,9 @@ vows.describe('Integration net 2 file :').addBatchRetry({
       helper.createAgent([
         'input://tcp://localhost:17874?type=2',
         'output://file://output.txt?serializer=json_logstash',
-        ], function(agent) {
+      ], function(agent) {
         var c = net.createConnection({port: 17874}, function() {
-          c.write("toto");
+          c.write('toto');
           c.end();
         });
         c.on('end', function() {
@@ -34,7 +34,7 @@ vows.describe('Integration net 2 file :').addBatchRetry({
 
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 2);
-      assert.equal("", splitted[splitted.length - 1]);
+      assert.equal('', splitted[splitted.length - 1]);
       helper.checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'tcp_port': 17874, 'message': 'toto', 'type': '2'});
     }
   },
@@ -58,7 +58,7 @@ vows.describe('Integration net 2 file :').addBatchRetry({
       helper.createAgent([
         'input://file://main_input.txt',
         'output://tcp://localhost:17874?serializer=raw',
-        ], function(agent) {
+      ], function(agent) {
         setTimeout(function() {
           fs.appendFile('main_input.txt', 'line 1\n', function(err) {
             assert.ifError(err);
@@ -103,5 +103,5 @@ vows.describe('Integration net 2 file :').addBatchRetry({
         'line 3',
       ]);
     }
- },
+  },
 }, 5, 20000).export(module);

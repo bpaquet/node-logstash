@@ -11,7 +11,7 @@ function testExtractProtocol(url, target) {
     check: function(result) {
       assert.deepEqual(target, result);
     }
-  }
+  };
 }
 
 function testProcessUrlContent(url, target) {
@@ -23,7 +23,7 @@ function testProcessUrlContent(url, target) {
     check: function(result) {
       assert.deepEqual(target, result);
     }
-  }
+  };
 }
 
 function testExtractPortNumber(url, target) {
@@ -35,19 +35,7 @@ function testExtractPortNumber(url, target) {
     check: function(result) {
       assert.deepEqual(target, result);
     }
-  }
-}
-
-function testExtractPath(url, target) {
-  return {
-    topic: function() {
-      this.callback(null, url_parser.extractPath(url));
-    },
-
-    check: function(result) {
-      assert.deepEqual(target, result);
-    }
-  }
+  };
 }
 
 vows.describe('Url parser').addBatch({
@@ -61,9 +49,9 @@ vows.describe('Url parser').addBatch({
   'process url content simple': testProcessUrlContent('/tmp/toto.txt', {host: '/tmp/toto.txt', params: {}}),
   'process url content qs': testProcessUrlContent('/tmp/toto.txt?type=t', {host: '/tmp/toto.txt', params: {type: 't'}}),
   'process url content qs special chars': testProcessUrlContent('/tmp/toto.txt?type=t&z=%20t', {host: '/tmp/toto.txt', params: {type: 't', z: ' t'}}),
-  'process url content no host': testProcessUrlContent('?type=t&z=%20t', {host: '', params: {type: 't', z: ' t'}}),
-  'process url content special chars in host': testProcessUrlContent('/tmp/toto%202.txt?type=t', {host: '/tmp/toto 2.txt', params: {type: 't'}}),
   'process url content no host': testProcessUrlContent('?type=t', {host: '', params: {type: 't'}}),
+  'process url content no host with others params': testProcessUrlContent('?type=t&z=%20t', {host: '', params: {type: 't', z: ' t'}}),
+  'process url content special chars in host': testProcessUrlContent('/tmp/toto%202.txt?type=t', {host: '/tmp/toto 2.txt', params: {type: 't'}}),
   'process url content with plus': testProcessUrlContent('?type=t+3', {host: '', params: {type: 't+3'}}),
   'extract port number hostonly': testExtractPortNumber('localhost', undefined),
   'extract port number ip': testExtractPortNumber('0.0.0.0:80', {host: '0.0.0.0', port: 80}),

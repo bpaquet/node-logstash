@@ -19,7 +19,7 @@ var e = new events.EventEmitter();
 
 e.on('msg', function() {
   k ++;
-  if (k % 10000 == 0) {
+  if (k % 10000 === 0) {
     log.info('Send', k);
   }
 });
@@ -35,7 +35,7 @@ setInterval(function() {
     socket.send(JSON.stringify({'type': type, '@timestamp': (new Date()).toISOString(), 'message': 'message ' + kk + ' ' + i}));
     e.emit('msg');
   }
-  if (max == kk) {
+  if (max === kk) {
     process.exit(0);
   }
 }, period);

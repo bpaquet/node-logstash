@@ -20,3 +20,5 @@ fi
 echo "Using node version $NODE_VERSION"
 rsync -avh --delete --exclude=.git --exclude=node_modules ../node-logstash/ $TARGET:node-logstash_$NODE_VERSION/
 ssh $TARGET "source .nvm/nvm.sh && nvm use v$NODE_VERSION && cd node-logstash_$NODE_VERSION && echo $NODE_VERSION > .node_version && $COMMAND"
+
+./jshint.sh

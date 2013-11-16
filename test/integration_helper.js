@@ -6,13 +6,13 @@ function createAgent(urls, callback, error_callback) {
   var a = agent.create();
   error_callback = error_callback || function(error) {
     assert.ifError(error);
-  }
+  };
   a.on('init_error', function(module_name, error) {
-    console.log("Init error agent detected, " + module_name + " : " + error);
+    console.log('Init error agent detected, ' + module_name + ' : ' + error);
     error_callback(error);
   });
   a.on('error', function(module_name, error) {
-    console.log("Error agent detected, " + module_name + " : " + error);
+    console.log('Error agent detected, ' + module_name + ' : ' + error);
     error_callback(error);
   });
   a.loadUrls(['filter://add_host://', 'filter://add_timestamp://', 'filter://add_version://'].concat(urls), function(error) {
@@ -28,9 +28,9 @@ function checkResult(line, target, override_host, keep_timestamp) {
   if (!keep_timestamp) {
     delete parsed['@timestamp'];
   }
-  delete parsed['redis_channel'];
+  delete parsed.redis_channel;
   if (override_host) {
-    target['host'] = os.hostname();
+    target.host = os.hostname();
   }
   assert.deepEqual(parsed, target);
 }

@@ -15,7 +15,7 @@ vows.describe('Integration file 2 file :').addBatchRetry({
         'output://file://output1.txt?serializer=json_logstash',
         'output://file://output2.txt?serializer=json_logstash',
         'output://file://output3.txt?serializer=raw&format=_#{message}_',
-        ], function(agent) {
+      ], function(agent) {
         setTimeout(function() {
           fs.appendFile('input1.txt', 'line1\n', function(err) {
             assert.ifError(err);
@@ -53,12 +53,12 @@ vows.describe('Integration file 2 file :').addBatchRetry({
       assert.equal(c1, c2);
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 4);
-      assert.equal("", splitted[splitted.length - 1]);
+      assert.equal('', splitted[splitted.length - 1]);
       helper.checkResult(splitted[0], {'@version': '1', 'path': 'input1.txt', 'message': 'line1'}, true);
       helper.checkResult(splitted[1], {'@version': '1', 'path': 'input2.txt', 'message': 'line2', 'type': 'input2'}, true);
       helper.checkResult(splitted[2], {'@version': '1', 'path': 'input1.txt', 'message': 'line3'}, true);
 
-      assert.equal("_line1_\n_line2_\n_line3_\n", c3);
+      assert.equal('_line1_\n_line2_\n_line3_\n', c3);
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -69,7 +69,7 @@ vows.describe('Integration file 2 file :').addBatchRetry({
       helper.createAgent([
         'input://file://toto/56/87/input.txt',
         'output://file://output.txt?serializer=json_logstash',
-        ], function(agent) {
+      ], function(agent) {
         setTimeout(function() {
           fs.mkdir('toto', function(err) {
             assert.ifError(err);
@@ -108,7 +108,7 @@ vows.describe('Integration file 2 file :').addBatchRetry({
 
       var splitted = c.split('\n');
       assert.equal(splitted.length, 3);
-      assert.equal("", splitted[splitted.length - 1]);
+      assert.equal('', splitted[splitted.length - 1]);
       helper.checkResult(splitted[0], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line1'}, true);
       helper.checkResult(splitted[1], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line2'}, true);
     }

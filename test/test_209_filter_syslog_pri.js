@@ -1,6 +1,4 @@
 var vows = require('vows'),
-    assert = require('assert'),
-    os = require('os'),
     filter_helper = require('./filter_helper');
 
 vows.describe('Filter syslog pri').addBatch({

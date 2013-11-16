@@ -18,7 +18,7 @@ function mock(modules) {
 
   m._load = mocked_loader;
   m._cache = {};
-  mocked_modules = modules
+  mocked_modules = modules;
 }
 
 function unmock() {

@@ -28,7 +28,7 @@ vows.describe('Integration statsd :').addBatchRetry({
         'output://statsd://127.0.0.1:17874?metric_type=counter&metric_key=toto.counter&metric_value=#{message}&only_type=tata',
         'output://statsd://127.0.0.1:17874?metric_type=timer&metric_key=toto.#{my_field}.#{my_field}&metric_value=20&only_type=tete',
         'output://statsd://127.0.0.1:17874?metric_type=gauge&metric_key=toto.gauge&metric_value=45&only_type=toto',
-        ], function(agent) {
+      ], function(agent) {
         setTimeout(function() {
           fs.appendFile('input1.txt', 'line1\n', function(err) {
             assert.ifError(err);
@@ -80,10 +80,10 @@ vows.describe('Integration statsd :').addBatchRetry({
         'toto.bouh:1|c',
         'toto.bouh:1|c',
         'toto.gauge:45|g',
-        ].sort());
-      }
-   },
- }, 5, 20000).addBatchRetry({
+      ].sort());
+    }
+  },
+}, 5, 20000).addBatchRetry({
   'file2statsd_missing_field': {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -99,7 +99,7 @@ vows.describe('Integration statsd :').addBatchRetry({
         'input://file://input1.txt',
         'filter://regex://?regex=(line2)&fields=unknown_field',
         'output://statsd://127.0.0.1:17874?metric_type=increment&metric_key=toto.bouh.#{unknown_field}',
-        ], function(agent) {
+      ], function(agent) {
         setTimeout(function() {
           fs.appendFile('input1.txt', 'line1\n', function(err) {
             assert.ifError(err);
@@ -124,5 +124,5 @@ vows.describe('Integration statsd :').addBatchRetry({
       assert.deepEqual(data.sort(), ['toto.bouh.line2:1|c'].sort());
       assert.equal(errors.length, 0);
     }
- },
+  },
 }, 5, 20000).export(module);

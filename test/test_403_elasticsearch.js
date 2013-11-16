@@ -1,46 +1,44 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
     http = require('http'),
     net = require('net'),
     assert = require('assert'),
-    helper = require('./integration_helper.js'),
-    monitor_file = require('../lib/lib/monitor_file');
+    helper = require('./integration_helper.js');
 
 vows.describe('Integration Elastic search event :').addBatchRetry({
   'elastic_search test': {
     topic: function() {
       var callback = this.callback;
       var reqs = [];
-      var agent = helper.createAgent([
+      helper.createAgent([
         'input://tcp://0.0.0.0:17874?type=nginx',
         'input://tcp://0.0.0.0:17875',
         'output://elasticsearch://localhost:17876',
-        ], function(agent) {
+      ], function(agent) {
         var es_server = http.createServer(function(req, res) {
-          var body = "";
+          var body = '';
           req.on('data', function(chunk) {
             body += chunk;
-          })
+          });
           req.on('end', function() {
             reqs.push({req: req, body: body});
             res.writeHead(201);
             res.end();
-            if (reqs.length == 2) {
+            if (reqs.length === 2) {
               agent.close(function() {
                 es_server.close(function() {
                   callback(null, reqs);
                 });
               });
             }
-          })
+          });
         }).listen(17876);
         var c1 = net.createConnection({port: 17874}, function() {
-          c1.write("toto");
+          c1.write('toto');
           c1.end();
         });
         setTimeout(function() {
           var c2 = net.createConnection({port: 17875}, function() {
-            c2.write("titi");
+            c2.write('titi');
             c2.end();
           });
         }, 200);

@@ -1,6 +1,6 @@
 var vows = require('vows-batch-retry'),
     assert = require('assert'),
-    fs = require('fs');
+    fs = require('fs'),
     path = require('path'),
     spawn = require('child_process').spawn,
     directory_detector = require('../lib/lib/directory_detector');
@@ -9,7 +9,7 @@ function TestDirectoryDetector(directory) {
   this.exists = 0;
   this.not_exists = 0;
   this.errors = [];
-  this.detector = new directory_detector.DirectoryDetector;
+  this.detector = new directory_detector.DirectoryDetector();
   this.detector.on('exists', function() {
     this.exists += 1;
   }.bind(this));
@@ -23,9 +23,9 @@ function TestDirectoryDetector(directory) {
 }
 
 function check(detector, exists, not_exists, errors) {
-  assert.equal(exists, detector.exists, "Wrong number of exists events");
-  assert.equal(not_exists, detector.not_exists, "Wrong number of not exists events")
-  assert.equal(errors, detector.errors.length, "Wrong number of errors");
+  assert.equal(exists, detector.exists, 'Wrong number of exists events');
+  assert.equal(not_exists, detector.not_exists, 'Wrong number of not exists events');
+  assert.equal(errors, detector.errors.length, 'Wrong number of errors');
 }
 
 function create_test(directory, start_callback, check_callback) {
@@ -43,7 +43,7 @@ function create_test(directory, start_callback, check_callback) {
       detector.detector.close();
       check_callback(detector);
     }
-  }
+  };
 }
 
 vows.describe('Directory detector ').addBatchRetry({
@@ -94,7 +94,7 @@ vows.describe('Directory detector ').addBatchRetry({
   }, function(detector) {
     check(detector, 0, 1, 1);
     console.log(detector.errors);
-    assert(detector.errors[0].toString().match(/EACCES/), detector.errors[0].toString() + " should contain EACCESS");
+    assert(detector.errors[0].toString().match(/EACCES/), detector.errors[0].toString() + ' should contain EACCESS');
   }),
 }, 5, 10000).addBatchRetry({
   '1 subdirectory': create_test(path.resolve('.') + '/toto44', function(callback, detector) {
@@ -127,7 +127,7 @@ vows.describe('Directory detector ').addBatchRetry({
                 assert.ifError(err);
                 setTimeout(function() {
                   check(detector, 0, 1, 0);
-                  fs.mkdir('toto48/yuo', function(err) {
+                  fs.mkdir('toto48/yuo', function() {
                     setTimeout(function() {
                       callback();
                     }, 50);
@@ -175,13 +175,13 @@ vows.describe('Directory detector ').addBatchRetry({
   '4 subdirectory mkdir -p': create_test(path.resolve('.') + '/toto49/12/45/87', function(callback, detector) {
     setTimeout(function() {
       check(detector, 0, 1, 0);
-      child = spawn('mkdir', ['-p', 'toto49/12/45/87']);
+      var child = spawn('mkdir', ['-p', 'toto49/12/45/87']);
       child.on('exit', function(exit_code) {
         assert.equal(0, exit_code);
         setTimeout(function() {
           callback();
         }, 50);
-      })
+      });
     }, 50);
   }, function(detector) {
     fs.rmdirSync('toto49/12/45/87');

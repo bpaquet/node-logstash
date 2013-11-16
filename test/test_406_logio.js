@@ -14,8 +14,8 @@ vows.describe('Integration log io :').addBatchRetry({
       var reqs = [];
       var server = net.createServer(function(c) {
         c.on('data', function(data) {
-          data.toString().split("\r\n").forEach(function(s) {
-            if (s != "") {
+          data.toString().split('\r\n').forEach(function(s) {
+            if (s !== '') {
               reqs.push(s);
             }
           });
@@ -27,7 +27,7 @@ vows.describe('Integration log io :').addBatchRetry({
         'input://file://main_input.txt?type=toto',
         'output://logio://localhost:17874',
         'output://logio://localhost:17874?priority=#{type}',
-        ], function(agent) {
+      ], function(agent) {
         setTimeout(function() {
           fs.appendFile('main_input.txt', 'line 1\n', function(err) {
             assert.ifError(err);

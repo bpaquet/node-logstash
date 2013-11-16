@@ -1,5 +1,6 @@
 var vows = require('vows-batch-retry'),
     assert = require('assert'),
+    fs = require('fs'),
     helper = require('./integration_helper.js'),
     monitor_file = require('../lib/lib/monitor_file');
 
@@ -42,10 +43,10 @@ function file2x2x2file(config1, config2, clean_callback) {
 
       var splitted = c.split('\n');
       assert.equal(splitted.length, 2);
-      assert.equal("", splitted[splitted.length - 1]);
+      assert.equal('', splitted[splitted.length - 1]);
       helper.checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'}, true);
     }
-  }
+  };
 }
 
 vows.describe('Integration file2x2x2file :').addBatchRetry({

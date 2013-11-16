@@ -1,7 +1,7 @@
 var vows = require('vows-batch-retry'),
     assert = require('assert'),
     os = require('os'),
-    fs = require('fs');
+    fs = require('fs'),
     path = require('path'),
     child_process = require('child_process'),
     log = require('log4node'),
@@ -31,13 +31,13 @@ function TestMonitor(file, options) {
     log.error(err);
     this.init_errors.push(err);
   }.bind(this));
-  this.monitor.on('renamed', function(err) {
+  this.monitor.on('renamed', function() {
     this.renamed_counter ++;
   }.bind(this));
-  this.monitor.on('changed', function(err) {
+  this.monitor.on('changed', function() {
     this.changed_counter ++;
   }.bind(this));
-  this.monitor.on('closed', function(err) {
+  this.monitor.on('closed', function() {
     this.closed_counter ++;
   }.bind(this));
 }
@@ -66,7 +66,7 @@ function create_test(start_callback, check_callback, path, options) {
       assert.ifError(err);
       check_callback(m);
     }
-  }
+  };
 }
 
 function no_error(m) {
@@ -174,12 +174,11 @@ vows.describe('Monitor ').addBatch({
       fs.writeFileSync(m.file, 'line1\nline2\n');
       setTimeout(callback, 200);
     }, 200);
-    }, function check(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    }
-  ),
+  }, function check(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }),
 }).addBatch({
   'File created after start, filled with append': create_test(
     function(m, callback) {
@@ -243,12 +242,11 @@ vows.describe('Monitor ').addBatch({
       fs.unlinkSync(m.file);
       setTimeout(callback, 200);
     }, 200);
-    }, function check(m) {
-      assert.equal(m.monitor.fdTailer, undefined);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    }
-  ),
+  }, function check(m) {
+    assert.equal(m.monitor.fdTailer, undefined);
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }),
 }).addBatch({
   'File removed and recreated': create_test(function(m, callback) {
     fs.writeFileSync(m.file, 'line1\nline2\n');
@@ -261,11 +259,10 @@ vows.describe('Monitor ').addBatch({
         setTimeout(callback, 200);
       }, 200);
     }, 200);
-    }, function check(m) {
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2', 'line3']);
-    },
-  undefined, {wait_delay_after_renaming: 100}),
+  }, function check(m) {
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2', 'line3']);
+  }, undefined, {wait_delay_after_renaming: 100}),
 }).addBatch({
   'Incomplete line': create_test(function(m, callback) {
     fs.writeFileSync(m.file, 'line1\nline2\nline3');
@@ -277,12 +274,11 @@ vows.describe('Monitor ').addBatch({
         setTimeout(callback, 200);
       }, 200);
     }, 200);
-    }, function check(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2', 'line3line3', 'line4']);
-    }
-  ),
+  }, function check(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2', 'line3line3', 'line4']);
+  }),
 }).addBatch({
   'Fd filled while monitoring': create_test(function(m, callback) {
     m.test_fd = fs.openSync(m.file, 'a');
@@ -298,13 +294,12 @@ vows.describe('Monitor ').addBatch({
         setTimeout(callback, 200);
       }, 200);
     }, 200);
-    }, function check(m) {
-      fs.closeSync(m.test_fd);
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    }
-  ),
+  }, function check(m) {
+    fs.closeSync(m.test_fd);
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }),
 }).addBatch({
   'utf8 encoding': create_test(
     function(m, callback) {
@@ -318,23 +313,21 @@ vows.describe('Monitor ').addBatch({
     }
   ),
 }).addBatch({
-  'ascii encoding': create_test(
-    function(m, callback) {
-      fs.writeFileSync(m.file, 'é\nline2\n');
-      m.monitor.start(0);
-      setTimeout(callback, 200);
-    }, function(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      // buffer.toString('ascii') is bugged with old node version
-      if (process.versions['node'].split('.')[1] < 10) {
-        assert.deepEqual(m.lines, ['é', 'line2']);
-      }
-      else {
-        assert.deepEqual(m.lines, ['C)', 'line2']);
-      }
+  'ascii encoding': create_test(function(m, callback) {
+    fs.writeFileSync(m.file, 'é\nline2\n');
+    m.monitor.start(0);
+    setTimeout(callback, 200);
+  }, function(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    // buffer.toString('ascii') is bugged with old node version
+    if (process.versions.node.split('.')[1] < 10) {
+      assert.deepEqual(m.lines, ['é', 'line2']);
     }
-  , undefined, {buffer_encoding: 'ascii'}),
+    else {
+      assert.deepEqual(m.lines, ['C)', 'line2']);
+    }
+  }, undefined, {buffer_encoding: 'ascii'}),
 }).addBatchRetry({
   'Double monitoring same directory': {
     topic: function() {
@@ -375,12 +368,11 @@ vows.describe('Monitor ').addBatch({
   'Wrong file path': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(callback, 200);
-    }, function check(m) {
-      assert.equal(m.errors.length, 0);
-      assert.equal(m.init_errors.length, 1);
-      assert.equal(m.lines.length, 0);
-    },
-  '/toto_does_not_exists/toto.log'),
+  }, function check(m) {
+    assert.equal(m.errors.length, 0);
+    assert.equal(m.init_errors.length, 1);
+    assert.equal(m.lines.length, 0);
+  }, '/toto_does_not_exists/toto.log'),
 }).addBatchRetry({
   'Simple logrotate simulation': create_test(function(m, callback) {
     m.monitor.start(0);
@@ -393,14 +385,13 @@ vows.describe('Monitor ').addBatch({
         setTimeout(callback, 200);
       }, 200);
     }, 200);
-    }, function check(m) {
-      fs.unlinkSync(m.file);
-      fs.unlinkSync(m.file + '.1');
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
-      assert.equal(m.closed_counter, 2);
-    },
-  undefined, {wait_delay_after_renaming: 1}),
+  }, function check(m) {
+    fs.unlinkSync(m.file);
+    fs.unlinkSync(m.file + '.1');
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
+    assert.equal(m.closed_counter, 2);
+  }, undefined, {wait_delay_after_renaming: 1}),
 }, 5, 10000).addBatchRetry({
   'Complex logrotate simulation': create_test(function(m, callback) {
     m.monitor.start(0);
@@ -418,14 +409,13 @@ vows.describe('Monitor ').addBatch({
         }, 100);
       }, 200);
     }, 200);
-    }, function check(m) {
-      fs.unlinkSync(m.file);
-      fs.unlinkSync(m.file + '.1');
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4', 'line5', 'line6']);
-      assert.equal(m.closed_counter, 2);
-    },
-  undefined, {wait_delay_after_renaming: 500}),
+  }, function check(m) {
+    fs.unlinkSync(m.file);
+    fs.unlinkSync(m.file + '.1');
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4', 'line5', 'line6']);
+    assert.equal(m.closed_counter, 2);
+  }, undefined, {wait_delay_after_renaming: 500}),
 }, 5, 10000).addBatch({
   'Complex logrotate simulation with permission pb': create_test(function(m, callback) {
     m.monitor.start(0);
@@ -450,16 +440,15 @@ vows.describe('Monitor ').addBatch({
         }, 100);
       }, 200);
     }, 200);
-    }, function check(m) {
-      fs.unlinkSync(m.file);
-      fs.unlinkSync(m.file + '.1');
-      assert.equal(m.init_errors.length, 0);
-      assert(m.errors.length >= 1);
-      assert(m.errors[0].toString().match(/EACCES/), m.errors[0].toString() + " should contain EACCESS");
-      assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
-      assert.equal(m.closed_counter, 2);
-    },
-  undefined, {wait_delay_after_renaming: 500}),
+  }, function check(m) {
+    fs.unlinkSync(m.file);
+    fs.unlinkSync(m.file + '.1');
+    assert.equal(m.init_errors.length, 0);
+    assert(m.errors.length >= 1);
+    assert(m.errors[0].toString().match(/EACCES/), m.errors[0].toString() + ' should contain EACCESS');
+    assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
+    assert.equal(m.closed_counter, 2);
+  }, undefined, {wait_delay_after_renaming: 500}),
 }, 5, 10000).addBatchRetry({
   'Monitor restart': {
     topic: function() {

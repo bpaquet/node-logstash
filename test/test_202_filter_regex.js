@@ -56,7 +56,7 @@ vows.describe('Filter regex ').addBatch({
     {'message': 'abcd efgh ijk', 'type': 'toto2'},
   ]),
   'two fields one in regex': filter_helper.create('regex', '?regex=^(\\S+) \\S+&fields=fa,fb', [
-     {'message': 'abcd efgh ijk'},
+    {'message': 'abcd efgh ijk'},
   ], [
     {'message': 'abcd efgh ijk', fa: 'abcd'},
   ]),

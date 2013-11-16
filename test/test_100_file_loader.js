@@ -1,3 +1,4 @@
+/* jshint unused:false */
 var vows = require('vows'),
     assert = require('assert'),
     file_loader = require('../lib/lib/file_loader');
@@ -40,7 +41,6 @@ vows.describe('File loader').addBatch({
     topic: function() {
       file_loader.loadFile('file_loader_test/comment2', this.callback);
     },
-
     check: function(err, result) {
       assert.ok(err);
       assert.ok(err.toString().match(/ENOENT/), 'Match failed on ' + err.toString());

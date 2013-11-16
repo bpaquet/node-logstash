@@ -1,7 +1,7 @@
 var vows = require('vows-batch-retry'),
     assert = require('assert'),
     os = require('os'),
-    fs = require('fs');
+    fs = require('fs'),
     path = require('path'),
     log = require('log4node'),
     tail = require('tail_file');
@@ -48,7 +48,7 @@ function create_test(start_callback, check_callback, path, options) {
       assert.ifError(err);
       check_callback(m);
     }
-  }
+  };
 }
 
 function no_error(m) {
@@ -112,12 +112,11 @@ vows.describe('Monitor ').addBatch({
       fs.writeFileSync(m.file, 'line1\nline2\n');
       setTimeout(callback, 200);
     }, 200);
-    }, function check(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    }
-  ),
+  }, function check(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }),
 }).addBatch({
   'File created after start, filled with append': create_test(
     function(m, callback) {
@@ -166,12 +165,11 @@ vows.describe('Monitor ').addBatch({
         setTimeout(callback, 200);
       }, 200);
     }, 200);
-    }, function check(m) {
-      assert.equal(m.monitor.fdTailer, undefined);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    }
-  ),
+  }, function check(m) {
+    assert.equal(m.monitor.fdTailer, undefined);
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }),
 }).addBatch({
   'File removed and recreated, second file is not read': create_test(function(m, callback) {
     m.monitor.start();
@@ -185,11 +183,10 @@ vows.describe('Monitor ').addBatch({
         }, 200);
       }, 200);
     }, 200);
-    }, function check(m) {
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    },
-  undefined, {wait_delay_after_renaming: 100}),
+  }, function check(m) {
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }, undefined, {wait_delay_after_renaming: 100}),
 }).addBatchRetry({
   'Double monitoring same directory': {
     topic: function() {
@@ -228,10 +225,9 @@ vows.describe('Monitor ').addBatch({
   'Wrong file path': create_test(function(m, callback) {
     m.monitor.start(0);
     setTimeout(callback, 200);
-    }, function check(m) {
-      assert.equal(m.errors.length, 0);
-      assert.equal(m.init_errors.length, 1);
-      assert.equal(m.lines.length, 0);
-    },
-  '/toto_does_not_exists/toto.log'),
+  }, function check(m) {
+    assert.equal(m.errors.length, 0);
+    assert.equal(m.init_errors.length, 1);
+    assert.equal(m.lines.length, 0);
+  }, '/toto_does_not_exists/toto.log'),
 }).export(module);

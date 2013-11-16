@@ -17,7 +17,7 @@ function check_error_init(urls, expected_message_pattern) {
         if (err) {
           return callback(null, err.toString());
         }
-        asser.fail("Init success, should not");
+        assert.fail('Init success, should not');
       }, 200);
     },
 
@@ -25,7 +25,7 @@ function check_error_init(urls, expected_message_pattern) {
       assert.ifError(error);
       assert.ok(message.match(expected_message_pattern), 'Message does not match pattern : ' + expected_message_pattern + ' : ' + message);
     }
-  }
+  };
 }
 
 function check_error_module(urls, type, expected_message_pattern, expected_module_name) {
@@ -34,10 +34,10 @@ function check_error_module(urls, type, expected_message_pattern, expected_modul
       var callback = this.callback;
       var a = agent.create();
       a.on(type, function(module_name, error) {
-        console.log("Error detected, " + module_name + " : " + error);
+        console.log('Error detected, ' + module_name + ' : ' + error);
         callback(null, error.toString(), module_name);
       });
-      a.on(type == 'error' ? 'init_error' : 'error', function(module_name, err) {
+      a.on(type === 'error' ? 'init_error' : 'error', function(module_name, err) {
         assert.ifError(err);
       });
       a.loadUrls(urls, function(err) {
@@ -50,7 +50,7 @@ function check_error_module(urls, type, expected_message_pattern, expected_modul
       assert.ok(message.match(expected_message_pattern), 'Message does not match pattern : ' + expected_message_pattern + ' : ' + message);
       assert.equal(module_name, expected_module_name);
     }
-  }
+  };
 }
 
 vows.describe('Integration error :').addBatch({
@@ -67,10 +67,10 @@ vows.describe('Integration error :').addBatch({
     'input://tcp://0.0.0.0:abcd'
   ], 'Unable to extract port'),
 }).addBatch({
- 'input_file_error : root directory not readable': check_error_module([
-   'input://file:///root/toto/43input1.txt',
-   'output://stdout://'
- ], 'init_error', 'Error: watch EACCES', 'input_file'),
+  'input_file_error : root directory not readable': check_error_module([
+    'input://file:///root/toto/43input1.txt',
+    'output://stdout://'
+  ], 'init_error', 'Error: watch EACCES', 'input_file'),
 }).addBatch({
   'wrong_output_file_module': check_error_module([
     'output://file:///path_which_does_not_exist/titi.txt'

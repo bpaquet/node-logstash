@@ -1,4 +1,4 @@
-var argv = require('optimist').argv;
+var argv = require('optimist').argv,
     log = require('log4node').reconfigure({file: argv.file, prefix: 'a '});
 
 console.log('Starting loop, count', argv.count, 'period', argv.period);
@@ -16,4 +16,4 @@ function toto() {
   count ++;
 }
 
-setInterval(toto, parseInt(argv.period));
+setInterval(toto, parseInt(argv.period, 10));

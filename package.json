@@ -19,7 +19,8 @@
   "devDependencies": {
     "vows": "0.7.0",
     "vows-batch-retry": "0.0.4",
-    "whereis": "0.0.2"
+    "whereis": "0.0.2",
+    "jshint": "2.x"
   },
   "scripts": {
     "test": "./test-runner.sh"

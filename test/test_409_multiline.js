@@ -13,7 +13,7 @@ vows.describe('Integration multiline :').addBatchRetry({
         'input://file://input.txt',
         'filter://multiline://?start_line_regex=^1234',
         'output://file://output.txt?serializer=json_logstash',
-        ], function(agent) {
+      ], function(agent) {
         setTimeout(function() {
           fs.appendFile('input.txt', 'line1\nline2\n1234line3\n1234line4\nline5\n', function(err) {
             assert.ifError(err);
@@ -35,10 +35,10 @@ vows.describe('Integration multiline :').addBatchRetry({
 
       var splitted = c.split('\n');
       assert.equal(splitted.length, 4);
-      assert.equal("", splitted[splitted.length - 1]);
-      assert.equal(JSON.parse(splitted[0])['message'], "line1\nline2");
-      assert.equal(JSON.parse(splitted[1])['message'], "1234line3");
-      assert.equal(JSON.parse(splitted[2])['message'], "1234line4\nline5");
+      assert.equal('', splitted[splitted.length - 1]);
+      assert.equal(JSON.parse(splitted[0]).message, 'line1\nline2');
+      assert.equal(JSON.parse(splitted[1]).message, '1234line3');
+      assert.equal(JSON.parse(splitted[2]).message, '1234line4\nline5');
     }
   },
 }, 5, 20000).export(module);
