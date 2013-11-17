@@ -4,6 +4,7 @@ set -e
 
 if [ "$TEST" = "" ]; then
   TEST=`ls test/test*.js`
+  RUN_JSHINT=1
 fi
 
 export PATH="/usr/sbin:$PATH"
@@ -20,3 +21,7 @@ else
 fi
 
 echo ""
+
+if [ "$RUN_JSHINT" = "1" ]; then
+  ./jshint.sh
+fi
