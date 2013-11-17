@@ -89,7 +89,7 @@ vows.describe('Integration file 2 file :').addBatchRetry({
                       }, 200);
                     });
                   });
-                });
+                }, 200);
               });
             });
           });
@@ -111,6 +111,50 @@ vows.describe('Integration file 2 file :').addBatchRetry({
       assert.equal('', splitted[splitted.length - 1]);
       helper.checkResult(splitted[0], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line1'}, true);
       helper.checkResult(splitted[1], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line2'}, true);
+    }
+  },
+}, 5, 20000).addBatchRetry({
+  'stop start on non existing file': {
+    topic: function() {
+      monitor_file.setFileStatus({});
+      var callback = this.callback;
+      helper.createAgent([
+        'input://file://toto/56/87/input.txt',
+      ], function(agent) {
+        setTimeout(function() {
+          agent.close(callback);
+        }, 200);
+      });
+    },
+
+    check: function(err) {
+      assert.ifError(err);
+    }
+  },
+}, 5, 20000).addBatchRetry({
+  'start index': {
+    topic: function() {
+      monitor_file.setFileStatus({});
+      fs.writeFileSync('toto.txt', 'line1\nline2\n');
+      var callback = this.callback;
+      helper.createAgent([
+        'output://file://output.txt',
+        'input://file://toto.txt?start_index=3',
+      ], function(agent) {
+        setTimeout(function() {
+          agent.close(function() {
+            setTimeout(callback, 200);
+          });
+        }, 200);
+      });
+    },
+
+    check: function(err) {
+      assert.ifError(err);
+      var data = fs.readFileSync('output.txt').toString().split('\n');
+      fs.unlinkSync('toto.txt');
+      fs.unlinkSync('output.txt');
+      assert.deepEqual(data, [ 'e1', 'line2', '' ]);
     }
   },
 }, 5, 20000).export(module);

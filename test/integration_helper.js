@@ -7,10 +7,6 @@ function createAgent(urls, callback, error_callback) {
   error_callback = error_callback || function(error) {
     assert.ifError(error);
   };
-  a.on('init_error', function(module_name, error) {
-    console.log('Init error agent detected, ' + module_name + ' : ' + error);
-    error_callback(error);
-  });
   a.on('error', function(module_name, error) {
     console.log('Error agent detected, ' + module_name + ' : ' + error);
     error_callback(error);

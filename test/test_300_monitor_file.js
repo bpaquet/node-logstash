@@ -15,7 +15,6 @@ function TestMonitor(file, options) {
   this.file = file;
   this.lines = [];
   this.errors = [];
-  this.init_errors = [];
   this.changed_counter = 0;
   this.renamed_counter = 0;
   this.closed_counter = 0;
@@ -26,10 +25,6 @@ function TestMonitor(file, options) {
   this.monitor.on('error', function(err) {
     log.error(err);
     this.errors.push(err);
-  }.bind(this));
-  this.monitor.on('init_error', function(err) {
-    log.error(err);
-    this.init_errors.push(err);
   }.bind(this));
   this.monitor.on('renamed', function() {
     this.renamed_counter ++;
@@ -71,14 +66,12 @@ function create_test(start_callback, check_callback, path, options) {
 
 function no_error(m) {
   assert.equal(m.errors.length, 0);
-  assert.equal(m.init_errors.length, 0);
 }
 
 vows.describe('Monitor ').addBatch({
   'Not existent file': create_test(
     function(m, callback) {
-      m.monitor.start();
-      setTimeout(callback, 200);
+      m.monitor.start(callback);
     }, function(m) {
       no_error(m);
       assert.equal(m.lines.length, 0);
@@ -88,8 +81,7 @@ vows.describe('Monitor ').addBatch({
   'Empty file': create_test(
     function(m, callback) {
       fs.writeFileSync(m.file, '');
-      m.monitor.start();
-      setTimeout(callback, 200);
+      m.monitor.start(callback);
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -100,8 +92,7 @@ vows.describe('Monitor ').addBatch({
   'Not empty file start index undefined': create_test(
     function(m, callback) {
       fs.writeFileSync(m.file, 'line1\nline2\n');
-      m.monitor.start();
-      setTimeout(callback, 200);
+      m.monitor.start(callback);
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -112,8 +103,7 @@ vows.describe('Monitor ').addBatch({
   'Not empty file start index 0': create_test(
     function(m, callback) {
       fs.writeFileSync(m.file, 'line1\nline2\n');
-      m.monitor.start(0);
-      setTimeout(callback, 200);
+      m.monitor.start(callback, 0);
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -124,8 +114,7 @@ vows.describe('Monitor ').addBatch({
   'Not empty file start index 6': create_test(
     function(m, callback) {
       fs.writeFileSync(m.file, 'line1\nline2\n');
-      m.monitor.start(3);
-      setTimeout(callback, 200);
+      m.monitor.start(callback, 3);
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -136,31 +125,32 @@ vows.describe('Monitor ').addBatch({
   'Not empty file start index 0, big buffer, and empty line removal': create_test(
     function(m, callback) {
       fs.writeFileSync(m.file, fs.readFileSync(__filename).toString());
-      m.monitor.start(0);
-      setTimeout(callback, 200);
+      m.monitor.start(callback, 0);
     }, function(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      var test_file_lines = fs.readFileSync(__filename).toString().split('\n');
-      var index = 0;
-      test_file_lines.forEach(function(l) {
-        if (l.length > 0) {
-          assert.equal(l, m.lines[index]);
-          index += 1;
-        }
-      });
-      assert.equal(m.lines.length, index);
+      setTimeout(function() {
+        fs.unlinkSync(m.file);
+        no_error(m);
+        var test_file_lines = fs.readFileSync(__filename).toString().split('\n');
+        var index = 0;
+        test_file_lines.forEach(function(l) {
+          if (l.length > 0) {
+            assert.equal(l, m.lines[index]);
+            index += 1;
+          }
+        });
+        assert.equal(m.lines.length, index);
+      }, 500);
     }
   ),
 }).addBatch({
   'File filled after start': create_test(
     function(m, callback) {
       fs.writeFileSync(m.file, '');
-      m.monitor.start();
-      setTimeout(function() {
+      m.monitor.start(function(err) {
+        assert.ifError(err);
         fs.appendFileSync(m.file, 'line1\nline2\n');
         setTimeout(callback, 200);
-      }, 200);
+      });
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -169,11 +159,11 @@ vows.describe('Monitor ').addBatch({
   ),
 }).addBatch({
   'File created after start': create_test(function(m, callback) {
-    m.monitor.start(0);
-    setTimeout(function() {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       fs.writeFileSync(m.file, 'line1\nline2\n');
       setTimeout(callback, 200);
-    }, 200);
+    }, 0);
   }, function check(m) {
     fs.unlinkSync(m.file);
     no_error(m);
@@ -182,14 +172,14 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'File created after start, filled with append': create_test(
     function(m, callback) {
-      m.monitor.start();
-      setTimeout(function() {
+      m.monitor.start(function(err) {
+        assert.ifError(err);
         fs.appendFileSync(m.file, 'line1\n');
         setTimeout(function() {
           fs.appendFileSync(m.file, 'line2\n');
           setTimeout(callback, 200);
         }, 200);
-      }, 200);
+      });
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -199,14 +189,14 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'File rewritten from start': create_test(
     function(m, callback) {
-      m.monitor.start();
-      setTimeout(function() {
+      m.monitor.start(function(err) {
+        assert.ifError(err);
         fs.appendFileSync(m.file, 'line1\n');
         setTimeout(function() {
           fs.writeFileSync(m.file, 'line2\n');
           setTimeout(callback, 200);
-        }, 1500);
-      }, 200);
+        }, 200);
+      });
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -216,8 +206,8 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'File created after start, filled with append async': create_test(
     function(m, callback) {
-      m.monitor.start();
-      setTimeout(function() {
+      m.monitor.start(function(err) {
+        assert.ifError(err);
         fs.appendFile(m.file, 'line1\n', function(err) {
           assert.ifError(err);
           setTimeout(function() {
@@ -227,7 +217,7 @@ vows.describe('Monitor ').addBatch({
             });
           }, 200);
         });
-      }, 200);
+      });
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -237,11 +227,13 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'File removed': create_test(function(m, callback) {
     fs.writeFileSync(m.file, 'line1\nline2\n');
-    m.monitor.start(0);
-    setTimeout(function() {
-      fs.unlinkSync(m.file);
-      setTimeout(callback, 200);
-    }, 200);
+    m.monitor.start(function(err) {
+      assert.ifError(err);
+      setTimeout(function() {
+        fs.unlinkSync(m.file);
+        setTimeout(callback, 200);
+      }, 200);
+    }, 0);
   }, function check(m) {
     assert.equal(m.monitor.fdTailer, undefined);
     no_error(m);
@@ -250,15 +242,15 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'File removed and recreated': create_test(function(m, callback) {
     fs.writeFileSync(m.file, 'line1\nline2\n');
-    m.monitor.start(0);
-    setTimeout(function() {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       fs.unlinkSync(m.file);
       setTimeout(function() {
         assert.equal(m.monitor.fdTailer, undefined);
         fs.writeFileSync(m.file, 'line3\n');
         setTimeout(callback, 200);
       }, 200);
-    }, 200);
+    }, 0);
   }, function check(m) {
     no_error(m);
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3']);
@@ -266,14 +258,16 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'Incomplete line': create_test(function(m, callback) {
     fs.writeFileSync(m.file, 'line1\nline2\nline3');
-    m.monitor.start(0);
-    setTimeout(function() {
-      assert.deepEqual(m.lines, ['line1', 'line2']);
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       setTimeout(function() {
-        fs.appendFileSync(m.file, 'line3\nline4\nline5');
-        setTimeout(callback, 200);
+        assert.deepEqual(m.lines, ['line1', 'line2']);
+        setTimeout(function() {
+          fs.appendFileSync(m.file, 'line3\nline4\nline5');
+          setTimeout(callback, 200);
+        }, 200);
       }, 200);
-    }, 200);
+    }, 0);
   }, function check(m) {
     fs.unlinkSync(m.file);
     no_error(m);
@@ -283,8 +277,8 @@ vows.describe('Monitor ').addBatch({
   'Fd filled while monitoring': create_test(function(m, callback) {
     m.test_fd = fs.openSync(m.file, 'a');
     var buffer = new Buffer('line1\nline2\n');
-    m.monitor.start(0);
-    setTimeout(function() {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       fs.writeSync(m.test_fd, buffer, 0, 6, null);
       fs.fsyncSync(m.test_fd);
       setTimeout(function() {
@@ -293,7 +287,7 @@ vows.describe('Monitor ').addBatch({
         fs.fsyncSync(m.test_fd);
         setTimeout(callback, 200);
       }, 200);
-    }, 200);
+    }, 0);
   }, function check(m) {
     fs.closeSync(m.test_fd);
     fs.unlinkSync(m.file);
@@ -304,8 +298,10 @@ vows.describe('Monitor ').addBatch({
   'utf8 encoding': create_test(
     function(m, callback) {
       fs.writeFileSync(m.file, 'é\nline2\n');
-      m.monitor.start(0);
-      setTimeout(callback, 200);
+      m.monitor.start(function(err) {
+        assert.ifError(err);
+        setTimeout(callback, 200);
+      }, 0);
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -315,8 +311,10 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'ascii encoding': create_test(function(m, callback) {
     fs.writeFileSync(m.file, 'é\nline2\n');
-    m.monitor.start(0);
-    setTimeout(callback, 200);
+    m.monitor.start(function(err) {
+      assert.ifError(err);
+      setTimeout(callback, 200);
+    }, 0);
   }, function(m) {
     fs.unlinkSync(m.file);
     no_error(m);
@@ -366,17 +364,18 @@ vows.describe('Monitor ').addBatch({
   }
 }, 5, 10000).addBatch({
   'Wrong file path': create_test(function(m, callback) {
-    m.monitor.start(0);
-    setTimeout(callback, 200);
+    m.monitor.start(function(err) {
+      assert.ok(err);
+      callback();
+    });
   }, function check(m) {
-    assert.equal(m.errors.length, 0);
-    assert.equal(m.init_errors.length, 1);
+    no_error(m);
     assert.equal(m.lines.length, 0);
   }, '/toto_does_not_exists/toto.log'),
 }).addBatchRetry({
   'Simple logrotate simulation': create_test(function(m, callback) {
-    m.monitor.start(0);
-    setTimeout(function() {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       fs.writeFileSync(m.file, 'line1\nline2\n');
       setTimeout(function() {
         assert.deepEqual(m.lines, ['line1', 'line2']);
@@ -384,7 +383,7 @@ vows.describe('Monitor ').addBatch({
         fs.writeFileSync(m.file, 'line3\nline4\n');
         setTimeout(callback, 200);
       }, 200);
-    }, 200);
+    }, 0);
   }, function check(m) {
     fs.unlinkSync(m.file);
     fs.unlinkSync(m.file + '.1');
@@ -394,8 +393,8 @@ vows.describe('Monitor ').addBatch({
   }, undefined, {wait_delay_after_renaming: 1}),
 }, 5, 10000).addBatchRetry({
   'Complex logrotate simulation': create_test(function(m, callback) {
-    m.monitor.start(0);
-    setTimeout(function() {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       fs.writeFileSync(m.file, 'line1\nline2\n');
       setTimeout(function() {
         assert.deepEqual(m.lines, ['line1', 'line2']);
@@ -408,7 +407,7 @@ vows.describe('Monitor ').addBatch({
           }, 100);
         }, 100);
       }, 200);
-    }, 200);
+    }, 0);
   }, function check(m) {
     fs.unlinkSync(m.file);
     fs.unlinkSync(m.file + '.1');
@@ -418,8 +417,8 @@ vows.describe('Monitor ').addBatch({
   }, undefined, {wait_delay_after_renaming: 500}),
 }, 5, 10000).addBatch({
   'Complex logrotate simulation with permission pb': create_test(function(m, callback) {
-    m.monitor.start(0);
-    setTimeout(function() {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       fs.writeFileSync(m.file, 'line1\nline2\n');
       setTimeout(function() {
         assert.deepEqual(m.lines, ['line1', 'line2']);
@@ -439,11 +438,10 @@ vows.describe('Monitor ').addBatch({
           });
         }, 100);
       }, 200);
-    }, 200);
+    }, 0);
   }, function check(m) {
     fs.unlinkSync(m.file);
     fs.unlinkSync(m.file + '.1');
-    assert.equal(m.init_errors.length, 0);
     assert(m.errors.length >= 1);
     assert(m.errors[0].toString().match(/EACCES/), m.errors[0].toString() + ' should contain EACCESS');
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
@@ -454,24 +452,24 @@ vows.describe('Monitor ').addBatch({
     topic: function() {
       var callback = this.callback;
       var m1 = new TestMonitor(randomFile());
-      m1.monitor.start();
-      setTimeout(function() {
+      m1.monitor.start(function(err) {
+        assert.ifError(err);
         fs.appendFileSync(m1.file, 'line1\nline2\n');
         setTimeout(function() {
           m1.monitor.close(function() {
             var m2 = new TestMonitor(m1.file);
-            m2.monitor.start();
-            setTimeout(function() {
+            m2.monitor.start(function(err) {
+              assert.ifError(err);
               fs.appendFileSync(m1.file, 'line3\nline4\n');
               setTimeout(function() {
                 m2.monitor.close(function() {
                   callback(undefined, m1, m2);
                 });
               });
-            }, 200);
+            });
           });
         }, 200);
-      }, 200);
+      });
     },
 
     check: function(err, m1, m2) {
@@ -490,23 +488,23 @@ vows.describe('Monitor ').addBatch({
     topic: function() {
       var callback = this.callback;
       var m1 = new TestMonitor(randomFile());
-      m1.monitor.start();
-      setTimeout(function() {
+      m1.monitor.start(function(err) {
+        assert.ifError(err);
         fs.appendFileSync(m1.file, 'line1\nline2\n');
         setTimeout(function() {
           m1.monitor.close(function() {
             setTimeout(function() {
               fs.appendFileSync(m1.file, 'line3\nline4\n');
               var m2 = new TestMonitor(m1.file);
-              m2.monitor.start();
-              setTimeout(function() {
+              m2.monitor.start(function(err) {
+                assert.ifError(err);
                 fs.appendFileSync(m1.file, 'line5\nline6\n');
                 setTimeout(function() {
                   m2.monitor.close(function() {
                     callback(undefined, m1, m2);
                   });
-                });
-              }, 200);
+                }, 200);
+              });
             }, 500);
           });
         }, 200);
@@ -529,8 +527,8 @@ vows.describe('Monitor ').addBatch({
     topic: function() {
       var callback = this.callback;
       var m1 = new TestMonitor(randomFile());
-      m1.monitor.start();
-      setTimeout(function() {
+      m1.monitor.start(function(err) {
+        assert.ifError(err);
         fs.appendFileSync(m1.file, 'line1\nline2\n');
         setTimeout(function() {
           m1.monitor.close(function() {
@@ -538,19 +536,19 @@ vows.describe('Monitor ').addBatch({
               fs.unlinkSync(m1.file);
               fs.appendFileSync(m1.file, 'line3\n');
               var m2 = new TestMonitor(m1.file);
-              m2.monitor.start();
-              setTimeout(function() {
+              m2.monitor.start(function(err) {
+                assert.ifError(err);
                 fs.appendFileSync(m1.file, 'line4\nline5\n');
                 setTimeout(function() {
                   m2.monitor.close(function() {
                     callback(undefined, m1, m2);
                   });
-                });
-              }, 200);
+                }, 200);
+              });
             }, 500);
           });
         }, 200);
-      }, 200);
+      });
     },
 
     check: function(err, m1, m2) {
@@ -569,8 +567,8 @@ vows.describe('Monitor ').addBatch({
     topic: function() {
       var callback = this.callback;
       var m1 = new TestMonitor(randomFile());
-      m1.monitor.start();
-      setTimeout(function() {
+      m1.monitor.start(function(err) {
+        assert.ifError(err);
         fs.appendFileSync(m1.file, 'line1\nline2\n');
         setTimeout(function() {
           m1.monitor.close(function() {
@@ -578,19 +576,19 @@ vows.describe('Monitor ').addBatch({
               fs.unlinkSync(m1.file);
               fs.appendFileSync(m1.file, 'line3\nline4\nline5\n');
               var m2 = new TestMonitor(m1.file);
-              m2.monitor.start();
-              setTimeout(function() {
+              m2.monitor.start(function(err) {
+                assert.ifError(err);
                 fs.appendFileSync(m1.file, 'line6\nline7\n');
                 setTimeout(function() {
                   m2.monitor.close(function() {
                     callback(undefined, m1, m2);
                   });
-                });
-              }, 200);
+                }, 200);
+              });
             }, 500);
           });
         }, 200);
-      }, 200);
+      });
     },
 
     check: function(err, m1, m2) {
@@ -611,8 +609,8 @@ vows.describe('Monitor ').addBatch({
       run('mkfifo', ['toto'], function(exitCode) {
         assert.equal(0, exitCode);
         var m = new TestMonitor('toto', {});
-        m.monitor.start();
-        setTimeout(function() {
+        m.monitor.start(function(err) {
+          assert.ifError(err);
           run('sh', ['-c', 'echo x1 > toto'], function(exitCode) {
             assert.equal(0, exitCode);
             run('sh', ['-c', 'echo x2 > toto'], function(exitCode) {
@@ -624,7 +622,7 @@ vows.describe('Monitor ').addBatch({
               }, 200);
             });
           });
-        }, 50);
+        });
       });
     },
 

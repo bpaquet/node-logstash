@@ -14,7 +14,6 @@ function TestMonitor(file, options) {
   this.file = file;
   this.lines = [];
   this.errors = [];
-  this.init_errors = [];
   this.changed_counter = 0;
   this.renamed_counter = 0;
   this.closed_counter = 0;
@@ -25,10 +24,6 @@ function TestMonitor(file, options) {
   this.monitor.on('error', function(err) {
     log.error(err);
     this.errors.push(err);
-  }.bind(this));
-  this.monitor.on('init_error', function(err) {
-    log.error(err);
-    this.init_errors.push(err);
   }.bind(this));
 }
 
@@ -53,118 +48,102 @@ function create_test(start_callback, check_callback, path, options) {
 
 function no_error(m) {
   assert.equal(m.errors.length, 0);
-  assert.equal(m.init_errors.length, 0);
 }
 
 vows.describe('Monitor ').addBatch({
-  'Not existent file': create_test(
-    function(m, callback) {
-      m.monitor.start();
-      setTimeout(callback, 200);
-    }, function(m) {
-      no_error(m);
-      assert.equal(m.lines.length, 0);
-    }
-  ),
+  'Not existent file': create_test(function(m, callback) {
+    m.monitor.start(callback);
+  }, function(m) {
+    no_error(m);
+    assert.equal(m.lines.length, 0);
+  }),
 }).addBatch({
-  'Empty file': create_test(
-    function(m, callback) {
-      fs.writeFileSync(m.file, '');
-      m.monitor.start();
-      setTimeout(callback, 200);
-    }, function(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.equal(m.lines.length, 0);
-    }
-  ),
+  'Empty file': create_test(function(m, callback) {
+    fs.writeFileSync(m.file, '');
+    m.monitor.start(callback);
+  }, function(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.equal(m.lines.length, 0);
+  }),
 }).addBatch({
-  'Not empty file start': create_test(
-    function(m, callback) {
-      fs.writeFileSync(m.file, 'line1\nline2\n');
-      m.monitor.start();
-      setTimeout(callback, 200);
-    }, function(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.equal(m.lines.length, 0);
-    }
-  ),
+  'Not empty file start': create_test(function(m, callback) {
+    fs.writeFileSync(m.file, 'line1\nline2\n');
+    m.monitor.start(callback);
+  }, function(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.equal(m.lines.length, 0);
+  }),
 }).addBatch({
-  'File filled after start': create_test(
-    function(m, callback) {
-      fs.writeFileSync(m.file, '');
-      m.monitor.start();
-      setTimeout(function() {
-        fs.appendFileSync(m.file, 'line1\nline2\n');
-        setTimeout(callback, 1000);
-      }, 200);
-    }, function(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    }
-  ),
+  'File filled after start': create_test(function(m, callback) {
+    fs.writeFileSync(m.file, '');
+    m.monitor.start(function(err) {
+      assert.ifError(err);
+      fs.appendFileSync(m.file, 'line1\nline2\n');
+      setTimeout(callback, 500);
+    });
+  }, function(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }),
 }).addBatch({
   'File created after start': create_test(function(m, callback) {
-    m.monitor.start();
-    setTimeout(function() {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       fs.writeFileSync(m.file, 'line1\nline2\n');
       setTimeout(callback, 200);
-    }, 200);
+    });
   }, function check(m) {
     fs.unlinkSync(m.file);
     no_error(m);
     assert.deepEqual(m.lines, ['line1', 'line2']);
   }),
 }).addBatch({
-  'File created after start, filled with append': create_test(
-    function(m, callback) {
-      m.monitor.start();
+  'File created after start, filled with append': create_test(function(m, callback) {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
+      fs.appendFileSync(m.file, 'line1\n');
       setTimeout(function() {
-        fs.appendFileSync(m.file, 'line1\n');
-        setTimeout(function() {
-          fs.appendFileSync(m.file, 'line2\n');
-          setTimeout(callback, 1000);
-        }, 200);
+        fs.appendFileSync(m.file, 'line2\n');
+        setTimeout(callback, 1000);
       }, 200);
-    }, function(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    }
-  ),
+    });
+  }, function(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }),
 }).addBatch({
-  'File created after start, filled with append async': create_test(
-    function(m, callback) {
-      m.monitor.start();
-      setTimeout(function() {
-        fs.appendFile(m.file, 'line1\n', function(err) {
-          assert.ifError(err);
-          setTimeout(function() {
-            fs.appendFile(m.file, 'line2\n', function(err) {
-              assert.ifError(err);
-              setTimeout(callback, 1000);
-            });
-          }, 200);
-        });
-      }, 200);
-    }, function(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    }
-  ),
+  'File created after start, filled with append async': create_test(function(m, callback) {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
+      fs.appendFile(m.file, 'line1\n', function(err) {
+        assert.ifError(err);
+        setTimeout(function() {
+          fs.appendFile(m.file, 'line2\n', function(err) {
+            assert.ifError(err);
+            setTimeout(callback, 1000);
+          });
+        }, 200);
+      });
+    });
+  }, function(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }),
 }).addBatch({
   'File removed': create_test(function(m, callback) {
-    m.monitor.start();
-    setTimeout(function() {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       fs.writeFileSync(m.file, 'line1\nline2\n');
       setTimeout(function() {
         fs.unlinkSync(m.file);
         setTimeout(callback, 200);
       }, 200);
-    }, 200);
+    });
   }, function check(m) {
     assert.equal(m.monitor.fdTailer, undefined);
     no_error(m);
@@ -172,8 +151,8 @@ vows.describe('Monitor ').addBatch({
   }),
 }).addBatch({
   'File removed and recreated, second file is not read': create_test(function(m, callback) {
-    m.monitor.start();
-    setTimeout(function() {
+    m.monitor.start(function(err) {
+      assert.ifError(err);
       fs.writeFileSync(m.file, 'line1\nline2\n');
       setTimeout(function() {
         fs.unlinkSync(m.file);
@@ -182,7 +161,7 @@ vows.describe('Monitor ').addBatch({
           setTimeout(callback, 200);
         }, 200);
       }, 200);
-    }, 200);
+    });
   }, function check(m) {
     no_error(m);
     assert.deepEqual(m.lines, ['line1', 'line2']);
@@ -193,22 +172,26 @@ vows.describe('Monitor ').addBatch({
       var callback = this.callback;
       var m1 = new TestMonitor(randomFile());
       var m2 = new TestMonitor(randomFile());
-      m1.monitor.start();
-      m2.monitor.start();
-      fs.appendFileSync(m1.file, 'line1\n');
-      setTimeout(function() {
-        fs.appendFileSync(m2.file, 'line10\n');
-        setTimeout(function() {
-          fs.appendFileSync(m1.file, 'line2\n');
+      m1.monitor.start(function(err) {
+        assert.ifError(err);
+        m2.monitor.start(function(err) {
+          assert.ifError(err);
+          fs.appendFileSync(m1.file, 'line1\n');
           setTimeout(function() {
-            m1.monitor.close(function() {
-              m2.monitor.close(function() {
-                callback(undefined, m1, m2);
-              });
-            });
-          }, 200);
-        }, 200);
-      }, 200);
+            fs.appendFileSync(m2.file, 'line10\n');
+            setTimeout(function() {
+              fs.appendFileSync(m1.file, 'line2\n');
+              setTimeout(function() {
+                m1.monitor.close(function() {
+                  m2.monitor.close(function() {
+                    callback(undefined, m1, m2);
+                  });
+                });
+              }, 200);
+            }, 200);
+          });
+        });
+      });
     },
 
     check: function(err, m1, m2) {
@@ -223,11 +206,12 @@ vows.describe('Monitor ').addBatch({
   }
 }, 5, 10000).addBatch({
   'Wrong file path': create_test(function(m, callback) {
-    m.monitor.start(0);
-    setTimeout(callback, 200);
+    m.monitor.start(function(err) {
+      assert.ok(err);
+      callback();
+    });
   }, function check(m) {
-    assert.equal(m.errors.length, 0);
-    assert.equal(m.init_errors.length, 1);
+    no_error(m);
     assert.equal(m.lines.length, 0);
   }, '/toto_does_not_exists/toto.log'),
 }).export(module);
