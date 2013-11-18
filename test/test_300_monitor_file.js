@@ -251,17 +251,39 @@ vows.describe('Monitor ').addBatch({
         assert.ifError(err);
         setTimeout(function() {
           assert.equal(m.monitor.fdTailer, undefined);
-          fs.writeFile(m.file, 'line3\n', function(err) {
-            assert.ifError(err);
-            setTimeout(callback, 200);
-          });
-        }, 200);
+          assert.equal(1, m.monitor.oldFdTailers.length);
+          setTimeout(function() {
+            assert.equal(0, m.monitor.oldFdTailers.length);
+            fs.writeFile(m.file, 'line3\n', function(err) {
+              assert.ifError(err);
+              setTimeout(callback, 200);
+            });
+          }, 200);
+        }, 10);
       });
     }, 0);
   }, function check(m) {
     no_error(m);
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3']);
   }, undefined, {wait_delay_after_renaming: 100}),
+}).addBatch({
+  'File renamed, same name': create_test(function(m, callback) {
+    fs.writeFileSync(m.file, 'line1\nline2\n');
+    m.monitor.start(function(err) {
+      assert.ifError(err);
+      m.monitor.emit('renamed', m.file);
+      setTimeout(function() {
+        assert.equal(0, m.monitor.oldFdTailers.length);
+        fs.appendFile(m.file, 'line3\n', function(err) {
+          assert.ifError(err);
+          setTimeout(callback, 200);
+        });
+      }, 200);
+    }, 0);
+  }, function check(m) {
+    no_error(m);
+    assert.deepEqual(m.lines, ['line1', 'line2', 'line1', 'line2', 'line3']);
+  }),
 }).addBatch({
   'Incomplete line': create_test(function(m, callback) {
     fs.writeFileSync(m.file, 'line1\nline2\nline3');
