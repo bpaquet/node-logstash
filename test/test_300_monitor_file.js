@@ -80,8 +80,10 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'Empty file': create_test(
     function(m, callback) {
-      fs.writeFileSync(m.file, '');
-      m.monitor.start(callback);
+      fs.writeFile(m.file, '', function(err) {
+        assert.ifError(err);
+        m.monitor.start(callback);
+      });
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -91,8 +93,10 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'Not empty file start index undefined': create_test(
     function(m, callback) {
-      fs.writeFileSync(m.file, 'line1\nline2\n');
-      m.monitor.start(callback);
+      fs.writeFile(m.file, 'line1\nline2\n', function(err) {
+        assert.ifError(err);
+        m.monitor.start(callback);
+      });
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -102,8 +106,10 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'Not empty file start index 0': create_test(
     function(m, callback) {
-      fs.writeFileSync(m.file, 'line1\nline2\n');
-      m.monitor.start(callback, 0);
+      fs.writeFile(m.file, 'line1\nline2\n', function(err) {
+        assert.ifError(err);
+        m.monitor.start(callback, 0);
+      });
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -111,10 +117,12 @@ vows.describe('Monitor ').addBatch({
     }
   ),
 }).addBatch({
-  'Not empty file start index 6': create_test(
+  'Not empty file start index 3': create_test(
     function(m, callback) {
-      fs.writeFileSync(m.file, 'line1\nline2\n');
-      m.monitor.start(callback, 3);
+      fs.writeFile(m.file, 'line1\nline2\n', function(err) {
+        assert.ifError(err);
+        m.monitor.start(callback, 3);
+      });
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -124,8 +132,10 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'Not empty file start index 0, big buffer, and empty line removal': create_test(
     function(m, callback) {
-      fs.writeFileSync(m.file, fs.readFileSync(__filename).toString());
-      m.monitor.start(callback, 0);
+      fs.writeFile(m.file, fs.readFileSync(__filename).toString(), function(err) {
+        assert.ifError(err);
+        m.monitor.start(callback, 0);
+      });
     }, function(m) {
       setTimeout(function() {
         fs.unlinkSync(m.file);
@@ -145,11 +155,15 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'File filled after start': create_test(
     function(m, callback) {
-      fs.writeFileSync(m.file, '');
-      m.monitor.start(function(err) {
+      fs.writeFile(m.file, '', function(err) {
         assert.ifError(err);
-        fs.appendFileSync(m.file, 'line1\nline2\n');
-        setTimeout(callback, 200);
+        m.monitor.start(function(err) {
+          assert.ifError(err);
+          fs.appendFile(m.file, 'line1\nline2\n', function(err) {
+            assert.ifError(err);
+            setTimeout(callback, 200);
+          });
+        });
       });
     }, function(m) {
       fs.unlinkSync(m.file);
@@ -161,8 +175,10 @@ vows.describe('Monitor ').addBatch({
   'File created after start': create_test(function(m, callback) {
     m.monitor.start(function(err) {
       assert.ifError(err);
-      fs.writeFileSync(m.file, 'line1\nline2\n');
-      setTimeout(callback, 200);
+      fs.writeFile(m.file, 'line1\nline2\n', function(err) {
+        assert.ifError(err);
+        setTimeout(callback, 200);
+      });
     }, 0);
   }, function check(m) {
     fs.unlinkSync(m.file);
@@ -174,11 +190,15 @@ vows.describe('Monitor ').addBatch({
     function(m, callback) {
       m.monitor.start(function(err) {
         assert.ifError(err);
-        fs.appendFileSync(m.file, 'line1\n');
-        setTimeout(function() {
-          fs.appendFileSync(m.file, 'line2\n');
-          setTimeout(callback, 200);
-        }, 200);
+        fs.appendFile(m.file, 'line1\n', function(err) {
+          assert.ifError(err);
+          setTimeout(function() {
+            fs.appendFile(m.file, 'line2\n', function(err) {
+              assert.ifError(err);
+              setTimeout(callback, 200);
+            });
+          }, 200);
+        });
       });
     }, function(m) {
       fs.unlinkSync(m.file);
@@ -191,27 +211,10 @@ vows.describe('Monitor ').addBatch({
     function(m, callback) {
       m.monitor.start(function(err) {
         assert.ifError(err);
-        fs.appendFileSync(m.file, 'line1\n');
-        setTimeout(function() {
-          fs.writeFileSync(m.file, 'line2\n');
-          setTimeout(callback, 200);
-        }, 200);
-      });
-    }, function(m) {
-      fs.unlinkSync(m.file);
-      no_error(m);
-      assert.deepEqual(m.lines, ['line1', 'line2']);
-    }
-  ),
-}).addBatch({
-  'File created after start, filled with append async': create_test(
-    function(m, callback) {
-      m.monitor.start(function(err) {
-        assert.ifError(err);
         fs.appendFile(m.file, 'line1\n', function(err) {
           assert.ifError(err);
           setTimeout(function() {
-            fs.appendFile(m.file, 'line2\n', function(err) {
+            fs.writeFile(m.file, 'line2\n', function(err) {
               assert.ifError(err);
               setTimeout(callback, 200);
             });
@@ -244,12 +247,16 @@ vows.describe('Monitor ').addBatch({
     fs.writeFileSync(m.file, 'line1\nline2\n');
     m.monitor.start(function(err) {
       assert.ifError(err);
-      fs.unlinkSync(m.file);
-      setTimeout(function() {
-        assert.equal(m.monitor.fdTailer, undefined);
-        fs.writeFileSync(m.file, 'line3\n');
-        setTimeout(callback, 200);
-      }, 200);
+      fs.unlink(m.file, function(err) {
+        assert.ifError(err);
+        setTimeout(function() {
+          assert.equal(m.monitor.fdTailer, undefined);
+          fs.writeFile(m.file, 'line3\n', function(err) {
+            assert.ifError(err);
+            setTimeout(callback, 200);
+          });
+        }, 200);
+      });
     }, 0);
   }, function check(m) {
     no_error(m);
@@ -263,8 +270,10 @@ vows.describe('Monitor ').addBatch({
       setTimeout(function() {
         assert.deepEqual(m.lines, ['line1', 'line2']);
         setTimeout(function() {
-          fs.appendFileSync(m.file, 'line3\nline4\nline5');
-          setTimeout(callback, 200);
+          fs.appendFile(m.file, 'line3\nline4\nline5', function(err) {
+            assert.ifError(err);
+            setTimeout(callback, 200);
+          });
         }, 200);
       }, 200);
     }, 0);
@@ -279,14 +288,22 @@ vows.describe('Monitor ').addBatch({
     var buffer = new Buffer('line1\nline2\n');
     m.monitor.start(function(err) {
       assert.ifError(err);
-      fs.writeSync(m.test_fd, buffer, 0, 6, null);
-      fs.fsyncSync(m.test_fd);
-      setTimeout(function() {
-        assert.deepEqual(m.lines, ['line1']);
-        fs.writeSync(m.test_fd, buffer, 6, 6, null);
-        fs.fsyncSync(m.test_fd);
-        setTimeout(callback, 200);
-      }, 200);
+      fs.write(m.test_fd, buffer, 0, 6, null, function(err) {
+        assert.ifError(err);
+        fs.fsync(m.test_fd, function(err) {
+          assert.ifError(err);
+          setTimeout(function() {
+            assert.deepEqual(m.lines, ['line1']);
+            fs.write(m.test_fd, buffer, 6, 6, null, function(err) {
+              assert.ifError(err);
+              fs.fsync(m.test_fd, function(err) {
+                assert.ifError(err);
+                setTimeout(callback, 200);
+              });
+            });
+          }, 200);
+        });
+      });
     }, 0);
   }, function check(m) {
     fs.closeSync(m.test_fd);
@@ -297,11 +314,13 @@ vows.describe('Monitor ').addBatch({
 }).addBatch({
   'utf8 encoding': create_test(
     function(m, callback) {
-      fs.writeFileSync(m.file, 'é\nline2\n');
-      m.monitor.start(function(err) {
+      fs.writeFile(m.file, 'é\nline2\n', function(err) {
         assert.ifError(err);
-        setTimeout(callback, 200);
-      }, 0);
+        m.monitor.start(function(err) {
+          assert.ifError(err);
+          setTimeout(callback, 200);
+        }, 0);
+      });
     }, function(m) {
       fs.unlinkSync(m.file);
       no_error(m);
@@ -310,11 +329,13 @@ vows.describe('Monitor ').addBatch({
   ),
 }).addBatch({
   'ascii encoding': create_test(function(m, callback) {
-    fs.writeFileSync(m.file, 'é\nline2\n');
-    m.monitor.start(function(err) {
+    fs.writeFile(m.file, 'é\nline2\n', function(err) {
       assert.ifError(err);
-      setTimeout(callback, 200);
-    }, 0);
+      m.monitor.start(function(err) {
+        assert.ifError(err);
+        setTimeout(callback, 200);
+      }, 0);
+    });
   }, function(m) {
     fs.unlinkSync(m.file);
     no_error(m);
@@ -334,20 +355,26 @@ vows.describe('Monitor ').addBatch({
       var m2 = new TestMonitor(randomFile());
       m1.monitor.start();
       m2.monitor.start();
-      fs.appendFileSync(m1.file, 'line1\n');
-      setTimeout(function() {
-        fs.appendFileSync(m2.file, 'line10\n');
+      fs.appendFile(m1.file, 'line1\n', function(err) {
+        assert.ifError(err);
         setTimeout(function() {
-          fs.appendFileSync(m1.file, 'line2\n');
-          setTimeout(function() {
-            m1.monitor.close(function() {
-              m2.monitor.close(function() {
-                callback(undefined, m1, m2);
+          fs.appendFile(m2.file, 'line10\n', function(err) {
+            assert.ifError(err);
+            setTimeout(function() {
+              fs.appendFile(m1.file, 'line2\n', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  m1.monitor.close(function() {
+                    m2.monitor.close(function() {
+                      callback(undefined, m1, m2);
+                    });
+                  });
+                }, 200);
               });
-            });
-          }, 200);
+            }, 200);
+          });
         }, 200);
-      }, 200);
+      });
     },
 
     check: function(err, m1, m2) {
@@ -376,13 +403,19 @@ vows.describe('Monitor ').addBatch({
   'Simple logrotate simulation': create_test(function(m, callback) {
     m.monitor.start(function(err) {
       assert.ifError(err);
-      fs.writeFileSync(m.file, 'line1\nline2\n');
-      setTimeout(function() {
-        assert.deepEqual(m.lines, ['line1', 'line2']);
-        fs.renameSync(m.file, m.file + '.1');
-        fs.writeFileSync(m.file, 'line3\nline4\n');
-        setTimeout(callback, 200);
-      }, 200);
+      fs.writeFile(m.file, 'line1\nline2\n', function(err) {
+        assert.ifError(err);
+        setTimeout(function() {
+          assert.deepEqual(m.lines, ['line1', 'line2']);
+          fs.rename(m.file, m.file + '.1', function(err) {
+            assert.ifError(err);
+            fs.writeFile(m.file, 'line3\nline4\n', function(err) {
+              assert.ifError(err);
+              setTimeout(callback, 200);
+            });
+          });
+        }, 200);
+      });
     }, 0);
   }, function check(m) {
     fs.unlinkSync(m.file);
@@ -395,18 +428,26 @@ vows.describe('Monitor ').addBatch({
   'Complex logrotate simulation': create_test(function(m, callback) {
     m.monitor.start(function(err) {
       assert.ifError(err);
-      fs.writeFileSync(m.file, 'line1\nline2\n');
-      setTimeout(function() {
-        assert.deepEqual(m.lines, ['line1', 'line2']);
-        fs.renameSync(m.file, m.file + '.1');
+      fs.writeFile(m.file, 'line1\nline2\n', function(err) {
+        assert.ifError(err);
         setTimeout(function() {
-          fs.appendFileSync(m.file + '.1', 'line3\nline4\n');
-          setTimeout(function() {
-            fs.writeFileSync(m.file, 'line5\nline6\n');
-            setTimeout(callback, 500);
-          }, 100);
-        }, 100);
-      }, 200);
+          assert.deepEqual(m.lines, ['line1', 'line2']);
+          fs.rename(m.file, m.file + '.1', function(err) {
+            assert.ifError(err);
+            setTimeout(function() {
+              fs.appendFile(m.file + '.1', 'line3\nline4\n', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  fs.writeFile(m.file, 'line5\nline6\n', function(err) {
+                    assert.ifError(err);
+                    setTimeout(callback, 500);
+                  });
+                }, 100);
+              });
+            }, 100);
+          });
+        }, 200);
+      });
     }, 0);
   }, function check(m) {
     fs.unlinkSync(m.file);
@@ -419,25 +460,31 @@ vows.describe('Monitor ').addBatch({
   'Complex logrotate simulation with permission pb': create_test(function(m, callback) {
     m.monitor.start(function(err) {
       assert.ifError(err);
-      fs.writeFileSync(m.file, 'line1\nline2\n');
-      setTimeout(function() {
-        assert.deepEqual(m.lines, ['line1', 'line2']);
-        fs.renameSync(m.file, m.file + '.1');
+      fs.writeFile(m.file, 'line1\nline2\n', function(err) {
+        assert.ifError(err);
         setTimeout(function() {
-          run('/bin/sh', ['-c', 'umask 777 && touch ' + m.file], function(exit_code) {
-            assert.equal(exit_code, 0);
+          assert.deepEqual(m.lines, ['line1', 'line2']);
+          fs.rename(m.file, m.file + '.1', function(err) {
+            assert.ifError(err);
             setTimeout(function() {
-              run('/bin/sh', ['-c', 'chmod 644 ' + m.file], function(exit_code) {
+              run('/bin/sh', ['-c', 'umask 777 && touch ' + m.file], function(exit_code) {
                 assert.equal(exit_code, 0);
                 setTimeout(function() {
-                  fs.writeFileSync(m.file, 'line3\nline4\n');
-                  setTimeout(callback, 200);
+                  run('/bin/sh', ['-c', 'chmod 644 ' + m.file], function(exit_code) {
+                    assert.equal(exit_code, 0);
+                    setTimeout(function() {
+                      fs.writeFile(m.file, 'line3\nline4\n', function(err) {
+                        assert.ifError(err);
+                        setTimeout(callback, 200);
+                      });
+                    }, 100);
+                  });
                 }, 100);
               });
             }, 100);
           });
-        }, 100);
-      }, 200);
+        }, 200);
+      });
     }, 0);
   }, function check(m) {
     fs.unlinkSync(m.file);
@@ -454,21 +501,25 @@ vows.describe('Monitor ').addBatch({
       var m1 = new TestMonitor(randomFile());
       m1.monitor.start(function(err) {
         assert.ifError(err);
-        fs.appendFileSync(m1.file, 'line1\nline2\n');
-        setTimeout(function() {
-          m1.monitor.close(function() {
-            var m2 = new TestMonitor(m1.file);
-            m2.monitor.start(function(err) {
-              assert.ifError(err);
-              fs.appendFileSync(m1.file, 'line3\nline4\n');
-              setTimeout(function() {
-                m2.monitor.close(function() {
-                  callback(undefined, m1, m2);
+        fs.appendFile(m1.file, 'line1\nline2\n', function(err) {
+          assert.ifError(err);
+          setTimeout(function() {
+            m1.monitor.close(function() {
+              var m2 = new TestMonitor(m1.file);
+              m2.monitor.start(function(err) {
+                assert.ifError(err);
+                fs.appendFile(m1.file, 'line3\nline4\n', function(err) {
+                  assert.ifError(err);
+                  setTimeout(function() {
+                    m2.monitor.close(function() {
+                      callback(undefined, m1, m2);
+                    });
+                  });
                 });
               });
             });
-          });
-        }, 200);
+          }, 200);
+        });
       });
     },
 
@@ -490,25 +541,31 @@ vows.describe('Monitor ').addBatch({
       var m1 = new TestMonitor(randomFile());
       m1.monitor.start(function(err) {
         assert.ifError(err);
-        fs.appendFileSync(m1.file, 'line1\nline2\n');
-        setTimeout(function() {
-          m1.monitor.close(function() {
-            setTimeout(function() {
-              fs.appendFileSync(m1.file, 'line3\nline4\n');
-              var m2 = new TestMonitor(m1.file);
-              m2.monitor.start(function(err) {
-                assert.ifError(err);
-                fs.appendFileSync(m1.file, 'line5\nline6\n');
-                setTimeout(function() {
-                  m2.monitor.close(function() {
-                    callback(undefined, m1, m2);
+        fs.appendFile(m1.file, 'line1\nline2\n', function(err) {
+          assert.ifError(err);
+          setTimeout(function() {
+            m1.monitor.close(function() {
+              setTimeout(function() {
+                fs.appendFile(m1.file, 'line3\nline4\n', function(err) {
+                  assert.ifError(err);
+                  var m2 = new TestMonitor(m1.file);
+                  m2.monitor.start(function(err) {
+                    assert.ifError(err);
+                    fs.appendFile(m1.file, 'line5\nline6\n', function(err) {
+                      assert.ifError(err);
+                      setTimeout(function() {
+                        m2.monitor.close(function() {
+                          callback(undefined, m1, m2);
+                        });
+                      }, 200);
+                    });
                   });
-                }, 200);
-              });
-            }, 500);
-          });
-        }, 200);
-      }, 200);
+                });
+              }, 500);
+            });
+          }, 200);
+        });
+      });
     },
 
     check: function(err, m1, m2) {
@@ -529,25 +586,33 @@ vows.describe('Monitor ').addBatch({
       var m1 = new TestMonitor(randomFile());
       m1.monitor.start(function(err) {
         assert.ifError(err);
-        fs.appendFileSync(m1.file, 'line1\nline2\n');
-        setTimeout(function() {
-          m1.monitor.close(function() {
-            setTimeout(function() {
-              fs.unlinkSync(m1.file);
-              fs.appendFileSync(m1.file, 'line3\n');
-              var m2 = new TestMonitor(m1.file);
-              m2.monitor.start(function(err) {
-                assert.ifError(err);
-                fs.appendFileSync(m1.file, 'line4\nline5\n');
-                setTimeout(function() {
-                  m2.monitor.close(function() {
-                    callback(undefined, m1, m2);
+        fs.appendFile(m1.file, 'line1\nline2\n', function(err) {
+          assert.ifError(err);
+          setTimeout(function() {
+            m1.monitor.close(function() {
+              setTimeout(function() {
+                fs.unlink(m1.file, function(err) {
+                  assert.ifError(err);
+                  fs.appendFile(m1.file, 'line3\n', function(err) {
+                    assert.ifError(err);
+                    var m2 = new TestMonitor(m1.file);
+                    m2.monitor.start(function(err) {
+                      assert.ifError(err);
+                      fs.appendFile(m1.file, 'line4\nline5\n', function(err) {
+                        assert.ifError(err);
+                        setTimeout(function() {
+                          m2.monitor.close(function() {
+                            callback(undefined, m1, m2);
+                          });
+                        }, 200);
+                      });
+                    });
                   });
-                }, 200);
-              });
-            }, 500);
-          });
-        }, 200);
+                });
+              }, 500);
+            });
+          }, 200);
+        });
       });
     },
 
@@ -569,25 +634,33 @@ vows.describe('Monitor ').addBatch({
       var m1 = new TestMonitor(randomFile());
       m1.monitor.start(function(err) {
         assert.ifError(err);
-        fs.appendFileSync(m1.file, 'line1\nline2\n');
-        setTimeout(function() {
-          m1.monitor.close(function() {
-            setTimeout(function() {
-              fs.unlinkSync(m1.file);
-              fs.appendFileSync(m1.file, 'line3\nline4\nline5\n');
-              var m2 = new TestMonitor(m1.file);
-              m2.monitor.start(function(err) {
-                assert.ifError(err);
-                fs.appendFileSync(m1.file, 'line6\nline7\n');
-                setTimeout(function() {
-                  m2.monitor.close(function() {
-                    callback(undefined, m1, m2);
+        fs.appendFile(m1.file, 'line1\nline2\n', function(err) {
+          assert.ifError(err);
+          setTimeout(function() {
+            m1.monitor.close(function() {
+              setTimeout(function() {
+                fs.unlink(m1.file, function(err) {
+                  assert.ifError(err);
+                  fs.appendFile(m1.file, 'line3\nline4\nline5\n', function(err) {
+                    assert.ifError(err);
+                    var m2 = new TestMonitor(m1.file);
+                    m2.monitor.start(function(err) {
+                      assert.ifError(err);
+                      fs.appendFile(m1.file, 'line6\nline7\n', function(err) {
+                        assert.ifError(err);
+                        setTimeout(function() {
+                          m2.monitor.close(function() {
+                            callback(undefined, m1, m2);
+                          });
+                        }, 200);
+                      });
+                    });
                   });
-                }, 200);
-              });
-            }, 500);
-          });
-        }, 200);
+                });
+              }, 500);
+            });
+          }, 200);
+        });
       });
     },
 
