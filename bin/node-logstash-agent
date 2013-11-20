@@ -68,13 +68,6 @@ a.on('error', function(module_name, error) {
   logger.error('[' + module_name + '] ' + error);
 });
 
-a.on('init_error', function(module_name, error) {
-  log_error('[' + module_name + '] ' + error);
-  setTimeout(function() {
-    process.exit(1);
-  }, 50);
-});
-
 patterns_loader.add(path.join(__dirname, '..', 'lib', 'patterns'));
 
 if (argv.patterns_directories) {
@@ -88,7 +81,8 @@ function after_config_directory(config) {
 
   a.loadUrls(config, function(err) {
     if (err) {
-      log_error('Unable to load urls : ' + err);
+      log_error('Unable to load urls from command line');
+      log_error(err.stack);
       setTimeout(function() {
         process.exit(2);
       }, 50);
@@ -103,7 +97,8 @@ function after_config_file(config) {
     logger.info('Loading config files from : ' + argv.config_dir);
     file_loader.loadDirectory(argv.config_dir, function(err, result) {
       if (err) {
-        log_error('Unable to load config from directory : ' + err.toString());
+        log_error('Unable to load config from directory');
+        log_error(err.stack);
         setTimeout(function() {
           process.exit(1);
         }, 50);
@@ -123,7 +118,8 @@ function load_config_file(config) {
     logger.info('Loading config file : ' + argv.config_file);
     file_loader.loadFile(argv.config_file, function(err, result) {
       if (err) {
-        log_error('Unable to load config file : ' + err.toString());
+        log_error('Unable to load config file');
+        log_error(err.stack);
         setTimeout(function() {
           process.exit(1);
         }, 50);

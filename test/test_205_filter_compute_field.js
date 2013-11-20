@@ -11,9 +11,11 @@ vows.describe('Filter compute field ').addBatch({
     {'message': 'toto', 'bouh': 'tata'},
     {'message': 'toto', 'bouh': 42},
     {'message': 'toto', 'bouh': 42, 'titi': 'abcdef'},
+    {'message': 'toto'},
   ], [
     {'message': 'toto', 'bouh': 'tata', 'titi': 'abtata'},
     {'message': 'toto', 'bouh': 42, 'titi': 'ab42'},
     {'message': 'toto', 'bouh': 42, 'titi': 'ab42'},
+    {'message': 'toto'},
   ]),
 }).export(module);

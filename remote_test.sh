@@ -28,5 +28,3 @@ ssh $TARGET "source .nvm/nvm.sh && nvm use v$NODE_VERSION && cd node-logstash_$N
 if [ "$COVER" != "" ]; then
   rsync -avh --delete $TARGET:node-logstash_$NODE_VERSION/coverage/ coverage/
 fi
-
-./jshint.sh
