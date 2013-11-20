@@ -10,7 +10,7 @@ function check_error_init(urls, expected_message_pattern) {
       a.on('error', function(module_name, error) {
         assert.ifError(error);
       });
-      a.loadUrls(urls, function(err) {
+      a.start(urls, function(err) {
         if (err) {
           a.close(function() {
             callback(null, err.toString());

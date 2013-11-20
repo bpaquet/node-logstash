@@ -79,7 +79,7 @@ if (argv.patterns_directories) {
 function after_config_directory(config) {
   logger.info('Loading config : ' + config.length + ' urls');
 
-  a.loadUrls(config, function(err) {
+  a.start(config, function(err) {
     if (err) {
       log_error('Unable to load urls from command line');
       log_error(err.stack);
