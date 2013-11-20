@@ -106,6 +106,12 @@ Config file for log server:
     filter://regex://http_combined
     output://elasticsearch://localhost:9001
 
+Signals
+---
+
+* USR1: closing or starting all inputs plugins. Can be used to close input when output targer are failing
+* USR2: see below file output plugin
+
 Changelog
 ===
 
@@ -337,7 +343,7 @@ In JSON mode, each line of log is dumped to target file as JSON object, containi
 
 In raw mode, each line of log is dumped to target file as specified in ``format`` parameter. Default format is ``#{message}``, which means the original log line.
 
-Note: target files can be reopened by sending USR signal to node-logstash.
+Note: target files can be reopened by sending USR2 signal to node-logstash.
 
 Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each ``nginx`` log lines to ``/var/log/toto.log``.
 
