@@ -15,7 +15,7 @@ echo "Launching test : $TEST"
 if [ "$COVER" != "" ]; then
   istanbul cover node_modules/.bin/vows -- $TEST --spec
 else
-  vows $TEST --spec
+  node_modules/.bin/vows $TEST --spec
 fi
 
 echo ""

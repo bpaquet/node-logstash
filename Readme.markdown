@@ -573,8 +573,13 @@ The proxy parameter allow to use an http proxy.
 
 The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` which gives support for:
   * http and https proxies
-  * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``)
   * proxy port
+  * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``).
+    Supported authentication schemes are Basic and NTLM.
+    The following parameters are used to configure authentication:
+    * ``proxy_auth`` - specifies the authentication type. Possible values are ``basic`` or ``ntlm``. If not specified, ``basic`` is assumed.
+    * ``proxy_ntlm_domain`` - Specifies the NTLM domain for authentication. Required if ``proxy_auth`` is ``ntlm``.
+
 
 Force fields typing in Elastic Search
 ---
