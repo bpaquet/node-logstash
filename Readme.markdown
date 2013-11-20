@@ -109,12 +109,13 @@ Config file for log server:
 Signals
 ---
 
-* USR1: closing or starting all inputs plugins. Can be used to close input when output targer are failing
+* USR1: stoping or starting all inputs plugins. Can be used to close input when output targer are failing
 * USR2: see below file output plugin
 
 Changelog
 ===
 
+* Add USR1 signal to stop and start inputs plugins
 * Add TCP / TLS plugin, thx to @dlanderson
 * Add input HTTP plugin, thx to @fujifish
 * Refactor SSL management
