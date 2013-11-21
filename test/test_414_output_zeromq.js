@@ -24,7 +24,7 @@ function loop(x, socket, callback) {
 }
 
 vows.describe('Integration zeromq:').addBatchRetry({
-  'normal': {
+  'no limit': {
     topic: function() {
       var callback = this.callback;
       monitor_file.setFileStatus({});
@@ -45,7 +45,7 @@ vows.describe('Integration zeromq:').addBatchRetry({
                 agent2.close(function() {
                   agent.close(callback);
                 });
-              }, 200);
+              }, 1000);
             });
           }, 100);
         });
@@ -63,7 +63,7 @@ vows.describe('Integration zeromq:').addBatchRetry({
     }
   },
 }, 5, 20000).addBatchRetry({
-  'interval check': {
+  'high watermark set to 100': {
     topic: function() {
       var callback = this.callback;
       monitor_file.setFileStatus({});
@@ -100,47 +100,6 @@ vows.describe('Integration zeromq:').addBatchRetry({
 
       var splitted = c.split('\n');
       assert.equal(splitted.length, 1000 + 1);
-    }
-  },
-}, 5, 20000).addBatchRetry({
-  'interval check too long': {
-    topic: function() {
-      var callback = this.callback;
-      monitor_file.setFileStatus({});
-      helper.createAgent([
-        'input://udp://localhost:17874?type=udp',
-        'output://zeromq://tcp://localhost:17875?zmq_high_watermark=100&zmq_check_interval=500',
-      ], function(agent) {
-        var socket = dgram.createSocket('udp4');
-        loop(1000, socket, function(err) {
-          assert.ifError(err);
-          setTimeout(function() {
-            helper.createAgent([
-              'input://zeromq://tcp://0.0.0.0:17875',
-              'output://file://output.txt',
-            ], function(agent2) {
-              setTimeout(function() {
-                assert.ifError(err);
-                socket.close();
-                agent2.close(function() {
-                  agent.close(callback);
-                });
-              }, 500);
-            });
-          }, 800);
-        });
-      });
-    },
-
-    check: function(err) {
-      assert.ifError(err);
-      var c = fs.readFileSync('output.txt').toString();
-      fs.unlinkSync('output.txt');
-      fs.unlinkSync('input.txt');
-
-      var splitted = c.split('\n');
-      assert.ok(splitted.length > 200, 'Number of events received ' + splitted.length + ' should be upper 200');
-      assert.ok(splitted.length < 900, 'Number of events received ' + splitted.length + ' should be lower 900');
     }
   },
 }, 5, 20000).addBatchRetry({

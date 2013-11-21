@@ -288,9 +288,9 @@ Parameters:
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
 * ``zmq_high_watermark``: set the high watermark param on [ZeroMQ socket](http://api.zeromq.org/2-1:zmq-setsockopt). Default : no value. WARNING : only work with ZeroMQ 2.x
-* ``zmq_check_interval``: if set, the plugin will check the NodeJS driver queue status every given interval (in ms). If not empty, the plugin will try to flush it. At each flush, the NodeJS driver will inject x elements in ZeroMQ library queue, x is the high watermak value. For example, to flush 1000 messages with high watermark setted to 100, it will take 10 * zmq_check_interval ms. Default: no value.
 * ``zmq_threshold_up``: if the NodeJS driver queues size goes upper this threshold, node-losgstash will stop every inputs plugins to avoid memory exhaustion. Default : no value.
 * ``zmq_threshold_down``: if the NodeJS driver queues size goes down this threshold and inputs plugins are stopped, node-losgstash will start every inputs plugins. Default : no value.
+* ``zmq_check_interval``: if set, the plugin will check the NodeJS driver queue status to go out of alarm mode. Default : no value
 
 Elastic search
 ---
