@@ -105,7 +105,7 @@ vows.describe('Integration closing inputs:').addBatchRetry({
       assert.equal(splitted_2.length, 500 + 1);
     }
   },
-}, 5, 20000).addBatch({
+}, 5, 20000).addBatchRetry({
   'closing': {
     topic: function() {
       var callback = this.callback;
