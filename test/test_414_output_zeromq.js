@@ -138,6 +138,7 @@ vows.describe('Integration zeromq:').addBatchRetry({
       fs.unlinkSync('output.txt');
       fs.unlinkSync('input.txt');
 
+      console.log(splitted.length);
       var splitted = c.split('\n');
       assert.ok(splitted.length > 200);
       assert.ok(splitted.length < 900);
