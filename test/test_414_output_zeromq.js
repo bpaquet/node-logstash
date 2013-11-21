@@ -109,7 +109,7 @@ vows.describe('Integration zeromq:').addBatchRetry({
       monitor_file.setFileStatus({});
       helper.createAgent([
         'input://udp://localhost:17874?type=udp',
-        'output://zeromq://tcp://localhost:17875?zmq_high_watermark=100&zmq_check_interval=800',
+        'output://zeromq://tcp://localhost:17875?zmq_high_watermark=100&zmq_check_interval=500',
       ], function(agent) {
         var socket = dgram.createSocket('udp4');
         loop(1000, socket, function(err) {
@@ -125,9 +125,9 @@ vows.describe('Integration zeromq:').addBatchRetry({
                 agent2.close(function() {
                   agent.close(callback);
                 });
-              }, 1000);
+              }, 500);
             });
-          }, 500);
+          }, 800);
         });
       });
     },
@@ -139,8 +139,8 @@ vows.describe('Integration zeromq:').addBatchRetry({
       fs.unlinkSync('input.txt');
 
       var splitted = c.split('\n');
-      assert.ok(splitted.length > 200, 'Number of events received ' + splitted.length);
-      assert.ok(splitted.length < 900, 'Number of events received ' + splitted.length);
+      assert.ok(splitted.length > 200, 'Number of events received ' + splitted.length + ' should be upper 200');
+      assert.ok(splitted.length < 900, 'Number of events received ' + splitted.length + ' should be lower 900');
     }
   },
 }, 5, 20000).addBatchRetry({
