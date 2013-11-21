@@ -12,12 +12,13 @@ function check_error_init(urls, expected_message_pattern) {
       });
       a.start(urls, function(err) {
         if (err) {
-          console.log(err);
+          console.log('Received error', err);
           a.close(function() {
             callback(null, err.toString());
           });
           return;
         }
+        console.log('Oups, should not be there');
         assert.fail('Init success, should not');
       }, 200);
     },

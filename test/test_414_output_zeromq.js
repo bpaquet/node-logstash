@@ -109,7 +109,7 @@ vows.describe('Integration zeromq:').addBatchRetry({
       monitor_file.setFileStatus({});
       helper.createAgent([
         'input://udp://localhost:17874?type=udp',
-        'output://zeromq://tcp://localhost:17875?zmq_high_watermark=100&zmq_check_interval=500',
+        'output://zeromq://tcp://localhost:17875?zmq_high_watermark=100&zmq_check_interval=800',
       ], function(agent) {
         var socket = dgram.createSocket('udp4');
         loop(1000, socket, function(err) {
@@ -144,7 +144,7 @@ vows.describe('Integration zeromq:').addBatchRetry({
       assert.ok(splitted.length < 900);
     }
   },
-}, 5, 20000).addBatch({
+}, 5, 20000).addBatchRetry({
   'closed inputs': {
     topic: function() {
       var callback = this.callback;
