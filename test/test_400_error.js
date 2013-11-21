@@ -12,19 +12,16 @@ function check_error_init(urls, expected_message_pattern) {
       });
       a.start(urls, function(err) {
         if (err) {
-          console.log('Received error', err);
           a.close(function() {
             callback(null, err.toString());
           });
           return;
         }
-        console.log('Oups, should not be there');
         assert.fail('Init success, should not');
       }, 200);
     },
 
     check: function(error, message) {
-      console.log('test', error, message);
       assert.ifError(error);
       assert.ok(message.match(expected_message_pattern), 'Message does not match pattern : ' + expected_message_pattern + ' : ' + message);
     }
