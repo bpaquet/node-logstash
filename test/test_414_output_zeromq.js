@@ -139,9 +139,8 @@ vows.describe('Integration zeromq:').addBatchRetry({
       fs.unlinkSync('input.txt');
 
       var splitted = c.split('\n');
-      console.log(splitted.length);
-      assert.ok(splitted.length > 200);
-      assert.ok(splitted.length < 900);
+      assert.ok(splitted.length > 200, 'Number of events received ' + splitted.length);
+      assert.ok(splitted.length < 900, 'Number of events received ' + splitted.length);
     }
   },
 }, 5, 20000).addBatchRetry({
