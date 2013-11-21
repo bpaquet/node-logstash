@@ -12,6 +12,7 @@ function check_error_init(urls, expected_message_pattern) {
       });
       a.start(urls, function(err) {
         if (err) {
+          console.log(err);
           a.close(function() {
             callback(null, err.toString());
           });
@@ -22,6 +23,7 @@ function check_error_init(urls, expected_message_pattern) {
     },
 
     check: function(error, message) {
+      console.log('test', error, message);
       assert.ifError(error);
       assert.ok(message.match(expected_message_pattern), 'Message does not match pattern : ' + expected_message_pattern + ' : ' + message);
     }
