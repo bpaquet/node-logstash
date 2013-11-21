@@ -51,9 +51,11 @@ function create_test(start_callback, check_callback, path, options) {
       var m = new TestMonitor(randomFile(path), options);
       var callback = this.callback;
       start_callback(m, function(err) {
-        m.monitor.close(function() {
-          callback(err, m);
-        });
+        setTimeout(function() {
+          m.monitor.close(function() {
+            callback(err, m);
+          });
+        }, 20);
       });
     },
 
