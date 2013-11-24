@@ -11,13 +11,13 @@ vows.describe('Integration Json logstash event :').addBatchRetry({
       monitor_file.setFileStatus({});
       var callback = this.callback;
       helper.createAgent([
-        'input://udp://0.0.0.0:67854',
+        'input://udp://0.0.0.0:17854',
         'output://file://output.txt?serializer=json_logstash',
       ], function(agent) {
         var socket = dgram.createSocket('udp4');
         var udp_send = function(s) {
           var buffer = new Buffer(s);
-          socket.send(buffer, 0, buffer.length, 67854, 'localhost', function(err, bytes) {
+          socket.send(buffer, 0, buffer.length, 17854, 'localhost', function(err, bytes) {
             if (err || bytes !== buffer.length) {
               assert.fail('Unable to send udp packet');
             }
@@ -48,8 +48,8 @@ vows.describe('Integration Json logstash event :').addBatchRetry({
       var splitted = c.split('\n');
       assert.equal(splitted.length, 4);
       assert.equal('', splitted[splitted.length - 1]);
-      helper.checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 67854, 'message': 'toto'});
-      helper.checkResult(splitted[1], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 67854, 'message': '{"tata":"toto","type":"titi","message":"oups"}'});
+      helper.checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 17854, 'message': 'toto'});
+      helper.checkResult(splitted[1], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 17854, 'message': '{"tata":"toto","type":"titi","message":"oups"}'});
       helper.checkResult(splitted[2], {'@version': '1', 'host': 'toto', 'source': 'test42', 'type': 'pouet', 'tata': 'toto', 'message': 'titi', '@timestamp': 'abc'}, undefined, true);
     }
   },

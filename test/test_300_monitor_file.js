@@ -51,9 +51,11 @@ function create_test(start_callback, check_callback, path, options) {
       var m = new TestMonitor(randomFile(path), options);
       var callback = this.callback;
       start_callback(m, function(err) {
-        m.monitor.close(function() {
-          callback(err, m);
-        });
+        setTimeout(function() {
+          m.monitor.close(function() {
+            callback(err, m);
+          });
+        }, 20);
       });
     },
 
@@ -478,7 +480,7 @@ vows.describe('Monitor ').addBatch({
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4', 'line5', 'line6']);
     assert.equal(m.closed_counter, 2);
   }, undefined, {wait_delay_after_renaming: 500}),
-}, 5, 10000).addBatch({
+}, 5, 10000).addBatchRetry({
   'Complex logrotate simulation with permission pb': create_test(function(m, callback) {
     m.monitor.start(function(err) {
       assert.ifError(err);

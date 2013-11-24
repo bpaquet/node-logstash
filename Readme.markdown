@@ -106,9 +106,16 @@ Config file for log server:
     filter://regex://http_combined
     output://elasticsearch://localhost:9001
 
+Signals
+---
+
+* USR1: stoping or starting all inputs plugins. Can be used to close input when output targer are failing
+* USR2: see below file output plugin
+
 Changelog
 ===
 
+* Add USR1 signal to stop and start inputs plugins
 * Add TCP / TLS plugin, thx to @dlanderson
 * Add input HTTP plugin, thx to @fujifish
 * Refactor SSL management
@@ -271,10 +278,19 @@ This plugin is used on agents to send logs to logs servers.
 
 Example: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
 
+There are two queues in ZeroMQ output plugin :
+
+* in the ZeroMQ library (see high watermark below). Default size: unlimited
+* in the ZeroMQ NodeJS driver. Size is unlimited.
+
 Parameters:
 
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
+* ``zmq_high_watermark``: set the high watermark param on [ZeroMQ socket](http://api.zeromq.org/2-1:zmq-setsockopt). Default : no value. WARNING : only work with ZeroMQ 2.x
+* ``zmq_threshold_up``: if the NodeJS driver queues size goes upper this threshold, node-losgstash will stop every inputs plugins to avoid memory exhaustion. Default : no value.
+* ``zmq_threshold_down``: if the NodeJS driver queues size goes down this threshold and inputs plugins are stopped, node-losgstash will start every inputs plugins. Default : no value.
+* ``zmq_check_interval``: if set, the plugin will check the NodeJS driver queue status to go out of alarm mode. Default : no value
 
 Elastic search
 ---
@@ -337,7 +353,7 @@ In JSON mode, each line of log is dumped to target file as JSON object, containi
 
 In raw mode, each line of log is dumped to target file as specified in ``format`` parameter. Default format is ``#{message}``, which means the original log line.
 
-Note: target files can be reopened by sending USR signal to node-logstash.
+Note: target files can be reopened by sending USR2 signal to node-logstash.
 
 Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each ``nginx`` log lines to ``/var/log/toto.log``.
 
