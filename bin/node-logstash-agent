@@ -11,6 +11,8 @@ var optimist = require('optimist'),
     file_loader = require('../lib/lib/file_loader'),
     patterns_loader = require('../lib/lib/patterns_loader');
 
+process.title = 'node-logstash-agent';
+
 var argv = optimist.argv;
 
 function help() {
