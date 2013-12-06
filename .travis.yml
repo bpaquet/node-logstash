@@ -9,4 +9,4 @@ env:
 before_install:
   - sudo apt-get install -y uuid-dev
   - sudo apt-get install -y logrotate
-  - sh -c "cd /tmp && wget http://download.zeromq.org/zeromq-$ZEROMQ_VERSION.tar.gz && tar xzf zeromq-$ZEROMQ_VERSION.tar.gz && ln -s zeromq-$ZEROMQ_VERSION  zmq && cd /tmp/zmq && ./configure && make"
+  - cd /tmp && wget http://download.zeromq.org/zeromq-${ZEROMQ_VERSION}.tar.gz && tar xzf zeromq-${ZEROMQ_VERSION}.tar.gz && ln -s zeromq-${ZEROMQ_VERSION} zmq && cd /tmp/zmq && ./configure && make
