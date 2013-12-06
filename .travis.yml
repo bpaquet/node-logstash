@@ -3,8 +3,9 @@ services:
   - redis-server
 node_js:
   - "0.10"
+  - "0.8"
 env:
-  - ZEROMQ_VERSION=2.2.0 CPLUS_INCLUDE_PATH=/tmp/zmq/include LB_LIBRARY_PATH=/tmp/zmq/src/.libs LIBRARY_PATH=/tmp/zmq/src/.libs
+  - ZEROMQ_VERSION=2.2.0 CPLUS_INCLUDE_PATH=$TRAVIS_BUILD_DIR/zmq/include LB_LIBRARY_PATH=$TRAVIS_BUILD_DIR/zmq/src/.libs LIBRARY_PATH=$TRAVIS_BUILD_DIR/zmq/src/.libs
 before_install:
   - sudo apt-get install -y logrotate uuid-dev
-  - ./build_zmq.sh /tmp/zmq $ZEROMQ_VERSION
+  - ./build_zmq.sh $TRAVIS_BUILD_DIR/zmq $ZEROMQ_VERSION
