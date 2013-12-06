@@ -14,7 +14,7 @@ echo "Installing ZeroMQ version $version to $target"
 cd /tmp
 rm -rf zeromq-$version.tar.gz $target
 wget http://download.zeromq.org/zeromq-$version.tar.gz
-tar xvzf zeromq-$version.tar.gz
+tar xzf zeromq-$version.tar.gz
 mv zeromq-$version $target
 
 echo "Compiling"
