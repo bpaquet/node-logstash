@@ -153,7 +153,7 @@ vows.describe('Real life :').addBatchRetry({
       fs.unlinkSync('output.txt.2');
     }
   ),
-}, 5, 20000).addBatchRetry({
+}, 10, 20000).addBatchRetry({
   'logrotate test': input_file_test('',
     function() {
       whereis('logrotate', function(err, logrotate) {
