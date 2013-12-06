@@ -5,7 +5,9 @@ node_js:
   - "0.10"
   - "0.8"
 env:
-  - ZEROMQ_VERSION=2.2.0 CPLUS_INCLUDE_PATH=$TRAVIS_BUILD_DIR/zmq/include LB_LIBRARY_PATH=$TRAVIS_BUILD_DIR/zmq/src/.libs LIBRARY_PATH=$TRAVIS_BUILD_DIR/zmq/src/.libs
+  - ZEROMQ_VERSION=2.1.11-1ubuntu1
 before_install:
-  - sudo apt-get install -y logrotate uuid-dev
+  - sudo apt-get install -y logrotate
+  - sudo add-apt-repository ppa:bpaquet/zeromq-precise -y
+  - sudo apt-get install -y libzmq1=${ZEROMQ_VERSION} libzmq-dev=${ZEROMQ_VERSION}
   - ./build_zmq.sh $TRAVIS_BUILD_DIR/zmq $ZEROMQ_VERSION
