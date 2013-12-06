@@ -7,5 +7,4 @@ env:
   - ZEROMQ_VERSION=2.2.0 CPLUS_INCLUDE_PATH=/tmp/zmq/include LB_LIBRARY_PATH=/tmp/zmq/src/.libs LIBRARY_PATH=/tmp/zmq/src/.libs
 before_install:
   - sudo apt-get install -y logrotate uuid-dev
-  - cd /tmp && wget http://download.zeromq.org/zeromq-${ZEROMQ_VERSION}.tar.gz && tar xzf zeromq-${ZEROMQ_VERSION}.tar.gz && ln -s zeromq-${ZEROMQ_VERSION} zmq
-  - cd /tmp/zmq && ./configure && make
+  - ./build.sh /tmp/zmq $ZEROMQ_VERSION
