@@ -5,7 +5,7 @@ node_js:
   - "0.10"
   - "0.8"
 env:
-	- ZEROMQ_VERSION=2.2.0 CPLUS_INCLUDE_PATH=zmq/include LB_LIBRARY_PATH=zmq/src/.libs LIBRARY_PATH=zmq/src/.libs
+  - ZEROMQ_VERSION=2.2.0 CPLUS_INCLUDE_PATH=zmq/include LB_LIBRARY_PATH=zmq/src/.libs LIBRARY_PATH=zmq/src/.libs
 before_install:
   - sudo apt-get install -y logrotate
   - "wget http://download.zeromq.org/zeromq-$ZEROMQ_VERSION.tar.gz"
