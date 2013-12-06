@@ -7,5 +7,6 @@ node_js:
 env:
   - ZEROMQ_VERSION=2.2.0 CPLUS_INCLUDE_PATH=/tmp/zmq/include LB_LIBRARY_PATH=/tmp/zmq/src/.libs LIBRARY_PATH=/tmp/zmq/src/.libs
 before_install:
-  - sudo apt-get install -y logrotate
-  - sh -c "cd /tmp && wget http://download.zeromq.org/zeromq-$ZEROMQ_VERSION.tar.gz && tar xvzf zeromq-$ZEROMQ_VERSION.tar.gz && ln -s zeromq-$ZEROMQ_VERSION zmq && cd /tmp/zmq && ./configure && make"
+  - sudo apt-get install -y libuuid-dev
+	- sudo apt-get install -y logrotate
+  - sh -c "cd /tmp && wget http://download.zeromq.org/zeromq-$ZEROMQ_VERSION.tar.gz && tar xvzf zeromq-$ZEROMQ_VERSION.tar.gz && ln -s zeromq-$ZEROMQ_VERSION  zmq && cd /tmp/zmq && ./configure && make"
