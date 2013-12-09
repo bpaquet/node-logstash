@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Compatibility with ZeroMQ 2.2.x, 3.x, 4.x
 * Add USR1 signal to stop and start inputs plugins
 * Add TCP / TLS plugin, thx to @dlanderson
 * Add input HTTP plugin, thx to @fujifish
