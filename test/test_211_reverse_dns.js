@@ -26,7 +26,7 @@ function unmock_dns() {
 }
 
 vows.describe('Filter reverse dns').addBatch({
-  'no_only_hostname': filter_helper.create('reverse_dns', '?only_hostname=false', [
+  'no_only_hostname': filter_helper.create('reverse_dns', 'host?only_hostname=false', [
     {'message': 'abcc'},
     {'host': 'www.free.fr'},
     {'host': 'www.free.fr2'},
@@ -45,7 +45,41 @@ vows.describe('Filter reverse dns').addBatch({
     unmock_dns();
   }),
 }).addBatch({
-  'only_hostname': filter_helper.create('reverse_dns', '?', [
+  'change target': filter_helper.create('reverse_dns', 'host?only_hostname=false&target_field=toto', [
+    {'message': 'abcc'},
+    {'host': 'www.free.fr'},
+    {'host': 'www.free.fr2'},
+    {'host': '212.27.48.10'},
+    {'host': '212.27.48.11'},
+  ], [
+    {'message': 'abcc'},
+    {'host': 'www.free.fr'},
+    {'host': 'www.free.fr2'},
+    {'host': '212.27.48.10', 'toto': 'www.free.fr'},
+    {'host': '212.27.48.11', 'toto': 'toto'},
+  ], function() {}, function(callback) {
+    mock_dns();
+    callback();
+  }, function() {
+    unmock_dns();
+  }),
+}).addBatch({
+  'change src': filter_helper.create('reverse_dns', 'titi?only_hostname=false', [
+    {'message': 'abcc'},
+    {'titi': '212.27.48.10'},
+    {'host': '212.27.48.11'},
+  ], [
+    {'message': 'abcc'},
+    {'titi': 'www.free.fr'},
+    {'host': '212.27.48.11'},
+  ], function() {}, function(callback) {
+    mock_dns();
+    callback();
+  }, function() {
+    unmock_dns();
+  }),
+}).addBatch({
+  'only_hostname': filter_helper.create('reverse_dns', 'host', [
     {'message': 'abcc'},
     {'host': 'www.free.fr'},
     {'host': 'www.free.fr2'},

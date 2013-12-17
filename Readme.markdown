@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Improve dns reverse filter
 * Compatibility with ZeroMQ 2.2.x, 3.x, 4.x
 * Add USR1 signal to stop and start inputs plugins
 * Add TCP / TLS plugin, thx to @dlanderson
@@ -484,12 +485,13 @@ Parameters:
 Reverse DNS
 ---
 
-The reverse dns filter replace an ip in `host` by the hostname, performing a dns resolution. This is useful with syslog.
+The reverse dns filter replace an ip in a field by the hostname, performing a dns resolution. This is useful with syslog.
 
-Example 1: ``filter://reverse_dns://``
+Example 1: ``filter://reverse_dns://host`` performs a dns resolution on the field ``host``.
 
 Parameters:
 
+* ``target_field``: field to store the result. Default: field used for resolution.
 * ``only_hostname``: after dns resolution, the filter will keep only the first word of dns name. Example : 'www.free.fr' will be transformed to 'www'. Default value: true
 
 Compute field
