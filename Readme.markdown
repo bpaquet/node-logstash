@@ -165,6 +165,24 @@ Parameters:
 
 Note: this plugin can be used on FIFO pipes.
 
+Directory
+---
+
+This plugin monitors multiple log files in a directory. See File input above for details.
+Enables filtering files for inclusion and exclusion from monitoring via the ``include`` and ``exclude`` parameters. If both ``include`` and ``exclude`` are provided then the exclude filter
+is activated after the include filter.
+
+Example: ``input://dir:///tmp/logs``, to monitor all files in ``/tmp/logs``.
+
+Parameters:
+
+* ``include`` - a filter for files to include in monitoring. Supports simple expressions with * and ?. Example: ``input://file:///tmp/logs?include=runtime-*.log``
+* ``exclude`` - a filter for files to exclude from monitoring. Supports simple expressions with * and ?. Example: ``input://file:///tmp/logs?exclude=runtime-a*.log``
+* ``use_tail``: use system ``tail -f`` command to monitor file, instead of built in file monitoring. Should be used with logrotate and copytuncate option. Defaut value: false.
+* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=nginx_error_log``.
+* ``unserializer``: please see above. Default value to ``json_logstash``.
+
+
 Syslog
 ---
 
@@ -592,8 +610,13 @@ The proxy parameter allow to use an http proxy.
 
 The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` which gives support for:
   * http and https proxies
-  * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``)
   * proxy port
+  * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``).
+    Supported authentication schemes are Basic and NTLM.
+    The following parameters are used to configure authentication:
+    * ``proxy_auth`` - specifies the authentication type. Possible values are ``basic`` or ``ntlm``. If not specified, ``basic`` is assumed.
+    * ``proxy_ntlm_domain`` - Specifies the NTLM domain for authentication. Required if ``proxy_auth`` is ``ntlm``.
+
 
 Force fields typing in Elastic Search
 ---
