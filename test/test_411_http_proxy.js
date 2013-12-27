@@ -1,13 +1,15 @@
 var vows = require('vows-batch-retry'),
     http = require('http'),
     net = require('net'),
+    os = require('os'),
     assert = require('assert'),
     helper = require('./integration_helper.js');
 
-function createHttpTest(config, check_callback) {
+function createHttpTest(config, check_callback, full_check_callback) {
   return {
     topic: function() {
       var callback = this.callback;
+      var error;
       helper.createAgent([
         'input://tcp://0.0.0.0:17874?type=pouet',
         'output://' + config,
@@ -18,11 +20,13 @@ function createHttpTest(config, check_callback) {
             body += chunk;
           });
           req.on('end', function() {
-            res.writeHead(204);
+            res.writeHead(204, {'Connection': 'close'});
             res.end();
             agent.close(function() {
               http_server.close(function() {
-                callback(null, {req: req, body: body});
+                setTimeout(function() {
+                  callback(error, {req: req, body: body});
+                }, 100);
               });
             });
           });
@@ -31,12 +35,19 @@ function createHttpTest(config, check_callback) {
           c1.write('toto');
           c1.end();
         });
+      }, function(err) {
+        error = err;
       });
     },
 
     check: function(err, reqs) {
-      assert.ifError(err);
-      check_callback(reqs);
+      if (full_check_callback) {
+        full_check_callback(err, reqs);
+      }
+      else {
+        assert.ifError(err);
+        check_callback(reqs);
+      }
     }
   };
 }
@@ -65,6 +76,8 @@ function createConnectTest(config, check_callback) {
           c1.write('toto');
           c1.end();
         });
+      }, function(err) {
+        callback(err);
       });
     },
 
@@ -126,5 +139,29 @@ vows.describe('Integration Http proxy :').addBatchRetry({
     assert.equal(req.req.method, 'CONNECT');
     assert.equal(req.req.url, 'toto.com:1234');
     assert.equal(req.req.headers['proxy-authorization'], 'Basic YTpiYw==');
+  }),
+}, 5, 20000).addBatchRetry({
+  'http ntlm no hostname': createHttpTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://ntlm:mydomain::a:bc@localhost:17875', undefined, function(err, req) {
+    assert(err.toString().match(/did not receive NTLM type 2 message/));
+    assert.equal(req.req.method, 'GET');
+    assert.equal(req.req.url, 'http://toto.com:1234/pouet');
+    var auth = req.req.headers['proxy-authorization'];
+    var res = auth.match(/^NTLM (.*)/);
+    assert(res);
+    var body = (new Buffer(res[1], 'base64')).toString();
+    var l = (os.hostname() + 'mydomain').toUpperCase();
+    assert(body.match(l + '$'));
+  }),
+}, 5, 20000).addBatchRetry({
+  'http ntlm with workstation': createHttpTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://ntlm:mydomain:titi:a:bc@localhost:17875', undefined, function(err, req) {
+    assert(err.toString().match(/did not receive NTLM type 2 message/));
+    assert.equal(req.req.method, 'GET');
+    assert.equal(req.req.url, 'http://toto.com:1234/pouet');
+    var auth = req.req.headers['proxy-authorization'];
+    var res = auth.match(/^NTLM (.*)/);
+    assert(res);
+    var body = (new Buffer(res[1], 'base64')).toString();
+    var l = ('titi' + 'mydomain').toUpperCase();
+    assert(body.match(l + '$'));
   }),
 }, 5, 20000).export(module);

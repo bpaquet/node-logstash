@@ -600,6 +600,7 @@ The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` whic
   * http and https proxies
   * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``)
   * proxy port
+  * NTLM : for ntlm authent, userinfo have to be ``ntlm:domain:hostname:username:password``. Hostname can be empty.
 
 Force fields typing in Elastic Search
 ---
