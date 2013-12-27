@@ -57,7 +57,7 @@ vows.describe('Integration net 2 file :').addBatchRetry({
       server.listen(17874);
       helper.createAgent([
         'input://file://main_input.txt',
-        'output://tcp://localhost:17874?serializer=raw',
+        'output://tcp://localhost:17874?serializer=raw&delimiter=',
       ], function(agent) {
         setTimeout(function() {
           fs.appendFile('main_input.txt', 'line 1\n', function(err) {

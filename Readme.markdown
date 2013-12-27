@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Add delimiter for file and tcp plugins
 * Auth on redis
 * Improve dns reverse filter
 * Compatibility with ZeroMQ 2.2.x, 3.x, 4.x
@@ -364,6 +365,7 @@ Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each 
 Parameters:
 
 * ``serializer``: please see above. Default value to ``raw``.
+* ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
 * ``format``: please see above. Used by the ``raw``serializer.
 
 HTTP Post
@@ -433,6 +435,7 @@ Parameters:
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 * ``format``: Optional. Please see above. Used by the ``raw``serializer.
+* ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
 
 Filters
 ===
