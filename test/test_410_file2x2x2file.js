@@ -2,31 +2,38 @@ var vows = require('vows-batch-retry'),
     assert = require('assert'),
     fs = require('fs'),
     helper = require('./integration_helper.js'),
-    monitor_file = require('lib/monitor_file');
+    monitor_file = require('lib/monitor_file'),
+    redis_driver = require('redis_driver');
 
-function file2x2x2file(config1, config2, clean_callback) {
+function file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback) {
   return {
     topic: function() {
+      start_callback = start_callback || function(callback) { callback(undefined); };
+      stop_callback = stop_callback || function(o, callback) { callback(); };
       if (clean_callback) {
         clean_callback();
       }
-      monitor_file.setFileStatus({});
       var callback = this.callback;
-      helper.createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
-        helper.createAgent(config2.concat(['output://file://main_output.txt?serializer=json_logstash']), function(a2) {
-          setTimeout(function() {
-            fs.appendFile('main_input.txt', '234 tgerhe grgh\n', function(err) {
-              assert.ifError(err);
-              setTimeout(function() {
-                a1.close(function() {
-                  a2.close(function() {
-                    callback(null);
+      start_callback(function(o) {
+        monitor_file.setFileStatus({});
+        helper.createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
+          helper.createAgent(config2.concat(['output://file://main_output.txt?serializer=json_logstash']), function(a2) {
+            setTimeout(function() {
+              fs.appendFile('main_input.txt', '234 tgerhe grgh\n', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  a1.close(function() {
+                    a2.close(function() {
+                      stop_callback(o, function() {
+                        callback(null);
+                      });
+                    });
                   });
-                });
-              }, 200);
-            });
+                }, 200);
+              });
+            }, 200);
           }, 200);
-        }, 200);
+        });
       });
     },
 
@@ -50,9 +57,9 @@ function file2x2x2file(config1, config2, clean_callback) {
 }
 
 vows.describe('Integration file2x2x2file :').addBatchRetry({
-  'redis channel transport': file2x2x2file(['output://redis://localhost:6379?channel=toto'], ['input://redis://localhost:6379?channel=toto']),
+  'redis channel transport': file2x2x2file(['output://redis://localhost:17874?channel=toto'], ['input://redis://localhost:17874?channel=toto'], undefined, function(callback) { var r = new redis_driver.RedisDriver(); r.start({port: 17874}, function() {callback(r);}); }, function(r, callback) { r.stop(callback); }),
 }, 5, 20000).addBatchRetry({
-  'redis pattern channel transport': file2x2x2file(['output://redis://localhost:6379?channel=pouet_toto'], ['input://redis://localhost:6379?channel=*toto&pattern_channel=true']),
+  'redis pattern channel transport': file2x2x2file(['output://redis://localhost:17874?channel=pouet_toto'], ['input://redis://localhost:17874?channel=*toto&pattern_channel=true'], undefined, function(callback) { var r = new redis_driver.RedisDriver(); r.start({port: 17874}, function() {callback(r);}); }, function(r, callback) { r.stop(callback); }),
 }, 5, 20000).addBatchRetry({
   'file transport': file2x2x2file(['output://file://main_middle.txt?serializer=json_logstash'], ['input://file://main_middle.txt'], function() { if (fs.existsSync('main_middle.txt')) { fs.unlinkSync('main_middle.txt'); }}),
 }, 5, 20000).addBatchRetry({
