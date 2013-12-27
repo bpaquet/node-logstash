@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Auth on redis
 * Improve dns reverse filter
 * Compatibility with ZeroMQ 2.2.x, 3.x, 4.x
 * Add USR1 signal to stop and start inputs plugins
@@ -208,6 +209,7 @@ Example:
 Parameters:
 
 * ``channel``: Redis channel to subscribe/psubscribe to
+* ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
 * ``pattern_channel``: use channel as pattern. Default value : false
 * ``unserializer``: please see above. Default value to ``json_logstash``.
@@ -395,6 +397,7 @@ Example:
 Parameters:
 
 * ``channel``: Redis channel to subscribe/psubscribe to
+* ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
 * ``pattern_channel``: use channel as pattern. Default value : false
 * ``serializer``: please see above. Default value to ``json_logstash``.
