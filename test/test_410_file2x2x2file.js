@@ -19,7 +19,7 @@ function file2x2x2file(config1, config2, clean_callback, start_callback, stop_ca
         helper.createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
           helper.createAgent(config2.concat(['output://file://main_output.txt?serializer=json_logstash']), function(a2) {
             setTimeout(function() {
-              fs.appendFile('main_input.txt', '234 tgerhe grgh\n', function(err) {
+              fs.appendFile('main_input.txt', '234 tgerhe grgh\néè\nline3\n', function(err) {
                 assert.ifError(err);
                 setTimeout(function() {
                   a1.close(function() {
@@ -49,9 +49,11 @@ function file2x2x2file(config1, config2, clean_callback, start_callback, stop_ca
       fs.unlinkSync('main_output.txt');
 
       var splitted = c.split('\n');
-      assert.equal(splitted.length, 2);
+      assert.equal(splitted.length, 4);
       assert.equal('', splitted[splitted.length - 1]);
       helper.checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'}, true);
+      helper.checkResult(splitted[1], {'path': 'main_input.txt', 'message': 'éè', 'type': 'test', '@version': '1'}, true);
+      helper.checkResult(splitted[2], {'path': 'main_input.txt', 'message': 'line3', 'type': 'test', '@version': '1'}, true);
     }
   };
 }
