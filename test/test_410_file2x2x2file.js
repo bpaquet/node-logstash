@@ -5,7 +5,7 @@ var vows = require('vows-batch-retry'),
     monitor_file = require('lib/monitor_file'),
     redis_driver = require('redis_driver');
 
-function file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback) {
+function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, check) {
   return {
     topic: function() {
       start_callback = start_callback || function(callback) { callback(undefined); };
@@ -51,11 +51,27 @@ function file2x2x2file(config1, config2, clean_callback, start_callback, stop_ca
       var splitted = c.split('\n');
       assert.equal(splitted.length, 4);
       assert.equal('', splitted[splitted.length - 1]);
-      helper.checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'}, true);
-      helper.checkResult(splitted[1], {'path': 'main_input.txt', 'message': 'éè', 'type': 'test', '@version': '1'}, true);
-      helper.checkResult(splitted[2], {'path': 'main_input.txt', 'message': 'line3', 'type': 'test', '@version': '1'}, true);
+
+      check(splitted.slice(0, 3));
     }
   };
+}
+
+function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callback, stop_callback) {
+  return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
+    splitted.sort();
+    helper.checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'}, true);
+    helper.checkResult(splitted[1], {'path': 'main_input.txt', 'message': 'line3', 'type': 'test', '@version': '1'}, true);
+    helper.checkResult(splitted[2], {'path': 'main_input.txt', 'message': 'éè', 'type': 'test', '@version': '1'}, true);
+  });
+}
+
+function file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback) {
+  return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
+    helper.checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'}, true);
+    helper.checkResult(splitted[1], {'path': 'main_input.txt', 'message': 'éè', 'type': 'test', '@version': '1'}, true);
+    helper.checkResult(splitted[2], {'path': 'main_input.txt', 'message': 'line3', 'type': 'test', '@version': '1'}, true);
+  });
 }
 
 vows.describe('Integration file2x2x2file :').addBatchRetry({
@@ -77,15 +93,15 @@ vows.describe('Integration file2x2x2file :').addBatchRetry({
 }, 5, 20000).addBatchRetry({
   'udp transport': file2x2x2file(['output://udp://localhost:17874'], ['input://udp://127.0.0.1:17874']),
 }, 5, 20000).addBatchRetry({
-  'http transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash'], ['input://http://127.0.0.1:17874']),
+  'http transport': file2x2x2fileNotOrdered(['output://http_post://localhost:17874?serializer=json_logstash'], ['input://http://127.0.0.1:17874']),
 }, 5, 20000).addBatchRetry({
-  'https transport': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
+  'https transport': file2x2x2fileNotOrdered(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
 }, 5, 20000).addBatchRetry({
-  'https transport with ca': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
+  'https transport with ca': file2x2x2fileNotOrdered(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
 }, 5, 20000).addBatchRetry({
-  'https transport with ca and client side certificate': file2x2x2file(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt&ssl_requestCert=true&ssl_ca=test/ssl/root-ca.crt&ssl_rejectUnauthorized=true']),
+  'https transport with ca and client side certificate': file2x2x2fileNotOrdered(['output://http_post://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt'], ['input://http://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt&ssl_requestCert=true&ssl_ca=test/ssl/root-ca.crt&ssl_rejectUnauthorized=true']),
 }, 5, 20000).addBatchRetry({
-  'tls': file2x2x2file(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
+  'tls': file2x2x2fileNotOrdered(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
 }, 5, 20000).addBatchRetry({
-  'tls with ca': file2x2x2file(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt&ssl_requestCert=true&ssl_ca=test/ssl/root-ca.crt&ssl_rejectUnauthorized=true']),
+  'tls with ca': file2x2x2fileNotOrdered(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt&ssl_requestCert=true&ssl_ca=test/ssl/root-ca.crt&ssl_rejectUnauthorized=true']),
 }, 5, 20000).export(module);
