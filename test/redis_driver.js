@@ -22,7 +22,7 @@ RedisDriver.prototype.stop = function(callback) {
 			callback();
 		});
 		this.redis.kill('SIGINT');
-		this.redis = undefined;
+		delete this.redis;
 	}
 };
 
