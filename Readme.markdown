@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Add wilcard for input file plugin
 * Add delimiter for file and tcp plugins
 * Auth on redis
 * Improve dns reverse filter
@@ -154,9 +155,18 @@ Supported unserializer for input plugin :
 File
 ---
 
-This plugin monitor log files. It's compatible with logrotate. If a db file is specified, this plugin store where the last line were read when node-logstash stop. This value is used when node-logstash restart to read lines written node-logstash downtime.
+This plugin monitor log files.
 
-Example: ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
+Wildcard (* and ?) can be used.
+
+This plugin is compatible with logrotate.
+
+If a db file is specified on node-logstash command line (``--db_file``), this plugin stores the last line read for each file, to allow restart at the same place, even the monitored file grows when node-logstash were down.
+
+Example:
+* ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
+* ``input://file:///var/log/*.log``, to monitor all log file in ``/var/log``.
+* ``input://file:///var/log/auth%3F.log``, to monitor all files matching ``auth?.log`` in ``/var/log``. ``%3F`` is the encoding of ``?``.
 
 Parameters:
 

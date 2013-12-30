@@ -76,6 +76,16 @@ vows.describe('Monitor ').addBatch({
     assert.equal(m.lines.length, 0);
   }),
 }).addBatch({
+  'Not empty file start, but start_index': create_test(function(m, callback) {
+    fs.writeFileSync(m.file, 'line1\nline2\n');
+    m.monitor.start(callback, 0);
+  }, function(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.equal(m.lines.length, 2);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
+  }),
+}).addBatch({
   'File filled after start': create_test(function(m, callback) {
     fs.writeFileSync(m.file, '');
     m.monitor.start(function(err) {

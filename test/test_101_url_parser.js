@@ -52,6 +52,8 @@ vows.describe('Url parser').addBatch({
   'process url content no host': testProcessUrlContent('?type=t', {host: '', params: {type: 't'}}),
   'process url content no host with others params': testProcessUrlContent('?type=t&z=%20t', {host: '', params: {type: 't', z: ' t'}}),
   'process url content special chars in host': testProcessUrlContent('/tmp/toto%202.txt?type=t', {host: '/tmp/toto 2.txt', params: {type: 't'}}),
+  'process url content wildcard in host': testProcessUrlContent('/tmp/to*to*.txt?type=t', {host: '/tmp/to*to*.txt', params: {type: 't'}}),
+  'process url content question mark in host': testProcessUrlContent('/tmp/to%3Fto%3F.txt?type=t', {host: '/tmp/to?to?.txt', params: {type: 't'}}),
   'process url content with plus': testProcessUrlContent('?type=t+3', {host: '', params: {type: 't+3'}}),
   'extract port number hostonly': testExtractPortNumber('localhost', undefined),
   'extract port number ip': testExtractPortNumber('0.0.0.0:80', {host: '0.0.0.0', port: 80}),
