@@ -513,7 +513,7 @@ vows.describe('Monitor ').addBatch({
   }, function check(m) {
     fs.unlinkSync(m.file);
     fs.unlinkSync(m.file + '.1');
-    assert.greater(m.errors.length, 1);
+    assert.greater(m.errors.length, 0);
     assert.match(m.errors[0].toString(), /EACCES/);
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
     assert.equal(m.closed_counter, 2);
