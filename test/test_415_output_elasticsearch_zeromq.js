@@ -46,7 +46,7 @@ vows.describe('Integration elasticsearch zeromq:').addBatchRetry({
       var l = splitted[0].split('|');
       assert.equal(l.length, 3);
       assert.equal(l[0], 'POST');
-      assert(l[1].match(/\/logstash-20.*\/data/));
+      assert(l[1].match(/\/logstash-20.*\/logs/));
       helper.checkResult(l[2], {message: 'message 42', host: '127.0.0.1', udp_port: 17874, type: 'udp','@version': '1' });
     }
   },

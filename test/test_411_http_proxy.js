@@ -98,7 +98,7 @@ vows.describe('Integration Http proxy :').addBatchRetry({
 }, 5, 20000).addBatchRetry({
   'no proxy elastic search': createHttpTest('elasticsearch://localhost:17875', function(req) {
     assert.equal(req.req.method, 'POST');
-    assert.match(req.req.url, /logstash.*data/);
+    assert.match(req.req.url, /logstash.*logs/);
     assert.equal(req.req.headers['proxy-authorization'], undefined);
   }),
 }, 5, 20000).addBatchRetry({
@@ -111,7 +111,7 @@ vows.describe('Integration Http proxy :').addBatchRetry({
 }, 5, 20000).addBatchRetry({
   'http proxy elastic search': createHttpTest('elasticsearch://toto.com:1234?proxy=http://localhost:17875', function(req) {
     assert.equal(req.req.method, 'POST');
-    assert.match(req.req.url, /http:\/\/toto.com:1234\/logstash.*data/);
+    assert.match(req.req.url, /http:\/\/toto.com:1234\/logstash.*logs/);
     assert.equal(req.req.headers['proxy-authorization'], undefined);
   }),
 }, 5, 20000).addBatchRetry({
