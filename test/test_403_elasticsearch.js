@@ -50,11 +50,11 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
       assert.equal(reqs.length, 2);
 
       assert.equal(reqs[0].req.method, 'POST');
-      assert(reqs[0].req.url.match('^\/logstash-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/logs'), reqs[0].req.url + ' does not match regex');
+      assert.match(reqs[0].req.url, new RegExp('^\/logstash-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/logs'));
       helper.checkResult(reqs[0].body, {'@version': '1', 'message': 'toto', 'host': '127.0.0.1', 'type': 'nginx', 'tcp_port': 17874});
 
       assert.equal(reqs[1].req.method, 'POST');
-      assert(reqs[1].req.url.match('^\/logstash-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/logs'), reqs[1].req.url + ' does not match regex');
+      assert.match(reqs[1].req.url, new RegExp('^\/logstash-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/logs'));
       helper.checkResult(reqs[1].body, {'@version': '1', 'message': 'titi', 'host': '127.0.0.1', 'tcp_port': 17875});
     }
   },

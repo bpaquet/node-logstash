@@ -32,7 +32,7 @@ function check_error_init(urls, expected_message_pattern, start_callback, stop_c
 
     check: function(error, message) {
       assert.ifError(error);
-      assert.ok(message.match(expected_message_pattern), 'Message does not match pattern : ' + expected_message_pattern + ' : ' + message);
+      assert.match(message, new RegExp(expected_message_pattern));
     }
   };
 }

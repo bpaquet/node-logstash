@@ -217,7 +217,7 @@ vows.describe('Monitor ').addBatch({
 }, 5, 10000).addBatch({
   'Wrong file path': create_test(function(m, callback) {
     m.monitor.start(function(err) {
-      assert.ok(err);
+      assert.isDefined(err);
       callback();
     });
   }, function check(m) {

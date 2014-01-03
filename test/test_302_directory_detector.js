@@ -51,8 +51,8 @@ function create_test_init_failed(directory, pattern) {
       var callback = this.callback;
       var detector = new directory_detector.DirectoryDetector();
       detector.start(directory, function(err) {
-        assert.ok(err);
-        assert.ok(err.toString().match(pattern));
+        assert.isDefined(err);
+        assert.match(err.toString(), new RegExp(pattern));
         callback(null);
       });
     },

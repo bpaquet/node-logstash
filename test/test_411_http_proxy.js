@@ -142,26 +142,26 @@ vows.describe('Integration Http proxy :').addBatchRetry({
   }),
 }, 5, 20000).addBatchRetry({
   'http ntlm no hostname': createHttpTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://ntlm:mydomain::a:bc@localhost:17875', undefined, function(err, req) {
-    assert(err.toString().match(/did not receive NTLM type 2 message/));
+    assert.match(err.toString(), /did not receive NTLM type 2 message/);
     assert.equal(req.req.method, 'GET');
     assert.equal(req.req.url, 'http://toto.com:1234/pouet');
     var auth = req.req.headers['proxy-authorization'];
+    assert.match(auth, /^NTLM (.*)/);
     var res = auth.match(/^NTLM (.*)/);
-    assert(res);
     var body = (new Buffer(res[1], 'base64')).toString();
     var l = (os.hostname() + 'mydomain').toUpperCase();
-    assert(body.match(l + '$'));
+    assert.match(body, new RegExp(l + '$'));
   }),
 }, 5, 20000).addBatchRetry({
   'http ntlm with workstation': createHttpTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://ntlm:mydomain:titi:a:bc@localhost:17875', undefined, function(err, req) {
-    assert(err.toString().match(/did not receive NTLM type 2 message/));
+    assert.match(err.toString(), /did not receive NTLM type 2 message/);
     assert.equal(req.req.method, 'GET');
     assert.equal(req.req.url, 'http://toto.com:1234/pouet');
     var auth = req.req.headers['proxy-authorization'];
+    assert.match(auth, /^NTLM (.*)/);
     var res = auth.match(/^NTLM (.*)/);
-    assert(res);
     var body = (new Buffer(res[1], 'base64')).toString();
     var l = ('titi' + 'mydomain').toUpperCase();
-    assert(body.match(l + '$'));
+    assert.match(body, new RegExp(l + '$'));
   }),
 }, 5, 20000).export(module);

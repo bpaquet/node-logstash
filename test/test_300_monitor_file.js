@@ -416,7 +416,7 @@ vows.describe('Monitor ').addBatch({
 }, 5, 10000).addBatch({
   'Wrong file path': create_test(function(m, callback) {
     m.monitor.start(function(err) {
-      assert.ok(err);
+      assert.isDefined(err);
       callback();
     });
   }, function check(m) {
@@ -513,8 +513,8 @@ vows.describe('Monitor ').addBatch({
   }, function check(m) {
     fs.unlinkSync(m.file);
     fs.unlinkSync(m.file + '.1');
-    assert(m.errors.length >= 1);
-    assert(m.errors[0].toString().match(/EACCES/), m.errors[0].toString() + ' should contain EACCESS');
+    assert.greater(m.errors.length, 1);
+    assert.match(m.errors[0].toString(), /EACCES/);
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
     assert.equal(m.closed_counter, 2);
   }, undefined, {wait_delay_after_renaming: 500}),

@@ -154,7 +154,7 @@ vows.describe('Integration zeromq:').addBatchRetry({
       assert.equal(splitted_1.length, 1000 + 1);
 
       var splitted_2 = c2.split('\n');
-      assert.ok(splitted_2.length < 1000);
+      assert.lesser(splitted_2.length, 1000);
     }
   },
 }, 5, 20000).export(module);

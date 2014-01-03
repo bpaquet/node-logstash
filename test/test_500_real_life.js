@@ -240,8 +240,8 @@ vows.describe('Real life :').addBatchRetry({
     fs.unlinkSync('output.txt');
     fs.unlinkSync('output.txt.1');
     assert.equal(exitCode, 1);
-    assert(o1.length > 0);
-    assert(o2.length > 0);
+    assert.greater(o1.length, 0);
+    assert.greater(o2.length, 0);
     assert.equal(output.length, 500);
     var i = 500;
     output.forEach(function(k) {
