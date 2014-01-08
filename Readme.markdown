@@ -209,6 +209,7 @@ Parameters:
 * ``channel``: Redis channel to subscribe/psubscribe to
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
 * ``pattern_channel``: use channel as pattern. Default value : false
+* ``blpop``: use blpop to retrieve message instead of PUBSUB. Default value : false
 * ``unserializer``: please see above. Default value to ``json_logstash``.
 
 HTTP
@@ -396,6 +397,7 @@ Parameters:
 * ``channel``: Redis channel to subscribe/psubscribe to
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
 * ``pattern_channel``: use channel as pattern. Default value : false
+* ``rpush``: use rpush to send message instead of PUBSUB. Default value : false
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
 
