@@ -32,7 +32,7 @@ function file100(config) {
               });
             }, timer);
           });
-        }, 200);
+        }, 500);
       });
     },
 
