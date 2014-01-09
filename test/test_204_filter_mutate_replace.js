@@ -18,23 +18,21 @@ vows.describe('Filter replace ').addBatch({
   }], [{
     'toto': 'my-domain-com'
   }]),
-  'type_filtering': filter_helper.create(
-    'mutate_replace',
-    'toto?only_type=titi&from=\\.&to=-', [
-      {
-        'type': 'titi',
-        'toto': 'my.domain.com'
-      },
-      {
-        'toto': 'my.domain2.com'
-      }
+  'type_filtering': filter_helper.create('mutate_replace', 'toto?only_type=titi&from=\\.&to=-', [
+    {
+      'type': 'titi',
+      'toto': 'my.domain.com'
+    },
+    {
+      'toto': 'my.domain2.com'
+    }
   ], [
-      {
-        'type': 'titi',
-        'toto': 'my-domain-com'
-      },
-      {
-        'toto': 'my.domain2.com'
-      }
+    {
+      'type': 'titi',
+      'toto': 'my-domain-com'
+    },
+    {
+      'toto': 'my.domain2.com'
+    }
   ]),
 }).export(module);

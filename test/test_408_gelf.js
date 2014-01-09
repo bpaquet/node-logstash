@@ -62,7 +62,7 @@ vows.describe('Integration gelf :').addBatchRetry({
           _a: 'b',
           _path: 'input1.txt',
           _type: 'toto',
-      },
+        },
         {
           version: '1.0',
           short_message: '[31/Jul/2012:20:02:28 +0200] line2',
@@ -71,7 +71,8 @@ vows.describe('Integration gelf :').addBatchRetry({
           facility: 'no_facility',
           level: '6',
           _path: 'input2.txt',
-      }].sort());
+        }
+      ].sort());
     }
   },
 }, 5, 20000).export(module);
