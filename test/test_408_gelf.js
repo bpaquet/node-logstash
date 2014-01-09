@@ -1,11 +1,11 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    os = require('os'),
-    zlib = require('zlib'),
-    dgram = require('dgram'),
-    assert = require('assert'),
-    helper = require('./integration_helper.js'),
-    monitor_file = require('lib/monitor_file');
+  fs = require('fs'),
+  os = require('os'),
+  zlib = require('zlib'),
+  dgram = require('dgram'),
+  assert = require('assert'),
+  helper = require('./integration_helper.js'),
+  monitor_file = require('lib/monitor_file');
 
 vows.describe('Integration gelf :').addBatchRetry({
   'file2gelf': {
@@ -53,24 +53,24 @@ vows.describe('Integration gelf :').addBatchRetry({
       fs.unlinkSync('input2.txt');
       assert.ifError(err);
       assert.deepEqual(data.sort(), [{
-        version: '1.0',
-        short_message: '[31/Jul/2012:18:02:28 +0200] line1',
-        timestamp: (new Date('2012-07-31T16:02:28+00:00')).getTime() / 1000,
-        host: os.hostname(),
-        facility: 'toto',
-        level: '6',
-        _a: 'b',
-        _path: 'input1.txt',
-        _type: 'toto',
+          version: '1.0',
+          short_message: '[31/Jul/2012:18:02:28 +0200] line1',
+          timestamp: (new Date('2012-07-31T16:02:28+00:00')).getTime() / 1000,
+          host: os.hostname(),
+          facility: 'toto',
+          level: '6',
+          _a: 'b',
+          _path: 'input1.txt',
+          _type: 'toto',
       },
-      {
-        version: '1.0',
-        short_message: '[31/Jul/2012:20:02:28 +0200] line2',
-        timestamp: (new Date('2012-07-31T18:02:28+00:00')).getTime() / 1000,
-        host: os.hostname(),
-        facility: 'no_facility',
-        level: '6',
-        _path: 'input2.txt',
+        {
+          version: '1.0',
+          short_message: '[31/Jul/2012:20:02:28 +0200] line2',
+          timestamp: (new Date('2012-07-31T18:02:28+00:00')).getTime() / 1000,
+          host: os.hostname(),
+          facility: 'no_facility',
+          level: '6',
+          _path: 'input2.txt',
       }].sort());
     }
   },

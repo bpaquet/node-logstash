@@ -1,13 +1,17 @@
 var agent = require('agent'),
-    vows = require('vows-batch-retry'),
-    redis_driver = require('redis_driver'),
-    assert = require('assert');
+  vows = require('vows-batch-retry'),
+  redis_driver = require('redis_driver'),
+  assert = require('assert');
 
 function check_error_init(urls, expected_message_pattern, start_callback, stop_callback) {
   return {
     topic: function() {
-      start_callback = start_callback || function(callback) { callback(undefined); };
-      stop_callback = stop_callback || function(o, callback) { callback(); };
+      start_callback = start_callback || function(callback) {
+        callback(undefined);
+      };
+      stop_callback = stop_callback || function(o, callback) {
+        callback();
+      };
       var callback = this.callback;
       start_callback(function(o) {
         var a = agent.create();
@@ -89,7 +93,16 @@ vows.describe('Integration error :').addBatch({
 }).addBatch({
   'http unable to open port (used)': check_error_init([
     'input://http://localhost:17874'
-  ], 'listen EADDRINUSE', function(callback) { var r = new redis_driver.RedisDriver(); r.start({port: 17874}, function() {callback(r);}); }, function(r, callback) { r.stop(callback); }),
+  ], 'listen EADDRINUSE', function(callback) {
+    var r = new redis_driver.RedisDriver();
+    r.start({
+      port: 17874
+    }, function() {
+      callback(r);
+    });
+  }, function(r, callback) {
+    r.stop(callback);
+  }),
 }).addBatch({
   'tcp unable to open port (access)': check_error_init([
     'input://tcp://localhost:80'
@@ -97,7 +110,16 @@ vows.describe('Integration error :').addBatch({
 }).addBatch({
   'tcp unable to open port (used)': check_error_init([
     'input://tcp://localhost:17874'
-  ], 'listen EADDRINUSE', function(callback) { var r = new redis_driver.RedisDriver(); r.start({port: 17874}, function() {callback(r);}); }, function(r, callback) { r.stop(callback); }),
+  ], 'listen EADDRINUSE', function(callback) {
+    var r = new redis_driver.RedisDriver();
+    r.start({
+      port: 17874
+    }, function() {
+      callback(r);
+    });
+  }, function(r, callback) {
+    r.stop(callback);
+  }),
 }).addBatch({
   'udp unable to open port (access)': check_error_init([
     'input://udp://localhost:123'

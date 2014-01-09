@@ -1,10 +1,10 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    os = require('os'),
-    net = require('net'),
-    assert = require('assert'),
-    helper = require('./integration_helper.js'),
-    monitor_file = require('lib/monitor_file');
+  fs = require('fs'),
+  os = require('os'),
+  net = require('net'),
+  assert = require('assert'),
+  helper = require('./integration_helper.js'),
+  monitor_file = require('lib/monitor_file');
 
 vows.describe('Integration log io :').addBatchRetry({
   'logio': {

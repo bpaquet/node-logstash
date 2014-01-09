@@ -1,6 +1,6 @@
 var agent = require('agent'),
-    os = require('os'),
-    assert = require('assert');
+  os = require('os'),
+  assert = require('assert');
 
 function createAgent(urls, callback, error_callback) {
   var a = agent.create();

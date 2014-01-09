@@ -1,7 +1,7 @@
 /* jshint unused:false */
 var vows = require('vows'),
-    assert = require('assert'),
-    file_loader = require('lib/file_loader');
+  assert = require('assert'),
+  file_loader = require('lib/file_loader');
 
 vows.describe('File loader').addBatch({
   'simple': {

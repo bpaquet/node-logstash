@@ -1,9 +1,9 @@
 var vows = require('vows-batch-retry'),
-    assert = require('assert'),
-    fs = require('fs'),
-    path = require('path'),
-    spawn = require('child_process').spawn,
-    directory_detector = require('lib/directory_detector');
+  assert = require('assert'),
+  fs = require('fs'),
+  path = require('path'),
+  spawn = require('child_process').spawn,
+  directory_detector = require('lib/directory_detector');
 
 function TestDirectoryDetector(directory, callback) {
   this.exists = 0;

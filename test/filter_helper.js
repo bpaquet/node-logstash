@@ -43,7 +43,6 @@ function createWithCallback(filter_name, filter_config, inputs, number_of_events
   return test;
 }
 
-
 function create(filter_name, filter_config, inputs, outputs, check_callback, init_callback, end_callback) {
   return createWithCallback(filter_name, filter_config, inputs, outputs.length, function(r) {
     assert.deepEqual(r, outputs);
@@ -54,6 +53,5 @@ function create(filter_name, filter_config, inputs, outputs, check_callback, ini
 }
 
 exports.create = create;
-
 
 exports.createWithCallback = createWithCallback;

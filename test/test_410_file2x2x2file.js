@@ -1,15 +1,19 @@
 var vows = require('vows-batch-retry'),
-    assert = require('assert'),
-    fs = require('fs'),
-    helper = require('./integration_helper.js'),
-    monitor_file = require('lib/monitor_file'),
-    redis_driver = require('redis_driver');
+  assert = require('assert'),
+  fs = require('fs'),
+  helper = require('./integration_helper.js'),
+  monitor_file = require('lib/monitor_file'),
+  redis_driver = require('redis_driver');
 
 function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, check) {
   return {
     topic: function() {
-      start_callback = start_callback || function(callback) { callback(undefined); };
-      stop_callback = stop_callback || function(o, callback) { callback(); };
+      start_callback = start_callback || function(callback) {
+        callback(undefined);
+      };
+      stop_callback = stop_callback || function(o, callback) {
+        callback();
+      };
       if (clean_callback) {
         clean_callback();
       }
@@ -60,28 +64,90 @@ function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_c
 function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callback, stop_callback) {
   return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
     splitted.sort();
-    helper.checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'}, true);
-    helper.checkResult(splitted[1], {'path': 'main_input.txt', 'message': 'line3', 'type': 'test', '@version': '1'}, true);
-    helper.checkResult(splitted[2], {'path': 'main_input.txt', 'message': 'éè', 'type': 'test', '@version': '1'}, true);
+    helper.checkResult(splitted[0], {
+      'path': 'main_input.txt',
+      'message': '234 tgerhe grgh',
+      'type': 'test',
+      '@version': '1'
+    }, true);
+    helper.checkResult(splitted[1], {
+      'path': 'main_input.txt',
+      'message': 'line3',
+      'type': 'test',
+      '@version': '1'
+    }, true);
+    helper.checkResult(splitted[2], {
+      'path': 'main_input.txt',
+      'message': 'éè',
+      'type': 'test',
+      '@version': '1'
+    }, true);
   });
 }
 
 function file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback) {
   return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
-    helper.checkResult(splitted[0], {'path': 'main_input.txt', 'message': '234 tgerhe grgh', 'type': 'test', '@version': '1'}, true);
-    helper.checkResult(splitted[1], {'path': 'main_input.txt', 'message': 'éè', 'type': 'test', '@version': '1'}, true);
-    helper.checkResult(splitted[2], {'path': 'main_input.txt', 'message': 'line3', 'type': 'test', '@version': '1'}, true);
+    helper.checkResult(splitted[0], {
+      'path': 'main_input.txt',
+      'message': '234 tgerhe grgh',
+      'type': 'test',
+      '@version': '1'
+    }, true);
+    helper.checkResult(splitted[1], {
+      'path': 'main_input.txt',
+      'message': 'éè',
+      'type': 'test',
+      '@version': '1'
+    }, true);
+    helper.checkResult(splitted[2], {
+      'path': 'main_input.txt',
+      'message': 'line3',
+      'type': 'test',
+      '@version': '1'
+    }, true);
   });
 }
 
 vows.describe('Integration file2x2x2file :').addBatchRetry({
-  'redis channel transport': file2x2x2file(['output://redis://localhost:17874?channel=toto'], ['input://redis://localhost:17874?channel=toto'], undefined, function(callback) { var r = new redis_driver.RedisDriver(); r.start({port: 17874}, function() {callback(r);}); }, function(r, callback) { r.stop(callback); }),
+  'redis channel transport': file2x2x2file(['output://redis://localhost:17874?channel=toto'], ['input://redis://localhost:17874?channel=toto'], undefined, function(callback) {
+    var r = new redis_driver.RedisDriver();
+    r.start({
+      port: 17874
+    }, function() {
+      callback(r);
+    });
+  }, function(r, callback) {
+    r.stop(callback);
+  }),
 }, 5, 20000).addBatchRetry({
-  'redis channel transport with auth': file2x2x2file(['output://redis://localhost:17874?channel=toto&auth_pass=pass_toto'], ['input://redis://localhost:17874?channel=toto&auth_pass=pass_toto'], undefined, function(callback) { var r = new redis_driver.RedisDriver(); r.start({port: 17874, requirepass: 'pass_toto'}, function() {callback(r);}); }, function(r, callback) { r.stop(callback); }),
+  'redis channel transport with auth': file2x2x2file(['output://redis://localhost:17874?channel=toto&auth_pass=pass_toto'], ['input://redis://localhost:17874?channel=toto&auth_pass=pass_toto'], undefined, function(callback) {
+    var r = new redis_driver.RedisDriver();
+    r.start({
+      port: 17874,
+      requirepass: 'pass_toto'
+    }, function() {
+      callback(r);
+    });
+  }, function(r, callback) {
+    r.stop(callback);
+  }),
 }, 5, 20000).addBatchRetry({
-  'redis pattern channel transport': file2x2x2file(['output://redis://localhost:17874?channel=pouet_toto'], ['input://redis://localhost:17874?channel=*toto&pattern_channel=true'], undefined, function(callback) { var r = new redis_driver.RedisDriver(); r.start({port: 17874}, function() {callback(r);}); }, function(r, callback) { r.stop(callback); }),
+  'redis pattern channel transport': file2x2x2file(['output://redis://localhost:17874?channel=pouet_toto'], ['input://redis://localhost:17874?channel=*toto&pattern_channel=true'], undefined, function(callback) {
+    var r = new redis_driver.RedisDriver();
+    r.start({
+      port: 17874
+    }, function() {
+      callback(r);
+    });
+  }, function(r, callback) {
+    r.stop(callback);
+  }),
 }, 5, 20000).addBatchRetry({
-  'file transport': file2x2x2file(['output://file://main_middle.txt?serializer=json_logstash'], ['input://file://main_middle.txt'], function() { if (fs.existsSync('main_middle.txt')) { fs.unlinkSync('main_middle.txt'); }}),
+  'file transport': file2x2x2file(['output://file://main_middle.txt?serializer=json_logstash'], ['input://file://main_middle.txt'], function() {
+    if (fs.existsSync('main_middle.txt')) {
+      fs.unlinkSync('main_middle.txt');
+    }
+  }),
 }, 5, 20000).addBatchRetry({
   'tcp transport': file2x2x2file(['output://tcp://localhost:17874'], ['input://tcp://0.0.0.0:17874']),
 }, 5, 20000).addBatchRetry({

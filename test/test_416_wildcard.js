@@ -1,8 +1,8 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    assert = require('assert'),
-    helper = require('./integration_helper.js'),
-    monitor_file = require('lib/monitor_file');
+  fs = require('fs'),
+  assert = require('assert'),
+  helper = require('./integration_helper.js'),
+  monitor_file = require('lib/monitor_file');
 
 function file100(config) {
   // tail forking under node 0.8 is very very slow
@@ -40,7 +40,7 @@ function file100(config) {
       assert.ifError(err);
       var c = fs.readFileSync('output.txt').toString();
       fs.unlinkSync('output.txt');
-      for(var i = 0; i < 110; i ++) {
+      for (var i = 0; i < 110; i++) {
         fs.unlinkSync('input' + i + '.txt');
       }
 
@@ -50,8 +50,12 @@ function file100(config) {
       if (process.versions.node.split('.')[1] < 10) {
         splitted = splitted.slice(0, 90).sort();
       }
-      for(var k = 10; k < 100; k ++) {
-        helper.checkResult(splitted[k - 10], {'@version': '1', 'path': 'input' + k + '.txt', 'message': 'line' + k}, true);
+      for (var k = 10; k < 100; k++) {
+        helper.checkResult(splitted[k - 10], {
+          '@version': '1',
+          'path': 'input' + k + '.txt',
+          'message': 'line' + k
+        }, true);
       }
     }
   };
@@ -103,8 +107,16 @@ vows.describe('Integration file wildcard :').addBatchRetry({
       var splitted = c.split('\n');
       assert.equal(splitted.length, 3);
       assert.equal('', splitted[splitted.length - 1]);
-      helper.checkResult(splitted[0], {'@version': '1', 'path': 'input01.txt', 'message': 'tata'}, true);
-      helper.checkResult(splitted[1], {'@version': '1', 'path': 'input01.txt', 'message': 'titi'}, true);
+      helper.checkResult(splitted[0], {
+        '@version': '1',
+        'path': 'input01.txt',
+        'message': 'tata'
+      }, true);
+      helper.checkResult(splitted[1], {
+        '@version': '1',
+        'path': 'input01.txt',
+        'message': 'titi'
+      }, true);
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -149,7 +161,11 @@ vows.describe('Integration file wildcard :').addBatchRetry({
       var splitted = c.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal('', splitted[splitted.length - 1]);
-      helper.checkResult(splitted[0], {'@version': '1', 'path': 'input01.txt', 'message': 'tata'}, true);
+      helper.checkResult(splitted[0], {
+        '@version': '1',
+        'path': 'input01.txt',
+        'message': 'tata'
+      }, true);
     }
   }
 }, 5, 20000).export(module);

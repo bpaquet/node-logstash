@@ -1,11 +1,11 @@
 var vows = require('vows-batch-retry'),
-    assert = require('assert'),
-    os = require('os'),
-    fs = require('fs'),
-    path = require('path'),
-    child_process = require('child_process'),
-    log = require('log4node'),
-    monitor_file = require('lib/monitor_file');
+  assert = require('assert'),
+  os = require('os'),
+  fs = require('fs'),
+  path = require('path'),
+  child_process = require('child_process'),
+  log = require('log4node'),
+  monitor_file = require('lib/monitor_file');
 
 function randomFile(pathname) {
   return path.join(pathname || os.tmpDir(), '___node-logstash_test___' + Math.random());
@@ -27,13 +27,13 @@ function TestMonitor(file, options) {
     this.errors.push(err);
   }.bind(this));
   this.monitor.on('renamed', function() {
-    this.renamed_counter ++;
+    this.renamed_counter++;
   }.bind(this));
   this.monitor.on('changed', function() {
-    this.changed_counter ++;
+    this.changed_counter++;
   }.bind(this));
   this.monitor.on('closed', function() {
-    this.closed_counter ++;
+    this.closed_counter++;
   }.bind(this));
 }
 
@@ -267,7 +267,9 @@ vows.describe('Monitor ').addBatch({
   }, function check(m) {
     no_error(m);
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3']);
-  }, undefined, {wait_delay_after_renaming: 100}),
+  }, undefined, {
+    wait_delay_after_renaming: 100
+  }),
 }).addBatch({
   'File renamed, same name': create_test(function(m, callback) {
     fs.writeFileSync(m.file, 'line1\nline2\n');
@@ -370,7 +372,9 @@ vows.describe('Monitor ').addBatch({
     else {
       assert.deepEqual(m.lines, ['C)', 'line2']);
     }
-  }, undefined, {buffer_encoding: 'ascii'}),
+  }, undefined, {
+    buffer_encoding: 'ascii'
+  }),
 }).addBatchRetry({
   'Double monitoring same directory': {
     topic: function() {
@@ -447,7 +451,9 @@ vows.describe('Monitor ').addBatch({
     no_error(m);
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
     assert.equal(m.closed_counter, 2);
-  }, undefined, {wait_delay_after_renaming: 1}),
+  }, undefined, {
+    wait_delay_after_renaming: 1
+  }),
 }, 5, 10000).addBatchRetry({
   'Complex logrotate simulation': create_test(function(m, callback) {
     m.monitor.start(function(err) {
@@ -479,7 +485,9 @@ vows.describe('Monitor ').addBatch({
     no_error(m);
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4', 'line5', 'line6']);
     assert.equal(m.closed_counter, 2);
-  }, undefined, {wait_delay_after_renaming: 500}),
+  }, undefined, {
+    wait_delay_after_renaming: 500
+  }),
 }, 5, 10000).addBatchRetry({
   'Complex logrotate simulation with permission pb': create_test(function(m, callback) {
     m.monitor.start(function(err) {
@@ -517,7 +525,9 @@ vows.describe('Monitor ').addBatch({
     assert.match(m.errors[0].toString(), /EACCES/);
     assert.deepEqual(m.lines, ['line1', 'line2', 'line3', 'line4']);
     assert.equal(m.closed_counter, 2);
-  }, undefined, {wait_delay_after_renaming: 500}),
+  }, undefined, {
+    wait_delay_after_renaming: 500
+  }),
 }, 5, 10000).addBatchRetry({
   'Monitor restart': {
     topic: function() {

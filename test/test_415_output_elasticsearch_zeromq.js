@@ -1,9 +1,9 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    dgram = require('dgram'),
-    assert = require('assert'),
-    monitor_file = require('lib/monitor_file'),
-    helper = require('./integration_helper.js');
+  fs = require('fs'),
+  dgram = require('dgram'),
+  assert = require('assert'),
+  monitor_file = require('lib/monitor_file'),
+  helper = require('./integration_helper.js');
 
 vows.describe('Integration elasticsearch zeromq:').addBatchRetry({
   'elasticsearch test': {
@@ -47,7 +47,13 @@ vows.describe('Integration elasticsearch zeromq:').addBatchRetry({
       assert.equal(l.length, 3);
       assert.equal(l[0], 'POST');
       assert.match(l[1], /\/logstash-20.*\/logs/);
-      helper.checkResult(l[2], {message: 'message 42', host: '127.0.0.1', udp_port: 17874, type: 'udp','@version': '1' });
+      helper.checkResult(l[2], {
+        message: 'message 42',
+        host: '127.0.0.1',
+        udp_port: 17874,
+        type: 'udp',
+        '@version': '1'
+      });
     }
   },
 }, 5, 20000).addBatchRetry({

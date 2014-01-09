@@ -1,9 +1,9 @@
 var vows = require('vows-batch-retry'),
-    http = require('http'),
-    net = require('net'),
-    os = require('os'),
-    assert = require('assert'),
-    helper = require('./integration_helper.js');
+  http = require('http'),
+  net = require('net'),
+  os = require('os'),
+  assert = require('assert'),
+  helper = require('./integration_helper.js');
 
 function createHttpTest(config, check_callback, full_check_callback) {
   return {
@@ -20,18 +20,25 @@ function createHttpTest(config, check_callback, full_check_callback) {
             body += chunk;
           });
           req.on('end', function() {
-            res.writeHead(204, {'Connection': 'close'});
+            res.writeHead(204, {
+              'Connection': 'close'
+            });
             res.end();
             agent.close(function() {
               http_server.close(function() {
                 setTimeout(function() {
-                  callback(error, {req: req, body: body});
+                  callback(error, {
+                    req: req,
+                    body: body
+                  });
                 }, 100);
               });
             });
           });
         }).listen(17875);
-        var c1 = net.createConnection({port: 17874}, function() {
+        var c1 = net.createConnection({
+          port: 17874
+        }, function() {
           c1.write('toto');
           c1.end();
         });
@@ -68,11 +75,15 @@ function createConnectTest(config, check_callback) {
           socket.destroy();
           agent.close(function() {
             http_server.close(function() {
-              callback(null, {req: req});
+              callback(null, {
+                req: req
+              });
             });
           });
         });
-        var c1 = net.createConnection({port: 17874}, function() {
+        var c1 = net.createConnection({
+          port: 17874
+        }, function() {
           c1.write('toto');
           c1.end();
         });

@@ -1,9 +1,9 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    dgram = require('dgram'),
-    assert = require('assert'),
-    helper = require('./integration_helper.js'),
-    monitor_file = require('lib/monitor_file');
+  fs = require('fs'),
+  dgram = require('dgram'),
+  assert = require('assert'),
+  helper = require('./integration_helper.js'),
+  monitor_file = require('lib/monitor_file');
 
 vows.describe('Integration statsd :').addBatchRetry({
   'file2statsd': {

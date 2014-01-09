@@ -1,8 +1,8 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    net = require('net'),
-    assert = require('assert'),
-    helper = require('./integration_helper.js');
+  fs = require('fs'),
+  net = require('net'),
+  assert = require('assert'),
+  helper = require('./integration_helper.js');
 
 vows.describe('Integration tls appendpeercert:').addBatchRetry({
   'tls info': {
@@ -16,7 +16,9 @@ vows.describe('Integration tls appendpeercert:').addBatchRetry({
           'input://tcp://localhost:17873',
           'output://tcp://localhost:17874?serializer=raw&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt',
         ], function(agent2) {
-          var c = net.createConnection({port: 17873}, function() {
+          var c = net.createConnection({
+            port: 17873
+          }, function() {
             c.write('toto');
             c.end();
           });
@@ -61,7 +63,13 @@ vows.describe('Integration tls appendpeercert:').addBatchRetry({
           fingerprint: '9D:39:A4:D8:B3:02:0E:4E:F5:42:1B:63:D9:86:E3:45:3E:51:A1:84'
         },
       };
-      helper.checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'tcp_port': 17874, 'message': 'toto', 'tls': client_tls_info});
+      helper.checkResult(splitted[0], {
+        '@version': '1',
+        'host': '127.0.0.1',
+        'tcp_port': 17874,
+        'message': 'toto',
+        'tls': client_tls_info
+      });
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -76,7 +84,9 @@ vows.describe('Integration tls appendpeercert:').addBatchRetry({
           'input://tcp://localhost:17873',
           'output://tcp://localhost:17874?serializer=raw&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt',
         ], function(agent2) {
-          var c = net.createConnection({port: 17873}, function() {
+          var c = net.createConnection({
+            port: 17873
+          }, function() {
             c.write('toto');
             c.end();
           });
@@ -101,7 +111,12 @@ vows.describe('Integration tls appendpeercert:').addBatchRetry({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal('', splitted[splitted.length - 1]);
-      helper.checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'tcp_port': 17874, 'message': 'toto'});
+      helper.checkResult(splitted[0], {
+        '@version': '1',
+        'host': '127.0.0.1',
+        'tcp_port': 17874,
+        'message': 'toto'
+      });
     }
   },
 }, 5, 20000).export(module);

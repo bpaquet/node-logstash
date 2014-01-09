@@ -1,9 +1,9 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    dgram = require('dgram'),
-    assert = require('assert'),
-    monitor_file = require('lib/monitor_file'),
-    helper = require('./integration_helper.js');
+  fs = require('fs'),
+  dgram = require('dgram'),
+  assert = require('assert'),
+  monitor_file = require('lib/monitor_file'),
+  helper = require('./integration_helper.js');
 
 function loop(x, socket, callback) {
   if (x === 0) {

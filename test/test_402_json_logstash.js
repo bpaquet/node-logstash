@@ -1,9 +1,9 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    dgram = require('dgram'),
-    assert = require('assert'),
-    helper = require('./integration_helper.js'),
-    monitor_file = require('lib/monitor_file');
+  fs = require('fs'),
+  dgram = require('dgram'),
+  assert = require('assert'),
+  helper = require('./integration_helper.js'),
+  monitor_file = require('lib/monitor_file');
 
 vows.describe('Integration Json logstash event :').addBatchRetry({
   'json_logstash_event': {
@@ -48,9 +48,27 @@ vows.describe('Integration Json logstash event :').addBatchRetry({
       var splitted = c.split('\n');
       assert.equal(splitted.length, 4);
       assert.equal('', splitted[splitted.length - 1]);
-      helper.checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 17854, 'message': 'toto'});
-      helper.checkResult(splitted[1], {'@version': '1', 'host': '127.0.0.1', 'udp_port': 17854, 'message': '{"tata":"toto","type":"titi","message":"oups"}'});
-      helper.checkResult(splitted[2], {'@version': '1', 'host': 'toto', 'source': 'test42', 'type': 'pouet', 'tata': 'toto', 'message': 'titi', '@timestamp': 'abc'}, undefined, true);
+      helper.checkResult(splitted[0], {
+        '@version': '1',
+        'host': '127.0.0.1',
+        'udp_port': 17854,
+        'message': 'toto'
+      });
+      helper.checkResult(splitted[1], {
+        '@version': '1',
+        'host': '127.0.0.1',
+        'udp_port': 17854,
+        'message': '{"tata":"toto","type":"titi","message":"oups"}'
+      });
+      helper.checkResult(splitted[2], {
+        '@version': '1',
+        'host': 'toto',
+        'source': 'test42',
+        'type': 'pouet',
+        'tata': 'toto',
+        'message': 'titi',
+        '@timestamp': 'abc'
+      }, undefined, true);
     }
   },
 }, 5, 20000).export(module);

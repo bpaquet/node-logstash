@@ -1,10 +1,10 @@
 var vows = require('vows-batch-retry'),
-    assert = require('assert'),
-    os = require('os'),
-    fs = require('fs'),
-    path = require('path'),
-    log = require('log4node'),
-    tail = require('lib/tail_file');
+  assert = require('assert'),
+  os = require('os'),
+  fs = require('fs'),
+  path = require('path'),
+  log = require('log4node'),
+  tail = require('lib/tail_file');
 
 function randomFile(pathname) {
   return path.join(pathname || os.tmpDir(), '___node-logstash_test___' + Math.random());
@@ -175,7 +175,9 @@ vows.describe('Monitor ').addBatch({
   }, function check(m) {
     no_error(m);
     assert.deepEqual(m.lines, ['line1', 'line2']);
-  }, undefined, {wait_delay_after_renaming: 100}),
+  }, undefined, {
+    wait_delay_after_renaming: 100
+  }),
 }).addBatchRetry({
   'Double monitoring same directory': {
     topic: function() {

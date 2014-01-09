@@ -19,6 +19,7 @@
   "devDependencies": {
     "vows": "0.7.0",
     "vows-batch-retry": "0.0.4",
+    "js-beautify": "1.4.x",
     "whereis": "0.0.2",
     "jshint": "2.x",
     "istanbul": "0.1.x"

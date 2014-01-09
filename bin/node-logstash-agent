@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 var optimist = require('optimist'),
-    fs = require('fs'),
-    path = require('path'),
-    http = require('http'),
-    https = require('https'),
-    logger = require('log4node'),
-    agent = require('../lib/agent'),
-    monitor_file = require('../lib/lib/monitor_file'),
-    file_loader = require('../lib/lib/file_loader'),
-    patterns_loader = require('../lib/lib/patterns_loader');
+  fs = require('fs'),
+  path = require('path'),
+  http = require('http'),
+  https = require('https'),
+  logger = require('log4node'),
+  agent = require('../lib/agent'),
+  monitor_file = require('../lib/lib/monitor_file'),
+  file_loader = require('../lib/lib/file_loader'),
+  patterns_loader = require('../lib/lib/patterns_loader');
 
 var argv = optimist.argv;
 
@@ -34,7 +34,7 @@ if (argv.help) {
   process.exit(0);
 }
 
-process.on('uncaughtException', function (err) {
+process.on('uncaughtException', function(err) {
   log_error('Exception has been catch, it\' a bug');
   log_error('Please submit an issue on https://github.com/bpaquet/node-logstash');
   log_error('Exception:', err);
@@ -43,7 +43,10 @@ process.on('uncaughtException', function (err) {
 
 if (argv.log_file) {
   logger.info('Log to file', argv.log_file, ', log_level', argv.log_level);
-  logger.reconfigure({level: argv.log_level, file: argv.log_file});
+  logger.reconfigure({
+    level: argv.log_level,
+    file: argv.log_file
+  });
 }
 else {
   if (argv.log_level) {
