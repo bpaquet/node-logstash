@@ -290,7 +290,7 @@ Supported serializer for output plugin :
 ZeroMQ
 ---
 
-This plugin is used on agents to send logs to logs servers.
+This plugin is used on agents to send logs to logs servers, or to send logs to [Elasticsearch Logstash River](https://github.com/bpaquet/elasticsearch-river-zeromq)
 
 Example: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
 
@@ -313,21 +313,14 @@ Elastic search
 
 This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
 
+Note : for better performance, you can also use the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
+
 Example: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
 
 Parameters:
 
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
-
-
-Elastic search ZeroMQ
----
-
-This plugin is used on log server to send logs to elastic search, using ZeroMQ transport.
-You can find the ZeroMQ transport here: https://github.com/bpaquet/transport-zeromq.
-
-Example: ``output://elasticsearch_zeromq://tcp://localhost:9700`` to send to the zeromq transport of an elastic search server listening on port 9700.
 
 Statsd
 ---
