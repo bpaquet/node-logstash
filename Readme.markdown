@@ -224,6 +224,7 @@ Parameters:
 * ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
 * ``pattern_channel``: use channel as pattern. Default value : false
+* ``method``: ``pubsub`` or ``blpop``. Method to use for redis messaging. Default value: blpop
 * ``unserializer``: please see above. Default value to ``json_logstash``.
 
 HTTP
@@ -290,7 +291,7 @@ Supported serializer for output plugin :
 ZeroMQ
 ---
 
-This plugin is used on agents to send logs to logs servers, or to send logs to [Elasticsearch Logstash River](https://github.com/bpaquet/elasticsearch-river-zeromq)
+This plugin is used on agents to send logs to logs servers, or to send logs to [Elasticsearch Logstash River](https://github.com/bpaquet/elasticsearch-river-zeromq).
 
 Example: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
 
@@ -406,6 +407,7 @@ Parameters:
 * ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
 * ``pattern_channel``: use channel as pattern. Default value : false
+* ``method``: ``pubsub`` or ``blpop``. Method to use for redis messaging. Default value: blpop
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
 
