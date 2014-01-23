@@ -109,7 +109,7 @@ function file2x2x2file(config1, config2, clean_callback, start_callback, stop_ca
 }
 
 vows.describe('Integration file2x2x2file :').addBatchRetry({
-  'redis channel transport': file2x2x2file(['output://redis://localhost:17874?channel=toto&method=pubsub'], ['input://redis://localhost:17874?channel=toto&method=pubsub'], undefined, function(callback) {
+  'redis queue channel transport': file2x2x2file(['output://redis://localhost:17874?channel=toto'], ['input://redis://localhost:17874?channel=toto'], undefined, function(callback) {
     var r = new redis_driver.RedisDriver();
     r.start({
       port: 17874
@@ -120,7 +120,18 @@ vows.describe('Integration file2x2x2file :').addBatchRetry({
     r.stop(callback);
   }),
 }, 5, 20000).addBatchRetry({
-  'redis channel transport with auth': file2x2x2file(['output://redis://localhost:17874?channel=toto&auth_pass=pass_toto&method=pubsub'], ['input://redis://localhost:17874?channel=toto&auth_pass=pass_toto&method=pubsub'], undefined, function(callback) {
+  'redis pubsub channel transport': file2x2x2file(['output://redis://localhost:17874?channel=toto&method=pubsub'], ['input://redis://localhost:17874?channel=toto&method=pubsub'], undefined, function(callback) {
+    var r = new redis_driver.RedisDriver();
+    r.start({
+      port: 17874
+    }, function() {
+      callback(r);
+    });
+  }, function(r, callback) {
+    r.stop(callback);
+  }),
+}, 5, 20000).addBatchRetry({
+  'redis pubsub channel transport with auth': file2x2x2file(['output://redis://localhost:17874?channel=toto&auth_pass=pass_toto&method=pubsub'], ['input://redis://localhost:17874?channel=toto&auth_pass=pass_toto&method=pubsub'], undefined, function(callback) {
     var r = new redis_driver.RedisDriver();
     r.start({
       port: 17874,
@@ -132,7 +143,7 @@ vows.describe('Integration file2x2x2file :').addBatchRetry({
     r.stop(callback);
   }),
 }, 5, 20000).addBatchRetry({
-  'redis pattern channel transport': file2x2x2file(['output://redis://localhost:17874?channel=pouet_toto&method=pubsub'], ['input://redis://localhost:17874?channel=*toto&pattern_channel=true&method=pubsub'], undefined, function(callback) {
+  'redis pubsub pattern channel transport': file2x2x2file(['output://redis://localhost:17874?channel=pouet_toto&method=pubsub'], ['input://redis://localhost:17874?channel=*toto&pattern_channel=true&method=pubsub'], undefined, function(callback) {
     var r = new redis_driver.RedisDriver();
     r.start({
       port: 17874

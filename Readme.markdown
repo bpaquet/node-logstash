@@ -224,7 +224,7 @@ Parameters:
 * ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
 * ``pattern_channel``: use channel as pattern. Default value : false
-* ``method``: ``pubsub`` or ``blpop``. Method to use for redis messaging. Default value: blpop
+* ``method``: ``pubsub`` or ``queue``. Method to use for redis messaging. ``pubsub`` will use ``subscribe``redis commands, ``queue``will use ``blpop`` command. Default value: ``queue``.
 * ``unserializer``: please see above. Default value to ``json_logstash``.
 
 HTTP
@@ -407,7 +407,7 @@ Parameters:
 * ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
 * ``pattern_channel``: use channel as pattern. Default value : false
-* ``method``: ``pubsub`` or ``blpop``. Method to use for redis messaging. Default value: blpop
+* ``method``: ``pubsub`` or ``queue``. Method to use for redis messaging. ``pubsub`` will use ``publish``redis commands, ``queue``will use ``rpush`` command. Default value: ``queue``.
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
 

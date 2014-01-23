@@ -142,7 +142,7 @@ vows.describe('Integration error :').addBatch({
   ], 'Wrong method'),
 }).addBatch({
   'wront redis input config': check_error_init([
-    'input://redis://localhost:6379?method=blpop&pattern_channel=true&channel=titi'
+    'input://redis://localhost:6379?method=queue&pattern_channel=true&channel=titi'
   ], 'Pattern channel have to be used with pubsub method'),
 }).addBatch({
   'wront redis output config': check_error_init([
