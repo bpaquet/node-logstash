@@ -109,7 +109,7 @@ function file2x2x2file(config1, config2, clean_callback, start_callback, stop_ca
 }
 
 vows.describe('Integration file2x2x2file :').addBatchRetry({
-  'redis queue channel transport': file2x2x2file(['output://redis://localhost:17874?channel=toto'], ['input://redis://localhost:17874?channel=toto'], undefined, function(callback) {
+  'redis queue channel transport': file2x2x2file(['output://redis://localhost:17874?key=toto'], ['input://redis://localhost:17874?key=toto'], undefined, function(callback) {
     var r = new redis_driver.RedisDriver();
     r.start({
       port: 17874

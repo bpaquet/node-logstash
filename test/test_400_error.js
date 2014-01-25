@@ -137,16 +137,27 @@ vows.describe('Integration error :').addBatch({
     'output://tcp://localhost:12345?serializer=non_existent'
   ], 'Unknown serializer non_existent'),
 }).addBatch({
-  'wront redis input config': check_error_init([
+  'wrong redis input config': check_error_init([
     'input://redis://localhost:6379?method=toto&channel=titi'
   ], 'Wrong method'),
 }).addBatch({
-  'wront redis input config': check_error_init([
-    'input://redis://localhost:6379?method=queue&pattern_channel=true&channel=titi'
-  ], 'Pattern channel have to be used with pubsub method'),
+  'wrong redis input queue config': check_error_init([
+    'input://redis://localhost:6379?method=queue&channel=titi'
+  ], 'You have to specify the key parameter in queue mode'),
 }).addBatch({
-  'wront redis output config': check_error_init([
+  'wrong redis input pubsub config': check_error_init([
+    'input://redis://localhost:6379?method=pubsub'
+  ], 'You have to specify the channel parameter in pubsub mode'),
+}).addBatch({
+  'wrong redis output config': check_error_init([
     'output://redis://localhost:6379?method=toto&channel=titi'
   ], 'Wrong method'),
-
+}).addBatch({
+  'wrong redis output queue config': check_error_init([
+    'output://redis://localhost:6379?method=queue&channel=titi'
+  ], 'You have to specify the key parameter in queue mode'),
+}).addBatch({
+  'wrong redis output pubsub config': check_error_init([
+    'output://redis://localhost:6379?method=pubsub&key=toto'
+  ], 'You have to specify the channel parameter in pubsub mode'),
 }).export(module);
