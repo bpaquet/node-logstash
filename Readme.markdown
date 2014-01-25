@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Implement BLPOP / RPUSH mechanism for redis, and use it by default. Thx to @perrinood.
 * ElasticSearch indexes now use UTC, and defaut type value is logs instead of data
 * Add wilcard for input file plugin
 * Add delimiter for file and tcp plugins
