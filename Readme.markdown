@@ -214,17 +214,22 @@ Redis
 
 This plugin is used on log server to receive logs from redis channels. json_event format is expected.
 
+They are two method to get message from redis :
+* Publish / subscribe : The ``subscribe`` redis command will be used. Parameters ``channel`` and ``pattern_channel`` are needed.
+* Queue. This ``blpop`` redis command will be used. ``key`` parameter is needed.
+
 Example:
 
 * ``input://redis://localhost:6379?channel=logstash_channel``
 
 Parameters:
 
-* ``channel``: Redis channel to subscribe/psubscribe to
 * ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
-* ``pattern_channel``: use channel as pattern. Default value : false
-* ``method``: ``pubsub`` or ``queue``. Method to use for redis messaging. ``pubsub`` will use ``subscribe``redis commands, ``queue``will use ``blpop`` command. Default value: ``queue``.
+* ``method``: ``pubsub`` or ``queue`` Default value: ``queue``.
+* ``channel``: Channel for publish / subscribe. No default value.
+* ``pattern_channel``: use channel as pattern. Default value : false.
+* ``key``: Queue name for queue. No default value.
 * ``unserializer``: please see above. Default value to ``json_logstash``.
 
 HTTP
@@ -397,17 +402,21 @@ Redis
 
 This plugin is used to sent data on a Redis channel.
 
+They are two method to send message from redis :
+* Publish / subscribe : The ``publsh`` redis command will be used. ``channel` parameter is needed.
+* Queue. This ``rpush`` redis command will be used. ``key`` parameter is needed.
+
 Example:
 
 * ``output://redis://localhost:6379?channel=logstash_channel``
 
 Parameters:
 
-* ``channel``: Redis channel to subscribe/psubscribe to
 * ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
-* ``pattern_channel``: use channel as pattern. Default value : false
-* ``method``: ``pubsub`` or ``queue``. Method to use for redis messaging. ``pubsub`` will use ``publish``redis commands, ``queue``will use ``rpush`` command. Default value: ``queue``.
+* ``method``: ``pubsub`` or ``queue``. Method to use for redis messaging.
+* ``channel``: Channel for publish / subscribe. No default value.
+* ``key``: Queue name for queue. No default value.
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
 
