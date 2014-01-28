@@ -1,7 +1,7 @@
 /* jshint unused:false */
 var vows = require('vows'),
-    assert = require('assert'),
-    file_loader = require('lib/file_loader');
+  assert = require('assert'),
+  file_loader = require('lib/file_loader');
 
 vows.describe('File loader').addBatch({
   'simple': {
@@ -42,8 +42,8 @@ vows.describe('File loader').addBatch({
       file_loader.loadFile('test/file_loader_test/comment2', this.callback);
     },
     check: function(err, result) {
-      assert.ok(err);
-      assert.ok(err.toString().match(/ENOENT/), 'Match failed on ' + err.toString());
+      assert.isDefined(err);
+      assert.match(err.toString(), /ENOENT/);
     }
   },
 
@@ -64,8 +64,8 @@ vows.describe('File loader').addBatch({
     },
 
     check: function(err, result) {
-      assert.ok(err);
-      assert.ok(err.toString().match(/ENOENT/), 'Match failed on ' + err.toString());
+      assert.isDefined(err);
+      assert.match(err.toString(), /ENOENT/);
     }
   },
 

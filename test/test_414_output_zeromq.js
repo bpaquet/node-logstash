@@ -1,9 +1,9 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    dgram = require('dgram'),
-    assert = require('assert'),
-    monitor_file = require('lib/monitor_file'),
-    helper = require('./integration_helper.js');
+  fs = require('fs'),
+  dgram = require('dgram'),
+  assert = require('assert'),
+  monitor_file = require('lib/monitor_file'),
+  helper = require('./integration_helper.js');
 
 function loop(x, socket, callback) {
   if (x === 0) {
@@ -154,7 +154,7 @@ vows.describe('Integration zeromq:').addBatchRetry({
       assert.equal(splitted_1.length, 1000 + 1);
 
       var splitted_2 = c2.split('\n');
-      assert.ok(splitted_2.length < 1000);
+      assert.lesser(splitted_2.length, 1000);
     }
   },
 }, 5, 20000).export(module);

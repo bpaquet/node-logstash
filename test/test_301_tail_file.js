@@ -1,10 +1,10 @@
 var vows = require('vows-batch-retry'),
-    assert = require('assert'),
-    os = require('os'),
-    fs = require('fs'),
-    path = require('path'),
-    log = require('log4node'),
-    tail = require('lib/tail_file');
+  assert = require('assert'),
+  os = require('os'),
+  fs = require('fs'),
+  path = require('path'),
+  log = require('log4node'),
+  tail = require('lib/tail_file');
 
 function randomFile(pathname) {
   return path.join(pathname || os.tmpDir(), '___node-logstash_test___' + Math.random());
@@ -74,6 +74,16 @@ vows.describe('Monitor ').addBatch({
     fs.unlinkSync(m.file);
     no_error(m);
     assert.equal(m.lines.length, 0);
+  }),
+}).addBatch({
+  'Not empty file start, but start_index': create_test(function(m, callback) {
+    fs.writeFileSync(m.file, 'line1\nline2\n');
+    m.monitor.start(callback, 0);
+  }, function(m) {
+    fs.unlinkSync(m.file);
+    no_error(m);
+    assert.equal(m.lines.length, 2);
+    assert.deepEqual(m.lines, ['line1', 'line2']);
   }),
 }).addBatch({
   'File filled after start': create_test(function(m, callback) {
@@ -165,7 +175,9 @@ vows.describe('Monitor ').addBatch({
   }, function check(m) {
     no_error(m);
     assert.deepEqual(m.lines, ['line1', 'line2']);
-  }, undefined, {wait_delay_after_renaming: 100}),
+  }, undefined, {
+    wait_delay_after_renaming: 100
+  }),
 }).addBatchRetry({
   'Double monitoring same directory': {
     topic: function() {
@@ -207,7 +219,7 @@ vows.describe('Monitor ').addBatch({
 }, 5, 10000).addBatch({
   'Wrong file path': create_test(function(m, callback) {
     m.monitor.start(function(err) {
-      assert.ok(err);
+      assert.isDefined(err);
       callback();
     });
   }, function check(m) {

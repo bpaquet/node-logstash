@@ -1,9 +1,9 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    net = require('net'),
-    assert = require('assert'),
-    helper = require('./integration_helper.js'),
-    monitor_file = require('lib/monitor_file');
+  fs = require('fs'),
+  net = require('net'),
+  assert = require('assert'),
+  helper = require('./integration_helper.js'),
+  monitor_file = require('lib/monitor_file');
 
 vows.describe('Integration net 2 file :').addBatchRetry({
   'net2file': {
@@ -13,7 +13,9 @@ vows.describe('Integration net 2 file :').addBatchRetry({
         'input://tcp://localhost:17874?type=2',
         'output://file://output.txt?serializer=json_logstash',
       ], function(agent) {
-        var c = net.createConnection({port: 17874}, function() {
+        var c = net.createConnection({
+          port: 17874
+        }, function() {
           c.write('toto');
           c.end();
         });
@@ -35,7 +37,13 @@ vows.describe('Integration net 2 file :').addBatchRetry({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 2);
       assert.equal('', splitted[splitted.length - 1]);
-      helper.checkResult(splitted[0], {'@version': '1', 'host': '127.0.0.1', 'tcp_port': 17874, 'message': 'toto', 'type': '2'});
+      helper.checkResult(splitted[0], {
+        '@version': '1',
+        'host': '127.0.0.1',
+        'tcp_port': 17874,
+        'message': 'toto',
+        'type': '2'
+      });
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -57,7 +65,7 @@ vows.describe('Integration net 2 file :').addBatchRetry({
       server.listen(17874);
       helper.createAgent([
         'input://file://main_input.txt',
-        'output://tcp://localhost:17874?serializer=raw',
+        'output://tcp://localhost:17874?serializer=raw&delimiter=',
       ], function(agent) {
         setTimeout(function() {
           fs.appendFile('main_input.txt', 'line 1\n', function(err) {

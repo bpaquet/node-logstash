@@ -1,6 +1,6 @@
 var agent = require('agent'),
-    os = require('os'),
-    assert = require('assert');
+  os = require('os'),
+  assert = require('assert');
 
 function createAgent(urls, callback, error_callback) {
   var a = agent.create();
@@ -9,7 +9,9 @@ function createAgent(urls, callback, error_callback) {
   };
   a.on('error', function(module_name, error) {
     console.log('Error agent detected, ' + module_name + ' : ' + error);
-    error_callback(error);
+    if (error_callback) {
+      error_callback(error);
+    }
   });
   a.start(['filter://add_host://', 'filter://add_timestamp://', 'filter://add_version://'].concat(urls), function(error) {
     assert.ifError(error);

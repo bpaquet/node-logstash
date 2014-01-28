@@ -1,11 +1,11 @@
 var vows = require('vows-batch-retry'),
-    assert = require('assert'),
-    fs = require('fs'),
-    agent = require('agent'),
-    spawn = require('child_process').spawn,
-    dgram = require('dgram'),
-    log = require('log4node'),
-    whereis = require('whereis');
+  assert = require('assert'),
+  fs = require('fs'),
+  agent = require('agent'),
+  spawn = require('child_process').spawn,
+  dgram = require('dgram'),
+  log = require('log4node'),
+  whereis = require('whereis');
 
 function createAgent(urls, callback, error_callback) {
   var a = agent.create();
@@ -55,10 +55,10 @@ function input_file_test(args, topic_callback, check_callback) {
         datas.push(data);
       });
       createAgent([
-        'input://file://output.txt' + args,
+        'input://file://*.txt' + args,
         'output://udp://localhost:17881',
       ], function(agent) {
-        run('node', ['test/50_real_life/run.js', '--file=output.txt', '--count=1500', '--period=1'], 'process.pid', function(exitCode) {
+        run('node', ['test/500_real_life/run.js', '--file=output.txt', '--count=1500', '--period=1'], 'process.pid', function(exitCode) {
           setTimeout(function() {
             socket.close();
             agent.close(function() {
@@ -125,9 +125,7 @@ function output_file_test(topic_callback, check_callback) {
 
 vows.describe('Real life :').addBatchRetry({
   'simple test': input_file_test('',
-  function() {
-  }, function() {
-  }),
+    function() {}, function() {}),
 }, 5, 20000).addBatchRetry({
   'logrotate test, short_wait_delay_after_renaming': input_file_test('?wait_delay_after_renaming=100',
     function() {
@@ -136,13 +134,13 @@ vows.describe('Real life :').addBatchRetry({
           return console.log(err);
         }
         setTimeout(function() {
-          run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/500_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
           });
         }, 500);
         setTimeout(function() {
-          run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/500_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
           });
@@ -153,7 +151,7 @@ vows.describe('Real life :').addBatchRetry({
       fs.unlinkSync('output.txt.2');
     }
   ),
-}, 10, 20000).addBatchRetry({
+}, 20, 20000).addBatchRetry({
   'logrotate test': input_file_test('',
     function() {
       whereis('logrotate', function(err, logrotate) {
@@ -161,13 +159,13 @@ vows.describe('Real life :').addBatchRetry({
           return console.log(err);
         }
         setTimeout(function() {
-          run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/500_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(0, exitCode);
           });
         }, 500);
         setTimeout(function() {
-          run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/500_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(exitCode, 0);
           });
@@ -178,7 +176,7 @@ vows.describe('Real life :').addBatchRetry({
       fs.unlinkSync('output.txt.2');
     }
   ),
-}, 10, 20000).addBatchRetry({
+}, 20, 20000).addBatchRetry({
   'logrotate copy_truncate test': input_file_test('?use_tail=true',
     function() {
       whereis('logrotate', function(err, logrotate) {
@@ -186,13 +184,13 @@ vows.describe('Real life :').addBatchRetry({
           return console.log(err);
         }
         setTimeout(function() {
-          run(logrotate, ['-f', 'test/50_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/500_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(exitCode, 0);
           });
         }, 500);
         setTimeout(function() {
-          run(logrotate, ['-f', 'test/50_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+          run(logrotate, ['-f', 'test/500_real_life/copytruncate_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
             console.log('Logrotate exit code', exitCode);
             assert.equal(exitCode, 0);
           });
@@ -205,48 +203,47 @@ vows.describe('Real life :').addBatchRetry({
   ),
 }, 5, 20000).addBatchRetry({
   'file output test': output_file_test(
-  function() {
-  },
-  function(exitCode) {
-    var output = fs.readFileSync('output.txt').toString().trim().split('\n');
-    fs.unlinkSync('output.txt');
-    assert.equal(exitCode, 1);
-    assert.equal(output.length, 500);
-    var i = 500;
-    output.forEach(function(k) {
-      assert.equal('line ' + i, k);
-      i --;
-    });
-  }),
+    function() {},
+    function(exitCode) {
+      var output = fs.readFileSync('output.txt').toString().trim().split('\n');
+      fs.unlinkSync('output.txt');
+      assert.equal(exitCode, 1);
+      assert.equal(output.length, 500);
+      var i = 500;
+      output.forEach(function(k) {
+        assert.equal('line ' + i, k);
+        i--;
+      });
+    }),
 }, 5, 20000).addBatchRetry({
   'file output test with logrotate': output_file_test(
-  function() {
-    setTimeout(function() {
-      whereis('logrotate', function(err, logrotate) {
-        if (err) {
-          return console.log(err);
-        }
-        run(logrotate, ['-f', 'test/50_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
-          console.log('Logrotate exit code', exitCode);
-          assert.equal(exitCode, 0);
+    function() {
+      setTimeout(function() {
+        whereis('logrotate', function(err, logrotate) {
+          if (err) {
+            return console.log(err);
+          }
+          run(logrotate, ['-f', 'test/500_real_life/std_logrotate.conf', '-s', '/tmp/toto'], undefined, function(exitCode) {
+            console.log('Logrotate exit code', exitCode);
+            assert.equal(exitCode, 0);
+          });
         });
+      }, 500);
+    },
+    function(exitCode) {
+      var o1 = fs.readFileSync('output.txt.1').toString();
+      var o2 = fs.readFileSync('output.txt').toString();
+      var output = (o1 + o2).trim().split('\n');
+      fs.unlinkSync('output.txt');
+      fs.unlinkSync('output.txt.1');
+      assert.equal(exitCode, 1);
+      assert.greater(o1.length, 0);
+      assert.greater(o2.length, 0);
+      assert.equal(output.length, 500);
+      var i = 500;
+      output.forEach(function(k) {
+        assert.equal(k, 'line ' + i);
+        i--;
       });
-    }, 500);
-  },
-  function(exitCode) {
-    var o1 = fs.readFileSync('output.txt.1').toString();
-    var o2 = fs.readFileSync('output.txt').toString();
-    var output = (o1 + o2).trim().split('\n');
-    fs.unlinkSync('output.txt');
-    fs.unlinkSync('output.txt.1');
-    assert.equal(exitCode, 1);
-    assert(o1.length > 0);
-    assert(o2.length > 0);
-    assert.equal(output.length, 500);
-    var i = 500;
-    output.forEach(function(k) {
-      assert.equal(k, 'line ' + i);
-      i --;
-    });
-  }),
+    }),
 }, 5, 20000).export(module);

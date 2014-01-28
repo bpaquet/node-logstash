@@ -1,9 +1,9 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    dgram = require('dgram'),
-    assert = require('assert'),
-    monitor_file = require('lib/monitor_file'),
-    helper = require('./integration_helper.js');
+  fs = require('fs'),
+  dgram = require('dgram'),
+  assert = require('assert'),
+  monitor_file = require('lib/monitor_file'),
+  helper = require('./integration_helper.js');
 
 function loop(x, socket, delay, callback) {
   if (x === 0) {
@@ -78,7 +78,7 @@ vows.describe('Integration closing inputs:').addBatchRetry({
           assert.ifError(err);
           setTimeout(function() {
             agent.close_inputs(function(err) {
-              assert(agent.closed_inputs === true);
+              assert.isTrue(agent.closed_inputs);
               assert.ifError(err);
               setTimeout(function() {
                 socket.close();
@@ -125,14 +125,14 @@ vows.describe('Integration closing inputs:').addBatchRetry({
           }, 100);
         });
         setTimeout(function() {
-          assert(agent.closed_inputs === false);
+          assert.isFalse(agent.closed_inputs);
           agent.close_inputs(function(err) {
-            assert(agent.closed_inputs === true);
+            assert.isTrue(agent.closed_inputs);
             assert.ifError(err);
             setTimeout(function() {
               agent.start_inputs(function(err) {
                 assert.ifError(err);
-                assert(agent.closed_inputs === false);
+                assert.isFalse(agent.closed_inputs);
               });
             }, 500);
           });
@@ -152,7 +152,7 @@ vows.describe('Integration closing inputs:').addBatchRetry({
       assert.equal(splitted_1.length, 500 + 1);
 
       var splitted_2 = c2.split('\n');
-      assert.ok(splitted_2.length < 500);
+      assert.lesser(splitted_2.length, 500);
     }
   },
 }, 5, 20000).export(module);

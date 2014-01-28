@@ -1,8 +1,8 @@
 var vows = require('vows-batch-retry'),
-    fs = require('fs'),
-    assert = require('assert'),
-    helper = require('./integration_helper.js'),
-    monitor_file = require('lib/monitor_file');
+  fs = require('fs'),
+  assert = require('assert'),
+  helper = require('./integration_helper.js'),
+  monitor_file = require('lib/monitor_file');
 
 vows.describe('Integration file 2 file :').addBatchRetry({
   'file2file': {
@@ -54,9 +54,22 @@ vows.describe('Integration file 2 file :').addBatchRetry({
       var splitted = c1.split('\n');
       assert.equal(splitted.length, 4);
       assert.equal('', splitted[splitted.length - 1]);
-      helper.checkResult(splitted[0], {'@version': '1', 'path': 'input1.txt', 'message': 'line1'}, true);
-      helper.checkResult(splitted[1], {'@version': '1', 'path': 'input2.txt', 'message': 'line2', 'type': 'input2'}, true);
-      helper.checkResult(splitted[2], {'@version': '1', 'path': 'input1.txt', 'message': 'line3'}, true);
+      helper.checkResult(splitted[0], {
+        '@version': '1',
+        'path': 'input1.txt',
+        'message': 'line1'
+      }, true);
+      helper.checkResult(splitted[1], {
+        '@version': '1',
+        'path': 'input2.txt',
+        'message': 'line2',
+        'type': 'input2'
+      }, true);
+      helper.checkResult(splitted[2], {
+        '@version': '1',
+        'path': 'input1.txt',
+        'message': 'line3'
+      }, true);
 
       assert.equal('_line1_\n_line2_\n_line3_\n', c3);
     }
@@ -109,8 +122,16 @@ vows.describe('Integration file 2 file :').addBatchRetry({
       var splitted = c.split('\n');
       assert.equal(splitted.length, 3);
       assert.equal('', splitted[splitted.length - 1]);
-      helper.checkResult(splitted[0], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line1'}, true);
-      helper.checkResult(splitted[1], {'@version': '1', 'path': 'toto/56/87/input.txt', 'message': 'line2'}, true);
+      helper.checkResult(splitted[0], {
+        '@version': '1',
+        'path': 'toto/56/87/input.txt',
+        'message': 'line1'
+      }, true);
+      helper.checkResult(splitted[1], {
+        '@version': '1',
+        'path': 'toto/56/87/input.txt',
+        'message': 'line2'
+      }, true);
     }
   },
 }, 5, 20000).addBatchRetry({
@@ -154,7 +175,7 @@ vows.describe('Integration file 2 file :').addBatchRetry({
       var data = fs.readFileSync('output.txt').toString().split('\n');
       fs.unlinkSync('toto.txt');
       fs.unlinkSync('output.txt');
-      assert.deepEqual(data, [ 'e1', 'line2', '' ]);
+      assert.deepEqual(data, ['e1', 'line2', '']);
     }
   },
 }, 5, 20000).export(module);

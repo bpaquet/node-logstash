@@ -115,6 +115,12 @@ Signals
 Changelog
 ===
 
+* Implement BLPOP / RPUSH mechanism for redis, and use it by default. Thx to @perrinood.
+* ElasticSearch indexes now use UTC, and defaut type value is logs instead of data
+* Add wilcard for input file plugin
+* Add delimiter for file and tcp plugins
+* Auth on redis
+* Improve dns reverse filter
 * Compatibility with ZeroMQ 2.2.x, 3.x, 4.x
 * Add USR1 signal to stop and start inputs plugins
 * Add TCP / TLS plugin, thx to @dlanderson
@@ -151,9 +157,18 @@ Supported unserializer for input plugin :
 File
 ---
 
-This plugin monitor log files. It's compatible with logrotate. If a db file is specified, this plugin store where the last line were read when node-logstash stop. This value is used when node-logstash restart to read lines written node-logstash downtime.
+This plugin monitor log files.
 
-Example: ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
+Wildcard (* and ?) can be used.
+
+This plugin is compatible with logrotate.
+
+If a db file is specified on node-logstash command line (``--db_file``), this plugin stores the last line read for each file, to allow restart at the same place, even the monitored file grows when node-logstash were down.
+
+Example:
+* ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
+* ``input://file:///var/log/*.log``, to monitor all log file in ``/var/log``.
+* ``input://file:///var/log/auth%3F.log``, to monitor all files matching ``auth?.log`` in ``/var/log``. ``%3F`` is the encoding of ``?``.
 
 Parameters:
 
@@ -218,15 +233,22 @@ Redis
 
 This plugin is used on log server to receive logs from redis channels. json_event format is expected.
 
+They are two method to get message from redis :
+* Publish / subscribe : The ``subscribe`` redis command will be used. Parameters ``channel`` and ``pattern_channel`` are needed.
+* Queue. This ``blpop`` redis command will be used. ``key`` parameter is needed.
+
 Example:
 
 * ``input://redis://localhost:6379?channel=logstash_channel``
 
 Parameters:
 
-* ``channel``: Redis channel to subscribe/psubscribe to
+* ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
-* ``pattern_channel``: use channel as pattern. Default value : false
+* ``method``: ``pubsub`` or ``queue`` Default value: ``queue``.
+* ``channel``: Channel for publish / subscribe. No default value.
+* ``pattern_channel``: use channel as pattern. Default value : false.
+* ``key``: Queue name for queue. No default value.
 * ``unserializer``: please see above. Default value to ``json_logstash``.
 
 HTTP
@@ -293,7 +315,7 @@ Supported serializer for output plugin :
 ZeroMQ
 ---
 
-This plugin is used on agents to send logs to logs servers.
+This plugin is used on agents to send logs to logs servers, or to send logs to [Elasticsearch Logstash River](https://github.com/bpaquet/elasticsearch-river-zeromq).
 
 Example: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
 
@@ -316,21 +338,14 @@ Elastic search
 
 This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
 
+Note : for better performance, you can also use the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
+
 Example: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
 
 Parameters:
 
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
-
-
-Elastic search ZeroMQ
----
-
-This plugin is used on log server to send logs to elastic search, using ZeroMQ transport.
-You can find the ZeroMQ transport here: https://github.com/bpaquet/transport-zeromq.
-
-Example: ``output://elasticsearch_zeromq://tcp://localhost:9700`` to send to the zeromq transport of an elastic search server listening on port 9700.
 
 Statsd
 ---
@@ -379,6 +394,7 @@ Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each 
 Parameters:
 
 * ``serializer``: please see above. Default value to ``raw``.
+* ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
 * ``format``: please see above. Used by the ``raw``serializer.
 
 HTTP Post
@@ -405,15 +421,21 @@ Redis
 
 This plugin is used to sent data on a Redis channel.
 
+They are two method to send message from redis :
+* Publish / subscribe : The ``publsh`` redis command will be used. ``channel` parameter is needed.
+* Queue. This ``rpush`` redis command will be used. ``key`` parameter is needed.
+
 Example:
 
 * ``output://redis://localhost:6379?channel=logstash_channel``
 
 Parameters:
 
-* ``channel``: Redis channel to subscribe/psubscribe to
+* ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
-* ``pattern_channel``: use channel as pattern. Default value : false
+* ``method``: ``pubsub`` or ``queue``. Method to use for redis messaging.
+* ``channel``: Channel for publish / subscribe. No default value.
+* ``key``: Queue name for queue. No default value.
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
 
@@ -447,6 +469,7 @@ Parameters:
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 * ``format``: Optional. Please see above. Used by the ``raw``serializer.
+* ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
 
 Filters
 ===
@@ -502,12 +525,13 @@ Parameters:
 Reverse DNS
 ---
 
-The reverse dns filter replace an ip in `host` by the hostname, performing a dns resolution. This is useful with syslog.
+The reverse dns filter replace an ip in a field by the hostname, performing a dns resolution. This is useful with syslog.
 
-Example 1: ``filter://reverse_dns://``
+Example 1: ``filter://reverse_dns://host`` performs a dns resolution on the field ``host``.
 
 Parameters:
 
+* ``target_field``: field to store the result. Default: field used for resolution.
 * ``only_hostname``: after dns resolution, the filter will keep only the first word of dns name. Example : 'www.free.fr' will be transformed to 'www'. Default value: true
 
 Compute field
@@ -609,12 +633,7 @@ The proxy parameter allow to use an http proxy.
 The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` which gives support for:
   * http and https proxies
   * proxy port
-  * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``).
-    Supported authentication schemes are Basic and NTLM.
-    The following parameters are used to configure authentication:
-    * ``proxy_auth`` - specifies the authentication type. Possible values are ``basic`` or ``ntlm``. If not specified, ``basic`` is assumed.
-    * ``proxy_ntlm_domain`` - Specifies the NTLM domain for authentication. Required if ``proxy_auth`` is ``ntlm``.
-
+  * NTLM : for ntlm authent, userinfo have to be ``ntlm:domain:hostname:username:password``. Hostname can be empty.
 
 Force fields typing in Elastic Search
 ---
@@ -641,7 +660,7 @@ For both cases you should add a `default-mapping.json` file in Elastic Search co
 License
 ===
 
-Copyright 2012 - 2013 Bertrand Paquet
+Copyright 2012 - 2014 Bertrand Paquet
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

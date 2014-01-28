@@ -1,29 +1,42 @@
 var agent = require('agent'),
-    vows = require('vows-batch-retry'),
-    assert = require('assert');
+  vows = require('vows-batch-retry'),
+  redis_driver = require('redis_driver'),
+  assert = require('assert');
 
-function check_error_init(urls, expected_message_pattern) {
+function check_error_init(urls, expected_message_pattern, start_callback, stop_callback) {
   return {
     topic: function() {
+      start_callback = start_callback || function(callback) {
+        callback(undefined);
+      };
+      stop_callback = stop_callback || function(o, callback) {
+        callback();
+      };
       var callback = this.callback;
-      var a = agent.create();
-      a.on('error', function(module_name, error) {
-        assert.ifError(error);
-      });
-      a.start(urls, function(err) {
-        if (err) {
-          a.close(function() {
-            callback(null, err.toString());
+      start_callback(function(o) {
+        var a = agent.create();
+        a.on('error', function(module_name, error) {
+          assert.ifError(error);
+        });
+        a.start(urls, function(err) {
+          if (err) {
+            a.close(function() {
+              stop_callback(o, function() {
+                callback(null, err.toString());
+              });
+            });
+            return;
+          }
+          stop_callback(o, function() {
+            assert.fail('Init success, should not');
           });
-          return;
-        }
-        assert.fail('Init success, should not');
-      }, 200);
+        }, 200);
+      });
     },
 
     check: function(error, message) {
       assert.ifError(error);
-      assert.ok(message.match(expected_message_pattern), 'Message does not match pattern : ' + expected_message_pattern + ' : ' + message);
+      assert.match(message, new RegExp(expected_message_pattern));
     }
   };
 }
@@ -79,16 +92,34 @@ vows.describe('Integration error :').addBatch({
   ], 'listen EACCES'),
 }).addBatch({
   'http unable to open port (used)': check_error_init([
-    'input://http://localhost:6379'
-  ], 'listen EADDRINUSE'),
+    'input://http://localhost:17874'
+  ], 'listen EADDRINUSE', function(callback) {
+    var r = new redis_driver.RedisDriver();
+    r.start({
+      port: 17874
+    }, function() {
+      callback(r);
+    });
+  }, function(r, callback) {
+    r.stop(callback);
+  }),
 }).addBatch({
   'tcp unable to open port (access)': check_error_init([
     'input://tcp://localhost:80'
   ], 'listen EACCES'),
 }).addBatch({
   'tcp unable to open port (used)': check_error_init([
-    'input://tcp://localhost:6379'
-  ], 'listen EADDRINUSE'),
+    'input://tcp://localhost:17874'
+  ], 'listen EADDRINUSE', function(callback) {
+    var r = new redis_driver.RedisDriver();
+    r.start({
+      port: 17874
+    }, function() {
+      callback(r);
+    });
+  }, function(r, callback) {
+    r.stop(callback);
+  }),
 }).addBatch({
   'udp unable to open port (access)': check_error_init([
     'input://udp://localhost:123'
@@ -105,4 +136,28 @@ vows.describe('Integration error :').addBatch({
   'wrong serializer': check_error_init([
     'output://tcp://localhost:12345?serializer=non_existent'
   ], 'Unknown serializer non_existent'),
+}).addBatch({
+  'wrong redis input config': check_error_init([
+    'input://redis://localhost:6379?method=toto&channel=titi'
+  ], 'Wrong method'),
+}).addBatch({
+  'wrong redis input queue config': check_error_init([
+    'input://redis://localhost:6379?method=queue&channel=titi'
+  ], 'You have to specify the key parameter in queue mode'),
+}).addBatch({
+  'wrong redis input pubsub config': check_error_init([
+    'input://redis://localhost:6379?method=pubsub'
+  ], 'You have to specify the channel parameter in pubsub mode'),
+}).addBatch({
+  'wrong redis output config': check_error_init([
+    'output://redis://localhost:6379?method=toto&channel=titi'
+  ], 'Wrong method'),
+}).addBatch({
+  'wrong redis output queue config': check_error_init([
+    'output://redis://localhost:6379?method=queue&channel=titi'
+  ], 'You have to specify the key parameter in queue mode'),
+}).addBatch({
+  'wrong redis output pubsub config': check_error_init([
+    'output://redis://localhost:6379?method=pubsub&key=toto'
+  ], 'You have to specify the channel parameter in pubsub mode'),
 }).export(module);
