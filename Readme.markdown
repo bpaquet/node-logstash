@@ -179,24 +179,6 @@ Parameters:
 
 Note: this plugin can be used on FIFO pipes.
 
-Directory
----
-
-This plugin monitors multiple log files in a directory. See File input above for details.
-Enables filtering files for inclusion and exclusion from monitoring via the ``include`` and ``exclude`` parameters. If both ``include`` and ``exclude`` are provided then the exclude filter
-is activated after the include filter.
-
-Example: ``input://dir:///tmp/logs``, to monitor all files in ``/tmp/logs``.
-
-Parameters:
-
-* ``include`` - a filter for files to include in monitoring. Supports simple expressions with * and ?. Example: ``input://file:///tmp/logs?include=runtime-*.log``
-* ``exclude`` - a filter for files to exclude from monitoring. Supports simple expressions with * and ?. Example: ``input://file:///tmp/logs?exclude=runtime-a*.log``
-* ``use_tail``: use system ``tail -f`` command to monitor file, instead of built in file monitoring. Should be used with logrotate and copytuncate option. Defaut value: false.
-* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=nginx_error_log``.
-* ``unserializer``: please see above. Default value to ``json_logstash``.
-
-
 Syslog
 ---
 
@@ -283,10 +265,25 @@ Parameters:
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
+Zabbix
+---
+This plugin is used on agents to receive tcp messages from a [zabbix](http://www.zabbix.com/) agent. This plugin should be used in conjunction with the zabbix output plugin on the server.
+Zabbix agents communicate with the zabbix server over TCP, which might be blocked if the agent is behind a firewall or proxy that only enables HTTP/S.
+Use of this plugin in conjunction with the http input and output plugins enables sending zabbix messages over a secure http channel.
+
+The setup should be as follows:
+* on the agent: zabbix agent => zabbix input plugin => http_post output plugin. Example: ``node-logstash-agent input://zabbix://localhost:10051 output://http_post://zabbix.server.com:8080?serializer=json_logstash``
+* on the server:  http input plugin => zabbix output plugin => zabbix server. Example: ``node-logstash-agent input://http://zabbix.server.com:8080 output://zabbix://localhost:10051``
+
+Parameters:
+* ``type`` - specify a type for the zabbix messages. The default is ``zabbix``.
+
+
 Outputs and filter, commons parameters
 ===
 
-* ``only_type``: execute the filter / output plugin only on lines with specified type. Example: ``only_type=nginx``
+* ``only_type``: execute the filter / output plugin only on lines with specified types. Multiple types are separated with a comma. Example: ``only_type=nginx,api``
+* ``not_type``: do NOT execute the filter / output plugin on lines with specified types. Multiple types are separated with a comma. Takes precedence over ``only_type``. Example: ``not_type=nginx,api``
 * ``only_field_exist_toto``: execute the filter / output plugin only on lines with a field ``toto``. You can specify it multiple times, all fields have to exist.
 * ``only_field_equal_toto=aaa``: execute the filter / output plugin only on lines with a field ``toto``, with value ``aaa``. You can specify it multiple times, all fields have to exist and have the specified value.
 
@@ -470,6 +467,18 @@ Parameters:
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 * ``format``: Optional. Please see above. Used by the ``raw``serializer.
 * ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
+
+Zabbix
+---
+This plugin is used on server to send messages via tcp to a [zabbix](http://www.zabbix.com/) server. This plugin should be used in conjunction with the zabbix input plugin on the agent.
+Zabbix agents communicate with the zabbix server over TCP, which might be blocked if the agent is behind a firewall or proxy that only enables HTTP/S.
+Use of this plugin in conjunction with the http input and output plugins enables sending zabbix messages over a secure http channel.
+
+The setup should be as follows:
+* on the server:  http input plugin => zabbix output plugin => zabbix server. Example: ``node-logstash-agent input://http://zabbix.server.com:8080 output://zabbix://localhost:10051``
+* on the agent: zabbix agent => zabbix input plugin => http_post output plugin. Example: ``node-logstash-agent input://zabbix://localhost:10051 output://http_post://zabbix.server.com:8080?serializer=json_logstash``
+
+Use ``not_type=zabbix`` on other output plugins to suppress sending zabbix messages to them.
 
 Filters
 ===
