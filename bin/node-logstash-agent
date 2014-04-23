@@ -11,12 +11,19 @@ var optimist = require('optimist'),
   file_loader = require('../lib/lib/file_loader'),
   patterns_loader = require('../lib/lib/patterns_loader');
 
-process.title = 'node-logstash-agent';
 
 var argv = optimist.argv;
 
+if (argv.title) {
+  if (typeof argv.title == 'string' && argv.title.trim() != '') {
+    process.title = argv.title;
+  }
+} else {
+  process.title = 'node-logstash-agent';
+}
+
 function help() {
-  console.log('Syntax : node-logstasth-agent [--log_level=info] [--log_file=file] [--config_file=toto.json] [--config_dir=/etc/config] urls');
+  console.log('Syntax : node-logstasth-agent [--title=process_title] [--log_level=info] [--log_file=file] [--config_file=toto.json] [--config_dir=/etc/config] urls');
   console.log('Url examples: ');
   console.log('- input://stdin://');
   console.log('- input://file://main_input.txt?type=toto');
@@ -60,7 +67,7 @@ else {
 var package_json_file = path.join(__dirname, '..', 'package.json');
 var version = JSON.parse(fs.readFileSync(package_json_file)).version;
 
-logger.notice('Starting node-logstasth-agent', version);
+logger.notice('Starting', process.title, version);
 
 var http_max_sockets = argv.http_max_sockets || 100;
 logger.info('Max http socket', http_max_sockets);
