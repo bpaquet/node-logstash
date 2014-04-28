@@ -15,7 +15,7 @@ var optimist = require('optimist'),
 var argv = optimist.argv;
 
 if (argv.title) {
-  if (typeof argv.title == 'string' && argv.title.trim() != '') {
+  if (typeof argv.title === 'string' && argv.title.trim() !== '') {
     process.title = argv.title;
   }
 } else {
