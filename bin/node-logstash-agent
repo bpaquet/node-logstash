@@ -69,7 +69,7 @@ var version = JSON.parse(fs.readFileSync(package_json_file)).version;
 
 logger.notice('Starting', process.title, version);
 
-var http_max_sockets = argv.http_max_sockets || 100;
+var http_max_sockets = argv.http_max_sockets || 1024;
 logger.info('Max http sockets', http_max_sockets);
 http.globalAgent.maxSockets = http_max_sockets;
 https.globalAgent.maxSockets = http_max_sockets;
