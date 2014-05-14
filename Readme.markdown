@@ -592,6 +592,19 @@ Parameters:
 * ``city_field``: field in which to store the geo ip city result. Default value : ``ip_geo_city``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip city result will not be stored.
 * ``lonlat_field``: field in which to store the geo ip longitude and latitude result. Default value : ``ip_geo_lonlat`, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip longitude and latitude result will not be stored.
 
+Eval
+---
+
+The eval filter is used to process a field with javascript code.
+
+Example 1: ``filter://eval://delay?operation=x*1000`` multiply the value of field ``delay`` by 1000.
+Example 2: ``filter://eval://toto?operation=x+%22a%22`` add ``a`` character to the field ``toto``.
+
+Parameters:
+
+* ``operation``: javascript code to execute. The input field is in the ``x`` variable.
+* ``target_field``: field to store the result. Default : source field.
+
 Misc
 ===
 
