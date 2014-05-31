@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Fix bug #62 : only_type not honored when component have no config (thx to @ryepup)
 * Allow ZeroMQ output to multiple hosts (thx to @dax)
 * Add bunyan filter (thx to @JonGretar)
 * Implement BLPOP / RPUSH mechanism for redis, and use it by default. Thx to @perrinood.
