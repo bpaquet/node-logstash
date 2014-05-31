@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Add bunyan filter (thx to @JonGretar)
 * Implement BLPOP / RPUSH mechanism for redis, and use it by default. Thx to @perrinood.
 * ElasticSearch indexes now use UTC, and defaut type value is logs instead of data
 * Add wilcard for input file plugin
@@ -604,6 +605,13 @@ Parameters:
 
 * ``operation``: javascript code to execute. The input field is in the ``x`` variable.
 * ``target_field``: field to store the result. Default : source field.
+
+Bunyan
+---
+
+The bunyan filter parse the [bunyan log format](https://github.com/trentm/node-bunyan).
+
+Example: ``filter://bunyan://?only_type=toto`` parse the logs with type toto, using the bunyan log format.
 
 Misc
 ===
