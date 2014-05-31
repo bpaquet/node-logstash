@@ -23,7 +23,58 @@ function loop(x, socket, callback) {
   });
 }
 
-vows.describe('Integration zeromq:').addBatchRetry({
+vows.describe('Integration zeromq:').addBatch({
+  'load balancing': {
+    topic: function() {
+      var callback = this.callback;
+      monitor_file.setFileStatus({});
+      helper.createAgent([
+        'input://zeromq://tcp://0.0.0.0:17875',
+        'output://file://output1.txt',
+      ], function(agent) {
+        helper.createAgent([
+          'input://zeromq://tcp://0.0.0.0:17876',
+          'output://file://output2.txt',
+        ], function(agent2) {
+          helper.createAgent([
+            'input://udp://localhost:17874?type=udp',
+            'output://zeromq://tcp://localhost:17875,tcp://localhost:17876',
+          ], function(agent3) {
+            var socket = dgram.createSocket('udp4');
+            socket.send(new Buffer('l1'), 0, 2, 17874, 'localhost', function(err) {
+              assert.ifError(err);
+              socket.send(new Buffer('l2'), 0, 2, 17874, 'localhost', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  socket.close();
+                  agent3.close(function() {
+                    agent2.close(function() {
+                      agent.close(callback);
+                    });
+                  });
+                }, 200);
+              });
+            });
+          });
+        });
+      });
+    },
+
+    check: function(err) {
+      assert.ifError(err);
+      var c1 = fs.readFileSync('output1.txt').toString();
+      var c2 = fs.readFileSync('output2.txt').toString();
+      fs.unlinkSync('output1.txt');
+      fs.unlinkSync('output2.txt');
+
+      var splitted1 = c1.split('\n');
+      assert.equal(splitted1.length, 2);
+
+      var splitted2 = c2.split('\n');
+      assert.equal(splitted2.length, 2);
+    }
+  },
+}).addBatchRetry({
   'no limit': {
     topic: function() {
       var callback = this.callback;

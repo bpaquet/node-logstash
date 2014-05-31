@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Allow ZeroMQ output to multiple hosts (thx to @dax)
 * Add bunyan filter (thx to @JonGretar)
 * Implement BLPOP / RPUSH mechanism for redis, and use it by default. Thx to @perrinood.
 * ElasticSearch indexes now use UTC, and defaut type value is logs instead of data
@@ -300,7 +301,8 @@ ZeroMQ
 
 This plugin is used on agents to send logs to logs servers, or to send logs to [Elasticsearch Logstash River](https://github.com/bpaquet/elasticsearch-river-zeromq).
 
-Example: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
+Example 1: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
+Example 1: ``output://zeromq://tcp://192.168.1.1:5555,tcp://192.168.1.2:5555``, to send logs to 192.168.1.1 and 192.168.1.1, using built in ZeroMQ load balancing feature.
 
 There are two queues in ZeroMQ output plugin :
 
