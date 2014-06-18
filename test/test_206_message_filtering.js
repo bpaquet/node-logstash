@@ -158,4 +158,56 @@ vows.describe('Message filtering ').addBatch({
       'toto': 'b'
     },
   ]),
+  'one field match': filter_helper.create('compute_field', 'titi?value=aa&only_field_match_titi=abc', [
+    {
+      'message': 'toto'
+    },
+    {
+      'message': 'toto',
+      'titi': 'acb'
+    },
+    {
+      'message': 'toto',
+      'titi': 'abc'
+    },
+    {
+      'message': 'toto',
+      'titi': '1234abcdef',
+    },
+  ], [
+    {
+      'message': 'toto'
+    },
+    {
+      'message': 'toto',
+      'titi': 'acb'
+    },
+    {
+      'message': 'toto',
+      'titi': 'aa'
+    },
+    {
+      'message': 'toto',
+      'titi': 'aa'
+    },
+  ]),
+  'multiple field match': filter_helper.create('compute_field', 'titi?value=aa&only_field_match_titi=abc&only_field_match_message=z$', [
+    {
+      'message': 'ztoto',
+      'titi': 'abc'
+    },
+    {
+      'message': 'totoz',
+      'titi': 'abc',
+    },
+  ], [
+    {
+      'message': 'ztoto',
+      'titi': 'abc'
+    },
+    {
+      'message': 'totoz',
+      'titi': 'aa',
+    },
+  ]),
 }).export(module);
