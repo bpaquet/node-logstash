@@ -115,6 +115,7 @@ Signals
 Changelog
 ===
 
+* Add only\_field\_match\_ options
 * Do not log error with Geo IP filter and local ips
 * Fix bug #62 : only_type not honored when component have no config (thx to @ryepup)
 * Allow ZeroMQ output to multiple hosts (thx to @dax)
@@ -275,7 +276,7 @@ Outputs and filter, commons parameters
 * ``only_type``: execute the filter / output plugin only on lines with specified type. Example: ``only_type=nginx``
 * ``only_field_exist_toto``: execute the filter / output plugin only on lines with a field ``toto``. You can specify it multiple times, all fields have to exist.
 * ``only_field_equal_toto=aaa``: execute the filter / output plugin only on lines with a field ``toto``, with value ``aaa``. You can specify it multiple times, all fields have to exist and have the specified value.
-* ``only_field_equal_match=aaa$``: execute the filter / output plugin only on lines with a field ``toto``, with value match the regular expression ``aaa$``. You can specify it multiple times, all fields have to exist and match the regular expression.
+* ``only_field_match_toto=aaa$``: execute the filter / output plugin only on lines with a field ``toto``, with value match the regular expression ``aaa$``. You can specify it multiple times, all fields have to exist and match the regular expression.
 
 Access to line log properties
 ===
