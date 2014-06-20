@@ -91,6 +91,7 @@ Others params:
 * ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin
 * ``--db_file`` to specify the file to use as database for file inputs (see below)
 * ``--http_max_sockets`` to specify the max sockets of [http.globalAgent.maxSockets](http://nodejs.org/api/http.html#http_agent_maxsockets). Default to 100.
+* ``--alarm_file`` to specify a file which will be created if node-logstash goes in alarm mode (see below).
 
 Examples
 ---
