@@ -157,12 +157,23 @@ vows.describe('Integration zeromq:').addBatch({
   'closed inputs': {
     topic: function() {
       var callback = this.callback;
+      var received = false;
       monitor_file.setFileStatus({});
       helper.createAgent([
         'input://udp://localhost:17874?type=udp',
         'input://file://input.txt?type=file',
         'output://zeromq://tcp://localhost:17875?zmq_high_watermark=100&zmq_check_interval=100&zmq_threshold_up=500&zmq_threshold_down=200',
       ], function(agent) {
+        agent.once('alarm_mode', function(alarm) {
+          assert.equal(true, alarm);
+          agent.once('alarm_mode', function(alarm) {
+            assert.equal(false, alarm);
+            received = true;
+            agent.once('alarm_mode', function() {
+              assert.fail();
+            });
+          });
+        });
         var socket = dgram.createSocket('udp4');
         assert.equal(false, agent.closed_inputs);
         loop(500, socket, function(err) {
@@ -179,7 +190,9 @@ vows.describe('Integration zeromq:').addBatch({
                 ], function(agent2) {
                   setTimeout(function() {
                     assert.ifError(err);
+                    console.log(received);
                     assert.equal(false, agent.closed_inputs);
+                    assert.equal(true, received);
                     socket.close();
                     agent2.close(function() {
                       agent.close(callback);
