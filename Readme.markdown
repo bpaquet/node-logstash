@@ -478,6 +478,7 @@ Example 3: ``filter://regex://?regex=(\d+|-)&fields=a&numerical_fields=a``, to f
 Parameters:
 
 * ``regex``: regex to apply.
+* ``regex_flags: regex flags (eg : g, i, m).
 * ``fields``: name of fields which will receive the pattern extracted (see below for the special field @timestamp).
 * ``numerical_fields``: name of fields which have to contain a numerical value. If value is not numerical, field will not be set.
 * ``date_format``: if ``date_format` is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
@@ -510,6 +511,7 @@ Example 3: ``filter://grep://?type=nginx&regex=abc`` remove all lines with type 
 Parameters:
 
 * ``regex``: regex to be matched. You have to escape special characters.
+* ``regex_flags: regex flags (eg : g, i, m).
 * ``invert``: if ``true``, remove lines which match. Default value: false.
 
 Reverse DNS
@@ -569,6 +571,7 @@ Example 1: ``filter://multiline://?start_line_regex=^\\d{4}-\\d{2}-\\d{2}`` will
 Parameters:
 
 * ``start_line_regex``: regular expression which is used to find lines which start blocks. You have to escape special characters.
+* ``regex_flags: regex flags (eg : g, i, m).
 * ``max_delay``: delay to wait the end of a block. Default value: 50 ms. Softwares which write logs by block usually write blocks in one time, this parameter is used to send lines without waiting the next matching start line.
 
 Json Fields

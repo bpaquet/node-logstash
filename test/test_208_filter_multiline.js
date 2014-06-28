@@ -8,7 +8,7 @@ vows.describe('Filter multiline ').addBatch({
       'host': 'a'
     },
     {
-      'message': 'def',
+      'message': 'ABC',
       'host': 'a'
     },
     {
@@ -21,7 +21,38 @@ vows.describe('Filter multiline ').addBatch({
     },
   ], [
     {
-      'message': 'abc\ndef',
+      'message': 'abc\nABC',
+      'host': 'a'
+    },
+    {
+      'message': 'abc\n123',
+      'host': 'a'
+    },
+  ]),
+  'regex flags': filter_helper.create('multiline', '?start_line_regex=^abc&regex_flags=i', [
+    {
+      'message': 'abc',
+      'host': 'a'
+    },
+    {
+      'message': 'ABC',
+      'host': 'a'
+    },
+    {
+      'message': 'abc',
+      'host': 'a'
+    },
+    {
+      'message': '123',
+      'host': 'a'
+    },
+  ], [
+    {
+      'message': 'abc',
+      'host': 'a'
+    },
+    {
+      'message': 'ABC',
       'host': 'a'
     },
     {

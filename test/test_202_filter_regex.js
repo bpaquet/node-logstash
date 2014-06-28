@@ -11,7 +11,7 @@ patterns_loader.add('/tata');
 patterns_loader.add('lib/patterns');
 
 vows.describe('Filter regex ').addBatch({
-  'normal': filter_helper.create('regex', '?regex=^(\\S+) (\\S+)&fields=fa,fb', [
+  'normal': filter_helper.create('regex', '?regex=^(a\\S+) (\\S+)&fields=fa,fb', [
     {
       'message': 'abcd efgh ijk'
     },
@@ -20,7 +20,7 @@ vows.describe('Filter regex ').addBatch({
       fc: 'toto'
     },
     {
-      'message': 'abcdefghijk'
+      'message': 'Abcd efghijk'
     },
   ], [
     {
@@ -35,7 +35,36 @@ vows.describe('Filter regex ').addBatch({
       fc: 'toto'
     },
     {
-      'message': 'abcdefghijk'
+      'message': 'Abcd efghijk'
+    },
+  ]),
+  'regex flags': filter_helper.create('regex', '?regex=^(a\\S+) (\\S+)&fields=fa,fb&regex_flags=i', [
+    {
+      'message': 'abcd efgh ijk'
+    },
+    {
+      'message': 'abcd efgh ijk',
+      fc: 'toto'
+    },
+    {
+      'message': 'Abcd efghijk'
+    },
+  ], [
+    {
+      'message': 'abcd efgh ijk',
+      fa: 'abcd',
+      fb: 'efgh'
+    },
+    {
+      'message': 'abcd efgh ijk',
+      fa: 'abcd',
+      fb: 'efgh',
+      fc: 'toto'
+    },
+    {
+      'message': 'Abcd efghijk',
+      fa: 'Abcd',
+      fb: 'efghijk',
     },
   ]),
   'number management': filter_helper.create('regex', '?regex=^(\\S+)$&fields=a', [
