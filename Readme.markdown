@@ -623,6 +623,17 @@ The bunyan filter parse the [bunyan log format](https://github.com/trentm/node-b
 
 Example: ``filter://bunyan://?only_type=toto`` parse the logs with type toto, using the bunyan log format.
 
+HTTP Status classifier
+---
+
+The http status classifier filter parse the status code.
+
+Example: ``filter://http_status_classifier://http_status`` parse the ``http_status`` field and fill the ``http_class`` field with value like ``2xx``, ``3xx``.
+
+Parameters:
+* ``target_field``: field to store the result. Default : ``http_class``.
+* ``special_codes``: http status codes to be kept as is. Eg, with ``498,499`` value in ``special_codes``, the filter will put 499 in the ``http_class`` field when receiving a ``499`` http code, and not ``4xx``. Mutlipe values must be separated with ``,``. Default value: empty.
+
 Misc
 ===
 
