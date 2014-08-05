@@ -23,7 +23,58 @@ function loop(x, socket, callback) {
   });
 }
 
-vows.describe('Integration zeromq:').addBatchRetry({
+vows.describe('Integration zeromq:').addBatch({
+  'load balancing': {
+    topic: function() {
+      var callback = this.callback;
+      monitor_file.setFileStatus({});
+      helper.createAgent([
+        'input://zeromq://tcp://0.0.0.0:17875',
+        'output://file://output1.txt',
+      ], function(agent) {
+        helper.createAgent([
+          'input://zeromq://tcp://0.0.0.0:17876',
+          'output://file://output2.txt',
+        ], function(agent2) {
+          helper.createAgent([
+            'input://udp://localhost:17874?type=udp',
+            'output://zeromq://tcp://localhost:17875,tcp://localhost:17876',
+          ], function(agent3) {
+            var socket = dgram.createSocket('udp4');
+            socket.send(new Buffer('l1'), 0, 2, 17874, 'localhost', function(err) {
+              assert.ifError(err);
+              socket.send(new Buffer('l2'), 0, 2, 17874, 'localhost', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  socket.close();
+                  agent3.close(function() {
+                    agent2.close(function() {
+                      agent.close(callback);
+                    });
+                  });
+                }, 200);
+              });
+            });
+          });
+        });
+      });
+    },
+
+    check: function(err) {
+      assert.ifError(err);
+      var c1 = fs.readFileSync('output1.txt').toString();
+      var c2 = fs.readFileSync('output2.txt').toString();
+      fs.unlinkSync('output1.txt');
+      fs.unlinkSync('output2.txt');
+
+      var splitted1 = c1.split('\n');
+      assert.equal(splitted1.length, 2);
+
+      var splitted2 = c2.split('\n');
+      assert.equal(splitted2.length, 2);
+    }
+  },
+}).addBatchRetry({
   'no limit': {
     topic: function() {
       var callback = this.callback;
@@ -106,12 +157,23 @@ vows.describe('Integration zeromq:').addBatchRetry({
   'closed inputs': {
     topic: function() {
       var callback = this.callback;
+      var received = false;
       monitor_file.setFileStatus({});
       helper.createAgent([
         'input://udp://localhost:17874?type=udp',
         'input://file://input.txt?type=file',
         'output://zeromq://tcp://localhost:17875?zmq_high_watermark=100&zmq_check_interval=100&zmq_threshold_up=500&zmq_threshold_down=200',
       ], function(agent) {
+        agent.once('alarm_mode', function(alarm) {
+          assert.equal(true, alarm);
+          agent.once('alarm_mode', function(alarm) {
+            assert.equal(false, alarm);
+            received = true;
+            agent.once('alarm_mode', function() {
+              assert.fail();
+            });
+          });
+        });
         var socket = dgram.createSocket('udp4');
         assert.equal(false, agent.closed_inputs);
         loop(500, socket, function(err) {
@@ -128,7 +190,9 @@ vows.describe('Integration zeromq:').addBatchRetry({
                 ], function(agent2) {
                   setTimeout(function() {
                     assert.ifError(err);
+                    console.log(received);
                     assert.equal(false, agent.closed_inputs);
+                    assert.equal(true, received);
                     socket.close();
                     agent2.close(function() {
                       agent.close(callback);

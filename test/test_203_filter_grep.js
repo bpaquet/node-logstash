@@ -19,6 +19,9 @@ vows.describe('Filter grep ').addBatch({
       'message': 'abcd'
     },
     {
+      'message': 'ABcD'
+    },
+    {
       'message': 'abd5'
     },
   ], [
@@ -36,6 +39,24 @@ vows.describe('Filter grep ').addBatch({
   ], [
     {
       'message': 'abd'
+    },
+  ]),
+  'flags': filter_helper.create('grep', '?regex=abc&regex_flags=i', [
+    {
+      'message': 'abcd'
+    },
+    {
+      'message': 'ABcD'
+    },
+    {
+      'message': 'abd'
+    },
+  ], [
+    {
+      'message': 'abcd'
+    },
+    {
+      'message': 'ABcD'
     },
   ]),
 }).export(module);

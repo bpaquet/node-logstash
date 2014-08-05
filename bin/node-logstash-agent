@@ -80,6 +80,34 @@ a.on('error', function(module_name, error) {
   logger.error('[' + module_name + '] ' + error);
 });
 
+function removeIfExists(file) {
+  fs.exists(file, function(exists) {
+    if (exists) {
+      fs.unlink(file, function(err) {
+        if (err) {
+          logger.error('Unable to remove file', file, err);
+        }
+      });
+    }
+  });
+}
+if (argv.alarm_file) {
+  logger.info('Alarm file', argv.alarm_file);
+  removeIfExists(argv.alarm_file);
+  a.on('alarm_mode', function(a) {
+    if (a) {
+      fs.writeFile(argv.alarm_file, '1', function(err) {
+        if (err) {
+          logger.error('Unable to write alarm file', argv.alarm_file, err);
+        }
+      });
+    }
+    else {
+      removeIfExists(argv.alarm_file);
+    }
+  });
+}
+
 patterns_loader.add(path.join(__dirname, '..', 'lib', 'patterns'));
 
 if (argv.patterns_directories) {

@@ -1,5 +1,5 @@
 {
-  "regex": "^(\\S+) (\\S+) \\S+ (\\S+) \\[([^\\]]+)\\] \"([^\"]+)\" (\\d+) (\\d+) \"([^\"]*)\" \"([^\"]*)",
+  "regex": "^(\\S+) (\\S+) \\S+ (\\S+) \\[([^\\]]+)\\] \"([^\"]*)\" (\\d+) (\\d+) \"([^\"]*)\" \"([^\"]*)",
   "fields": "vhost,ip,user,@timestamp,request,status,bytes_sent,referer,user_agent",
   "numerical_fields": "status,bytes_sent",
   "date_format": "DD/MMMM/YYYY:HH:mm:ss ZZ"
