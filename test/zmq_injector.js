@@ -1,6 +1,6 @@
 var events = require('events'),
-    log = require('log4node'),
-    zmq = require('zmq');
+  log = require('log4node'),
+  zmq = require('zmq');
 
 var target = process.argv[2];
 var type = process.argv[3];
@@ -18,8 +18,8 @@ var k = 0;
 var e = new events.EventEmitter();
 
 e.on('msg', function() {
-  k ++;
-  if (k % 10000 == 0) {
+  k++;
+  if (k % 10000 === 0) {
     log.info('Send', k);
   }
 });
@@ -30,12 +30,16 @@ var socket = zmq.socket('push');
 socket.connect(target);
 
 setInterval(function() {
-  kk ++;
-  for(var i = 0; i < count; i ++) {
-    socket.send(JSON.stringify({'@type': type, '@timestamp': (new Date()).toISOString(), '@message': 'message ' + kk + ' ' + i}));
+  kk++;
+  for (var i = 0; i < count; i++) {
+    socket.send(JSON.stringify({
+      'type': type,
+      '@timestamp': (new Date()).toISOString(),
+      'message': 'message ' + kk + ' ' + i
+    }));
     e.emit('msg');
   }
-  if (max == kk) {
+  if (max === kk) {
     process.exit(0);
   }
 }, period);

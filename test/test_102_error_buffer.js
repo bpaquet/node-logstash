@@ -1,7 +1,7 @@
 var vows = require('vows'),
-    assert = require('assert'),
-    events = require('events');
-    error_buffer = require('error_buffer');
+  assert = require('assert'),
+  events = require('events'),
+  error_buffer = require('lib/error_buffer');
 
 vows.describe('Error buffer').addBatch({
   'standard check': {
@@ -13,10 +13,11 @@ vows.describe('Error buffer').addBatch({
       e.on('error', function(err) {
         errors.push(err);
       });
-      for(var i = 0; i < 1000; i ++) {
-        setTimeout(function() {
-          b.emit('error', 'toto');
-        }, 600 * i / 1000);
+      var loop_f = function() {
+        b.emit('error', 'toto');
+      };
+      for (var i = 0; i < 1000; i++) {
+        setTimeout(loop_f, 600 * i / 1000);
       }
       setTimeout(function() {
         b.emit('ok', 'toto');

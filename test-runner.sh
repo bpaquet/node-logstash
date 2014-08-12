@@ -2,14 +2,26 @@
 
 set -e
 
-cd test
-
 if [ "$TEST" = "" ]; then
-  TEST=`ls test*.js`
+  TEST=`ls test/test*.js`
+  RUN_JSHINT=1
 fi
 
-for test in $TEST; do
-  echo "Launching test : $test"
-  PATH=/usr/sbin:$PATH TZ=Etc/GMT NODE_PATH=../lib:../lib/lib vows $test --spec
-  echo ""
-done
+export PATH="/usr/sbin:$PATH"
+export TZ="Etc/GMT"
+export NODE_PATH="test:lib:$NODE_PATH"
+
+echo "Launching test : $TEST"
+
+if [ "$COVER" != "" ]; then
+  rm -rf coverage
+  istanbul cover node_modules/.bin/vows -- $TEST --spec
+else
+  vows $TEST --spec
+fi
+
+echo ""
+
+if [ "$RUN_JSHINT" = "1" ]; then
+  ./jshint.sh
+fi

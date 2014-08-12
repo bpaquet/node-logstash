@@ -1,7 +1,7 @@
 {
   "name": "node-logstash",
   "description": "Logstash implementation in node JS",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "author": "Bertrand Paquet <bertrand.paquet@gmail.com>",
   "keywords": ["logstash", "log", "zmq", "zeromq"],
   "main": "./lib/log4node.js",
@@ -19,18 +19,25 @@
   "devDependencies": {
     "vows": "0.7.0",
     "vows-batch-retry": "0.0.4",
-    "whereis": "0.0.2"
+    "js-beautify": "1.4.x",
+    "whereis": "0.0.2",
+    "jshint": "2.x",
+    "istanbul": "0.1.x"
   },
   "scripts": {
     "test": "./test-runner.sh"
   },
   "dependencies": {
     "log4node": "0.1.2",
-    "zmq": "2.3.x",
-    "optimist": "0.3.4",
+    "optimist": "0.3.4"
+  },
+  "optionalDependencies":{
+    "zmq": "2.5.1",
     "moment": "1.7.0",
     "redis": "0.8.x",
-    "msgpack": "0.1.8"
+    "msgpack": "0.1.8",
+    "geoip-lite": "1.1.x",
+    "proxying-agent": "0.1.x"
   },
   "directories": {
     "test": "./test",

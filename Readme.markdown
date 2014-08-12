@@ -47,6 +47,11 @@ On agent, node-logstash is configured whith inputs plugins to get logs from your
 
 On log server, logs come trough a zeromq input plugin, are processed (fields and timestamps extraction), and send to elastic search.
 
+How to get help ?
+===
+
+Please mail the users groups : node-logstash-users@googlegroups.com, or open an [issue](https://github.com/bpaquet/node-logstash/issues).
+
 How to use it ?
 ===
 
@@ -86,6 +91,7 @@ Others params:
 * ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin
 * ``--db_file`` to specify the file to use as database for file inputs (see below)
 * ``--http_max_sockets`` to specify the max sockets of [http.globalAgent.maxSockets](http://nodejs.org/api/http.html#http_agent_maxsockets). Default to 100.
+* ``--alarm_file`` to specify a file which will be created if node-logstash goes in alarm mode (see below).
 
 Examples
 ---
@@ -101,11 +107,41 @@ Config file for log server:
     filter://regex://http_combined
     output://elasticsearch://localhost:9001
 
+Signals
+---
+
+* USR1: stoping or starting all inputs plugins. Can be used to close input when output targer are failing
+* USR2: see below file output plugin
+
 Changelog
 ===
 
+* Add only\_field\_match\_ options
+* Do not log error with Geo IP filter and local ips
+* Fix bug #62 : only_type not honored when component have no config (thx to @ryepup)
+* Allow ZeroMQ output to multiple hosts (thx to @dax)
+* Add bunyan filter (thx to @JonGretar)
+* Implement BLPOP / RPUSH mechanism for redis, and use it by default. Thx to @perrinood.
+* ElasticSearch indexes now use UTC, and defaut type value is logs instead of data
+* Add wilcard for input file plugin
+* Add delimiter for file and tcp plugins
+* Auth on redis
+* Improve dns reverse filter
+* Compatibility with ZeroMQ 2.2.x, 3.x, 4.x
+* Add USR1 signal to stop and start inputs plugins
+* Add TCP / TLS plugin, thx to @dlanderson
+* Add input HTTP plugin, thx to @fujifish
+* Refactor SSL management
+* Add GeopIP filter, thx to @subutux
 * Add serializer and unserializer support
 * Allow to use input file plugin on non existent directory
+* Utf-8 is now the default encoding for input file plugin
+
+0.0.3
+---
+
+* Add [Log.io](http://logio.org) output
+* Use the 1.2 logstash json format
 
 0.0.2
 ---
@@ -127,9 +163,18 @@ Supported unserializer for input plugin :
 File
 ---
 
-This plugin monitor log files. It's compatible with logrotate. If a db file is specified, this plugin store where the last line were read when node-logstash stop. This value is used when node-logstash restart to read lines written node-logstash downtime.
+This plugin monitor log files.
 
-Example: ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
+Wildcard (* and ?) can be used.
+
+This plugin is compatible with logrotate.
+
+If a db file is specified on node-logstash command line (``--db_file``), this plugin stores the last line read for each file, to allow restart at the same place, even the monitored file grows when node-logstash were down.
+
+Example:
+* ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
+* ``input://file:///var/log/*.log``, to monitor all log file in ``/var/log``.
+* ``input://file:///var/log/auth%3F.log``, to monitor all files matching ``auth?.log`` in ``/var/log``. ``%3F`` is the encoding of ``?``.
 
 Parameters:
 
@@ -152,7 +197,7 @@ Example:
 * ``filter://syslog_pri://?only_type=syslog``
 
 The first filter will parse the syslog line, and extract ``syslog_priority``, ``syslog_program``, ``syslog_pid`` fields,
-parse timestamp, and will replace ``@source_host`` and ``@message`` field.
+parse timestamp, and will replace ``host`` and ``message`` field.
 
 The second filter will extract from ``syslog_priority`` field severity and facility.
 
@@ -176,16 +221,55 @@ Redis
 
 This plugin is used on log server to receive logs from redis channels. json_event format is expected.
 
+They are two method to get message from redis :
+* Publish / subscribe : The ``subscribe`` redis command will be used. Parameters ``channel`` and ``pattern_channel`` are needed.
+* Queue. This ``blpop`` redis command will be used. ``key`` parameter is needed.
+
 Example:
 
 * ``input://redis://localhost:6379?channel=logstash_channel``
 
 Parameters:
 
-* ``channel``: Redis channel to subscribe/psubscribe to
+* ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
-* ``pattern_channel``: use channel as pattern. Default value : false
+* ``method``: ``pubsub`` or ``queue`` Default value: ``queue``.
+* ``channel``: Channel for publish / subscribe. No default value.
+* ``pattern_channel``: use channel as pattern. Default value : false.
+* ``key``: Queue name for queue. No default value.
 * ``unserializer``: please see above. Default value to ``json_logstash``.
+
+HTTP
+---
+
+This plugin is used on log server to receive logs from an HTTP/HTTPS stream. This is useful
+in case the agent can only output logs through an HTTP/HTTPS channel.
+
+Example:
+
+* ``input://http://localhost:8080``
+
+Parameters:
+
+* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=http``. No default value.
+* ``unserializer``: please see above. Default value to ``json_logstash``.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+
+TCP / TLS
+---
+This plugin is used on log server to receive data over TCP, optionnaly with SSL/TLS encryption.
+
+Examples:
+
+* TCP mode: ``input://tcp://0.0.0.0:12345``
+* SSL mode: ``input://tcp://0.0.0.0:443?ssl=true&ssl_key=/etc/ssl/private/logstash-server.key&ssl_cert=/etc/ssl/private/logstash-server.crt&ssl_requestCert=true&ssl_rejectUnauthorized=true``
+
+Parameters:
+
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``appendPeerCert``: Optional. In SSL mode, adds details of the peer certificate to the @tls field if the peer certificate was received from the client using requestCert option. Default: true in SSL mode
+* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
+* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 Outputs and filter, commons parameters
 ===
@@ -193,14 +277,15 @@ Outputs and filter, commons parameters
 * ``only_type``: execute the filter / output plugin only on lines with specified type. Example: ``only_type=nginx``
 * ``only_field_exist_toto``: execute the filter / output plugin only on lines with a field ``toto``. You can specify it multiple times, all fields have to exist.
 * ``only_field_equal_toto=aaa``: execute the filter / output plugin only on lines with a field ``toto``, with value ``aaa``. You can specify it multiple times, all fields have to exist and have the specified value.
+* ``only_field_match_toto=aaa$``: execute the filter / output plugin only on lines with a field ``toto``, with value match the regular expression ``aaa$``. You can specify it multiple times, all fields have to exist and match the regular expression.
 
 Access to line log properties
 ===
 
 Some params are string, which can reference line log properties:
 
-* ``#{@message}`` will contain the full log line
-* ``#{@type}`` will contain the type of log line
+* ``#{message}`` will contain the full log line
+* ``#{type}`` will contain the type of log line
 * ``#{toto}`` will contain the value of the field ``toto``, which have to be extracted with a regex filter
 * ``2#{toto}`` will contain ``2`` followed by the value of the field ``toto``.
 
@@ -219,29 +304,38 @@ Supported serializer for output plugin :
 ZeroMQ
 ---
 
-This plugin is used on agents to send logs to logs servers.
+This plugin is used on agents to send logs to logs servers, or to send logs to [Elasticsearch Logstash River](https://github.com/bpaquet/elasticsearch-river-zeromq).
 
-Example: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
+Example 1: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
+Example 1: ``output://zeromq://tcp://192.168.1.1:5555,tcp://192.168.1.2:5555``, to send logs to 192.168.1.1 and 192.168.1.1, using built in ZeroMQ load balancing feature.
+
+There are two queues in ZeroMQ output plugin :
+
+* in the ZeroMQ library (see high watermark below). Default size: unlimited
+* in the ZeroMQ NodeJS driver. Size is unlimited.
 
 Parameters:
 
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
+* ``zmq_high_watermark``: set the high watermark param on [ZeroMQ socket](http://api.zeromq.org/2-1:zmq-setsockopt). Default : no value.
+* ``zmq_threshold_up``: if the NodeJS driver queues size goes upper this threshold, node-losgstash will stop every inputs plugins to avoid memory exhaustion. Default : no value.
+* ``zmq_threshold_down``: if the NodeJS driver queues size goes down this threshold and inputs plugins are stopped, node-losgstash will start every inputs plugins. Default : no value.
+* ``zmq_check_interval``: if set, the plugin will check the NodeJS driver queue status to go out of alarm mode. Default : no value. Unit is milliseconds
 
 Elastic search
 ---
 
 This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
 
+Note : for better performance, you can also use the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
+
 Example: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
 
-Elastic search ZeroMQ
----
+Parameters:
 
-This plugin is used on log server to send logs to elastic search, using ZeroMQ transport.
-You can find the ZeroMQ transport here: https://github.com/bpaquet/transport-zeromq.
-
-Example: ``output://elasticsearch_zeromq://tcp://localhost:9700`` to send to the zeromq transport of an elastic search server listening on port 9700.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
 Statsd
 ---
@@ -269,8 +363,8 @@ Example: ``output://gelf://192.168.1.1:12201``, to send logs to 192.168.1.1 port
 
 Parameters:
 
-* ``message``: ``short_message`` field. Default value: ``#{@message}``, the line of log. Can reference log line properties (see above).
-* ``facility``: ``facility`` field. Default value: ``#{@type}``, the line type. ``no_facility`` if no value. Can reference log line properties (see above).
+* ``message``: ``short_message`` field. Default value: ``#{message}``, the line of log. Can reference log line properties (see above).
+* ``facility``: ``facility`` field. Default value: ``#{type}``, the line type. ``no_facility`` if no value. Can reference log line properties (see above).
 * ``level``: ``level`` field. Default value: ``6``. Can reference log line properties (see above).
 * ``version``: ``version`` field. Default value: ``1.0``.
 
@@ -281,15 +375,16 @@ This plugin is used to write data into files. There are two modes: JSON, and raw
 
 In JSON mode, each line of log is dumped to target file as JSON object, containing all fields.
 
-In raw mode, each line of log is dumped to target file as specified in ``format`` parameter. Default format is ``#{@message}``, which means the original log line.
+In raw mode, each line of log is dumped to target file as specified in ``format`` parameter. Default format is ``#{message}``, which means the original log line.
 
-Note: target files can be reopened by sending USR signal to node-logstash.
+Note: target files can be reopened by sending USR2 signal to node-logstash.
 
 Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each ``nginx`` log lines to ``/var/log/toto.log``.
 
 Parameters:
 
 * ``serializer``: please see above. Default value to ``raw``.
+* ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
 * ``format``: please see above. Used by the ``raw``serializer.
 
 HTTP Post
@@ -306,14 +401,19 @@ Example 1: Send data to [Loggly](http://loggly.com/): ``output://http_post://log
 Parameters:
 
 * ``path``: path to use in the HTTP request. Can reference log line properties (see above).
-* ``proto``: ``http`` or ``https``. Default value: ``http``.
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
 Redis
 ---
 
 This plugin is used to sent data on a Redis channel.
+
+They are two method to send message from redis :
+* Publish / subscribe : The ``publsh`` redis command will be used. ``channel` parameter is needed.
+* Queue. This ``rpush`` redis command will be used. ``key`` parameter is needed.
 
 Example:
 
@@ -321,11 +421,45 @@ Example:
 
 Parameters:
 
-* ``channel``: Redis channel to subscribe/psubscribe to
+* ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
-* ``pattern_channel``: use channel as pattern. Default value : false
+* ``method``: ``pubsub`` or ``queue``. Method to use for redis messaging.
+* ``channel``: Channel for publish / subscribe. No default value.
+* ``key``: Queue name for queue. No default value.
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
+
+Logio
+---
+
+This plugin is used to sent data to a [Log.io](http://logio.org) server.
+
+Example:
+
+* ``output://logio://localhost:28777``
+
+Others params:
+
+* ``--priority`` to change the line priority. Can reference log line properties. Default value: ``info``.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
+
+TCP / TLS
+---
+
+This plugin is used on log clients to send data over TCP, optionnaly with SSL/TLS encryption.
+
+Example:
+
+* TCP mode:  ``output://tcp://192.168.1.1:12345``
+* SSL Mode: ``output://tcp://192.168.1.1:443?ssl=true&ssl_key=/etc/ssl/private/logstash-client.key&ssl_cert=/etc/ssl/private/logstash-client.crt&ssl_rejectUnauthorized=true``
+
+Parameters:
+
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
+* ``format``: Optional. Please see above. Used by the ``raw``serializer.
+* ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
 
 Filters
 ===
@@ -344,6 +478,7 @@ Example 3: ``filter://regex://?regex=(\d+|-)&fields=a&numerical_fields=a``, to f
 Parameters:
 
 * ``regex``: regex to apply.
+* ``regex_flags: regex flags (eg : g, i, m).
 * ``fields``: name of fields which will receive the pattern extracted (see below for the special field @timestamp).
 * ``numerical_fields``: name of fields which have to contain a numerical value. If value is not numerical, field will not be set.
 * ``date_format``: if ``date_format` is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
@@ -376,17 +511,19 @@ Example 3: ``filter://grep://?type=nginx&regex=abc`` remove all lines with type 
 Parameters:
 
 * ``regex``: regex to be matched. You have to escape special characters.
+* ``regex_flags: regex flags (eg : g, i, m).
 * ``invert``: if ``true``, remove lines which match. Default value: false.
 
 Reverse DNS
 ---
 
-The reverse dns filter replace an ip in `@source_host` by the hostname, performing a dns resolution. This is useful with syslog.
+The reverse dns filter replace an ip in a field by the hostname, performing a dns resolution. This is useful with syslog.
 
-Example 1: ``filter://reverse_dns://`` 
+Example 1: ``filter://reverse_dns://host`` performs a dns resolution on the field ``host``.
 
 Parameters:
 
+* ``target_field``: field to store the result. Default: field used for resolution.
 * ``only_hostname``: after dns resolution, the filter will keep only the first word of dns name. Example : 'www.free.fr' will be transformed to 'www'. Default value: true
 
 Compute field
@@ -405,7 +542,7 @@ Parameters:
 Compute date field
 ---
 
-The compute date field filter is used to compute a date field from ``@timestamp``field, using using [moment](http://momentjs.com/docs/#/parsing/string-format/) date format.
+The compute date field filter is used to compute a date field from ``timestamp``field, using using [moment](http://momentjs.com/docs/#/parsing/string-format/) date format.
 
 Example 1: ``filter://compute_date_field://toto?date_format=DD/MMMM/YYYY`` add a field named ``toto``, containing timestamp formated with ``DD/MMMM/YYYY``
 
@@ -418,7 +555,7 @@ Split
 
 The split filter is used to split a line of log into multiple lines, on a given delimiter.
 
-Example 1: ``filter://split://?delimiter=|`` split all lines of logs on ``|`` char.
+Example 1: ``filter://split://?delimiter=|`` split all lines of logs on ``|`` char. You have to url encode special chars (%0A for ``\n``).
 
 Parameters:
 
@@ -429,26 +566,99 @@ Multiline
 
 The multiline filter is used to regroup lines into blocks. For example, you can group lines from a Java stacktrace into single line of log. To do that, you have to provide a regular expression which match the first line of each block. Standard way is to detect a timestamp.
 
-Example 1: ``filter://multiline?start_line_regex=^\\d{4}-\\d{2}-\\d{2}`` will regroup lines by blocks, each block have to start with a line with a date like ``2012-12-02``
+Example 1: ``filter://multiline://?start_line_regex=^\\d{4}-\\d{2}-\\d{2}`` will regroup lines by blocks, each block have to start with a line with a date like ``2012-12-02``
 
 Parameters:
 
-* ``start_line_regex``: egular expression which is used to find lines which start blocks. You have to escape special characters.
+* ``start_line_regex``: regular expression which is used to find lines which start blocks. You have to escape special characters.
+* ``regex_flags: regex flags (eg : g, i, m).
 * ``max_delay``: delay to wait the end of a block. Default value: 50 ms. Softwares which write logs by block usually write blocks in one time, this parameter is used to send lines without waiting the next matching start line.
 
 Json Fields
 ---
 
-The json fields filter is used to parse the message payload as a JSON object, and merge it to the ``@fields`` attribute.
+The json fields filter is used to parse the message payload as a JSON object, and merge it into current object.
 
-This allows to automatically index fields for messages that already contain a well-formatted JSON payload. The JSON object is parsed starting from the first ``{`` character found in the message. 
+This allows to automatically index fields for messages that already contain a well-formatted JSON payload. The JSON object is parsed starting from the first ``{`` character found in the message.
 
-Filter does nothing in case of error while parsing the message. Existing attributes in ``@fields`` are kept, but overwritten if they conflict with attributes from the parsed payload.
+Filter does nothing in case of error while parsing the message. Existing attributes in current line are kept, but overwritten if they conflict with attributes from the parsed payload.
 
-Example 1: ``filter://json_fields://?only_type=json_stream`` will parse, as JSON, the given stream of messages which ``@type`` matches ``json_stream``, and fill the ``@fields`` attribute using the messages content.
+Example 1: ``filter://json_fields://?only_type=json_stream`` will parse, as JSON, the given stream of messages which ``type`` matches ``json_stream``.
+
+Geoip
+---
+
+The geoip filter is used to perform a geoip lookup from a given field, and store teh result into current object.
+
+After installing, to update the geoip database from maxmind, go to `node_modules/geoip-lite/` and execute `npm run-script updatedb`.
+
+The reverse dns filter can be used before geop filter to resolve hostname.
+
+Example 1: ``filter://geoip://ip`` will lookup for ``ip`` field in the geoip database. The resulting object will contains following fields: ``ip_geo_country``, ``ip_geo_region``, ``ip_geo_city``, ``ip_geo_lonlat``, filled with geoip lookup result.
+
+Parameters:
+
+* ``country_field``: field in which to store the geo ip country result. Default value : ``ip_geo_country``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip country result will not be stored.
+* ``region_field``: field in which to store the geo ip region result. Default value : ``ip_geo_region``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip region result will not be stored.
+* ``city_field``: field in which to store the geo ip city result. Default value : ``ip_geo_city``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip city result will not be stored.
+* ``lonlat_field``: field in which to store the geo ip longitude and latitude result. Default value : ``ip_geo_lonlat`, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip longitude and latitude result will not be stored.
+
+Eval
+---
+
+The eval filter is used to process a field with javascript code.
+
+Example 1: ``filter://eval://delay?operation=x*1000`` multiply the value of field ``delay`` by 1000.
+Example 2: ``filter://eval://toto?operation=x+%22a%22`` add ``a`` character to the field ``toto``.
+
+Parameters:
+
+* ``operation``: javascript code to execute. The input field is in the ``x`` variable.
+* ``target_field``: field to store the result. Default : source field.
+
+Bunyan
+---
+
+The bunyan filter parse the [bunyan log format](https://github.com/trentm/node-bunyan).
+
+Example: ``filter://bunyan://?only_type=toto`` parse the logs with type toto, using the bunyan log format.
+
+HTTP Status classifier
+---
+
+The http status classifier filter parse the status code.
+
+Example: ``filter://http_status_classifier://http_status`` parse the ``http_status`` field and fill the ``http_class`` field with value like ``2xx``, ``3xx``.
+
+Parameters:
+* ``target_field``: field to store the result. Default : ``http_class``.
+* ``special_codes``: http status codes to be kept as is. Eg, with ``498,499`` value in ``special_codes``, the filter will put 499 in the ``http_class`` field when receiving a ``499`` http code, and not ``4xx``. Mutlipe values must be separated with ``,``. Default value: empty.
 
 Misc
 ===
+
+SSL Params
+---
+
+When you are in SSL mode (client or server), you can use [all the parameters using by node for SSL / TLS](http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener), prefixed by ``ssl_``.
+You have to give path for certificate and key params, node-logstash will load them before initializing SSL / TLS stack.
+
+For example, for a HTTPS server : ``ssl=true&ssl_cert=/path/to/cert&ssl_key=/path/to/key``
+
+For using a Certificate authority, add ``&ssl_ca=/path/to/ca``.
+
+For changing SSL ciphers, add ``ssl_ciphers=AES128-GCM-SHA256``.
+
+HTTP Proxy
+---
+
+The proxy parameter allow to use an http proxy.
+
+The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` which gives support for:
+  * http and https proxies
+  * proxy authentication via userinfo ``username:password`` in plain text or in base64 encoding (i.e. ``dXNlcm5hbWU6cGFzc3dvcmQ=``)
+  * proxy port
+  * NTLM : for ntlm authent, userinfo have to be ``ntlm:domain:hostname:username:password``. Hostname can be empty.
 
 Force fields typing in Elastic Search
 ---
@@ -463,13 +673,9 @@ For both cases you should add a `default-mapping.json` file in Elastic Search co
 {
   "_default_": {
     "properties": {
-      "@fields": {
-        "properties": {
-          "my_hash_field": {
-            "type" : "string",
-            "index" : "not_analyzed"
-          }
-        }
+      "my_hash_field": {
+        "type" : "string",
+        "index" : "not_analyzed"
       }
     }
   }
@@ -479,7 +685,7 @@ For both cases you should add a `default-mapping.json` file in Elastic Search co
 License
 ===
 
-Copyright 2012 - 2013 Bertrand Paquet
+Copyright 2012 - 2014 Bertrand Paquet
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

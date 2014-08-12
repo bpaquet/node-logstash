@@ -1,11 +1,12 @@
+/* jshint unused:false */
 var vows = require('vows'),
-    assert = require('assert'),
-    file_loader = require('../lib/lib/file_loader');
+  assert = require('assert'),
+  file_loader = require('lib/file_loader');
 
 vows.describe('File loader').addBatch({
   'simple': {
     topic: function() {
-      file_loader.loadFile('file_loader_test/simple', this.callback);
+      file_loader.loadFile('test/file_loader_test/simple', this.callback);
     },
 
     check: function(err, result) {
@@ -16,7 +17,7 @@ vows.describe('File loader').addBatch({
 
   'multiple': {
     topic: function() {
-      file_loader.loadFile('file_loader_test/multiple', this.callback);
+      file_loader.loadFile('test/file_loader_test/multiple', this.callback);
     },
 
     check: function(err, result) {
@@ -27,7 +28,7 @@ vows.describe('File loader').addBatch({
 
   'comment': {
     topic: function() {
-      file_loader.loadFile('file_loader_test/comment', this.callback);
+      file_loader.loadFile('test/file_loader_test/comment', this.callback);
     },
 
     check: function(err, result) {
@@ -38,18 +39,17 @@ vows.describe('File loader').addBatch({
 
   'file not found': {
     topic: function() {
-      file_loader.loadFile('file_loader_test/comment2', this.callback);
+      file_loader.loadFile('test/file_loader_test/comment2', this.callback);
     },
-
     check: function(err, result) {
-      assert.ok(err);
-      assert.ok(err.toString().match(/ENOENT/), 'Match failed on ' + err.toString());
+      assert.isDefined(err);
+      assert.match(err.toString(), /ENOENT/);
     }
   },
 
   'loadDirectory': {
     topic: function() {
-      file_loader.loadDirectory('file_loader_test', this.callback);
+      file_loader.loadDirectory('test/file_loader_test', this.callback);
     },
 
     check: function(err, result) {
@@ -60,12 +60,12 @@ vows.describe('File loader').addBatch({
 
   'directory not found': {
     topic: function() {
-      file_loader.loadDirectory('file_loader_test2', this.callback);
+      file_loader.loadDirectory('test/file_loader_test2', this.callback);
     },
 
     check: function(err, result) {
-      assert.ok(err);
-      assert.ok(err.toString().match(/ENOENT/), 'Match failed on ' + err.toString());
+      assert.isDefined(err);
+      assert.match(err.toString(), /ENOENT/);
     }
   },
 

@@ -1,9 +1,15 @@
 language: node_js
-services:
-  - redis-server
 node_js:
   - "0.10"
   - "0.8"
+env:
+  - ZEROMQ_VERSION=2.1.11-1ubuntu1
+  - ZEROMQ_VERSION=3.2.4-bpa~precise1
+  - ZEROMQ_VERSION=4.0.4-bpa~precise1
 before_install:
-  - sudo apt-get install libzmq3-dev
-  - sudo apt-get install logrotate
+  - sudo add-apt-repository ppa:bpaquet/zeromq3-precise -y
+  - sudo add-apt-repository ppa:bpaquet/zeromq4-precise -y
+  - sudo apt-get update
+  - sudo apt-get install -y logrotate
+  - sudo apt-get install -y libzmq1=${ZEROMQ_VERSION} libzmq-dev=${ZEROMQ_VERSION}
+  - npm install -g npm

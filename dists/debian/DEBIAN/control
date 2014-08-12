@@ -1,12 +1,12 @@
-Package: logstash 
+Package: logstash
 Version: ##VERSION##
 Section: base
 Priority: optional
 Architecture: amd64
-Depends: libc6, libgcc1, libstdc++6, libzmq1 
+Depends: libc6, libgcc1, libstdc++6, libzmq1
 Maintainer: Bertrand Paquet <bertrand.paquet@gmail.com>
-Description: 
+Description:
  Collect logs on multiple servers and ship them to elastic search
  https://github.com/bpaquet/node-logstash
  Git sha1 : ##GIT_SHA1##
-   
+
