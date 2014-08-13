@@ -354,6 +354,24 @@ Parameters:
 
 Example: ``metric_key=nginx.response.#{status}``
 
+Datadog
+---
+
+This plugin is used send data to the datadog statsd which has some extended functionality (like tags) compared to statsd.
+
+Example: ``output://datadog://localhost:8125?only_type=nginx&metric_type=increment&metric_key=nginx.request&tags=server:web1``, to send, for each line of nginx log, a counter with value 1, key ``nginx.request``, on a datadog statsd instance located on port 8125.
+
+Parameters:
+
+* ``metric_type``: one of ``increment``, ``decrement``, ``counter``, ``timer``, ``gauge``, ``histogram``, ``set``. Type of value to send to datadog statsd.
+* ``metric_key``: key to send to statsd.
+* ``metric_value``: metric value to send to statsd. Mandatory for ``timer``, ``counter``, ``gauge``, ``histogram`` and ``set`` type.
+* ``tags``: tags you want to send to datadog. Example: &tags=status:200,server:web1
+
+``metric_key``, ``metric_value`` and ``tags`` can reference log line properties (see above).
+
+Example: ``metric_key=nginx.response.#{status}``
+
 Gelf
 ---
 
