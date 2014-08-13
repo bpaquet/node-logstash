@@ -503,6 +503,32 @@ Parameters:
 
 Note: fields with empty values will not be set.
 
+Regex URL
+---
+
+The url regex filter is the same as the regex filter but has additional parameters to parse the GET params from urls (url.parse() is used).
+
+Example 1: ``filter://regex_url://?regex=^(\S)+ &fields=toto``, to extract the first word of a line of logs, and place it into the ``toto`` field.
+
+Example 2: ``filter://regex_url://http_combined?only_type=nginx``, to extract fields following configuration into the http_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
+
+Example 3: ``filter://regex_url://?regex=(\d+|-)&fields=a&numerical_fields=a``, to force number extraction. If the matched string is not a number but ``-``, the field ``a`` will not be set.
+
+Example 4: ``filter://regex_url://http_combined?only_type=nginx&request_fields=url&request_fields_list=param1,param2&request_prefix=req_``, to force number extraction. If the matched string is not a number but ``-``, the field ``a`` will not be set.
+
+Parameters:
+
+* ``regex``: regex to apply.
+* ``regex_flags: regex flags (eg : g, i, m).
+* ``fields``: name of fields which will receive the pattern extracted (see below for the special field @timestamp).
+* ``numerical_fields``: name of fields which have to contain a numerical value. If value is not numerical, field will not be set.
+* ``request_fields``: name of fields which should parsed with url.parse() - so every GET param in these fields are own fields afterwards (with request_prefix).
+* ``request_fields_list``: whitelist of request_fields - so if this is given only params in this will result in own fields if they are parsed within request_fields.
+* ``request_prefix``: prefix of the request param fields (?param1=foo&param2=bar results in req_param1:foo,req_param2:bar with the request_prefix set to req_)
+* ``date_format``: if ``date_format` is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
+
+Note: fields with empty values will not be set.
+
 Mutate replace
 ---
 
