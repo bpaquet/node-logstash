@@ -159,6 +159,9 @@ vows.describe('Filter Geoip ').addBatch({
     {
       'ip': '172.31.0.1',
     },
+    {
+      'ip': '127.0.0.1',
+    },
   ], [
     {
       'ip': '10.0.0.1',
@@ -213,6 +216,9 @@ vows.describe('Filter Geoip ').addBatch({
     },
     {
       'ip': '172.31.0.1',
+    },
+    {
+      'ip': '127.0.0.1',
     },
   ]),
 }).export(module);
