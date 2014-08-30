@@ -149,6 +149,20 @@ Changelog
 * Add redis input and output plugin
 * Add tail -f input file plugin
 
+Plugins list
+===
+
+Inputs
+---
+
+* [File](#file)
+* [Syslog](#syslog)
+* [ZeroMQ](#zeromq)
+* [Redis](#redis)
+* [HTTP](#http)
+* [TCP](#tcp--tls)
+
+
 Inputs plugins
 ===
 
