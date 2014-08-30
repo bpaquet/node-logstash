@@ -367,7 +367,7 @@ Parameters:
 * ``zmq_threshold_down``: if the NodeJS driver queues size goes down this threshold and inputs plugins are stopped, node-losgstash will start every inputs plugins. Default : no value.
 * ``zmq_check_interval``: if set, the plugin will check the NodeJS driver queue status to go out of alarm mode. Default : no value. Unit is milliseconds
 
-Elastic search
+ElasticSearch
 ---
 
 This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
