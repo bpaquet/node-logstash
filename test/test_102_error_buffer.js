@@ -13,23 +13,25 @@ vows.describe('Error buffer').addBatch({
       e.on('error', function(err) {
         errors.push(err);
       });
-      var loop_f = function() {
+      var count = 0;
+      var i = setInterval(function() {
         b.emit('error', 'toto');
-      };
-      for (var i = 0; i < 1000; i++) {
-        setTimeout(loop_f, 600 * i / 1000);
-      }
-      setTimeout(function() {
-        b.emit('ok', 'toto');
-        b.emit('ok', 'toto');
-        b.emit('ok', 'toto');
-      }, 700);
-      setTimeout(function() {
-        callback(undefined, errors);
-      }, 1200);
+        count += 1;
+        if (count === 500) {
+          clearInterval(i);
+          setTimeout(function() {
+            b.emit('ok', 'toto');
+            b.emit('ok', 'toto');
+            b.emit('ok', 'toto');
+            setTimeout(function() {
+              callback(undefined, errors);
+            }, 200);
+          }, 200);
+        }
+      }, 1);
     },
     check: function(errors) {
-      assert.deepEqual(errors, ['my name start failing: toto', 'my name still failing.', 'my name still failing.', 'my name is back to normal.']);
+      assert.deepEqual(errors, ['my name start failing: toto', 'my name still failing.', 'my name still failing.', 'my name still failing.', 'my name is back to normal.']);
     }
   }
 }).export(module);
