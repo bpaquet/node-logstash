@@ -36,9 +36,9 @@ How it's works ?
 
 The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules:
 
-* [inputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
-* [filter plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/filters): extract fields from logs, like timestamps. Example: regex plugin
-* [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
+* [inputs plugins](#inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
+* [filter plugins](#filters): extract fields from logs, like timestamps. Example: regex plugin
+* [outputs plugins](#outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
 
 
 A typical node-logstash deployement contains agents to crawl logs and a log server.
@@ -148,6 +148,50 @@ Changelog
 
 * Add redis input and output plugin
 * Add tail -f input file plugin
+
+Plugins list
+===
+
+Inputs
+---
+
+* [File](#file)
+* [Syslog](#syslog)
+* [ZeroMQ](#zeromq)
+* [Redis](#redis)
+* [HTTP](#http)
+* [TCP / TLS](#tcp--tls)
+
+Filters
+---
+
+* [Regex](#regex)
+* [Mutate Replace](#mutate-replace)
+* [Grep](#grep)
+* [Reverse DNS](#reverse-dns)
+* [Compute field](#compute-field)
+* [Compute date field](#compute-date-field)
+* [Split](#split)
+* [Multiline](#multiline)
+* [Json fields](#json-fields)
+* [Geoip](#geoip)
+* [Eval](#eval)
+* [Bunyan](#bunyan)
+* [HTTP Status Classifier](#http-status-classifier)
+
+Outputs
+---
+
+* [ZeroMQ](#zeromq-1)
+* [ElasticSearch](#elasticsearch)
+* [Statsd](#statsd)
+* [Gelf](#gelf)
+* [File](#file-1)
+* [HTTP Post](#http-post)
+* [Redis](#redis-1)
+* [Logio](#logio)
+* [TCP / TLS](#tcp--tls-1)
+
 
 Inputs plugins
 ===
@@ -323,7 +367,7 @@ Parameters:
 * ``zmq_threshold_down``: if the NodeJS driver queues size goes down this threshold and inputs plugins are stopped, node-losgstash will start every inputs plugins. Default : no value.
 * ``zmq_check_interval``: if set, the plugin will check the NodeJS driver queue status to go out of alarm mode. Default : no value. Unit is milliseconds
 
-Elastic search
+ElasticSearch
 ---
 
 This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
