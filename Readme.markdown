@@ -36,9 +36,9 @@ How it's works ?
 
 The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules:
 
-* [inputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
-* [filter plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/filters): extract fields from logs, like timestamps. Example: regex plugin
-* [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
+* [inputs plugins](#inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
+* [filter plugins](#filters): extract fields from logs, like timestamps. Example: regex plugin
+* [outputs plugins](#outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
 
 
 A typical node-logstash deployement contains agents to crawl logs and a log server.
@@ -160,7 +160,37 @@ Inputs
 * [ZeroMQ](#zeromq)
 * [Redis](#redis)
 * [HTTP](#http)
-* [TCP](#tcp--tls)
+* [TCP / TLS](#tcp--tls)
+
+Filters
+---
+
+* [Regex](#regex)
+* [Mutate Replace](#mutate-replace)
+* [Grep](#grep)
+* [Reverse DNS](#reverse-dns)
+* [Compute field](#compute-field)
+* [Compute date field](#compute-date-field)
+* [Split](#split)
+* [Multiline](#multiline)
+* [Json fields](#json-fields)
+* [Geoip](#geoip)
+* [Eval](#eval)
+* [Bunyan](#bunyan)
+* [HTTP Status Classifier](#http-status-classifier)
+
+Outputs
+---
+
+* [ZeroMQ](#zeromq-1)
+* [ElasticSearch](#elasticsearch)
+* [Statsd](#statsd)
+* [Gelf](#gelf)
+* [File](#file-1)
+* [HTTP Post](#http-post)
+* [Redis](#redis-1)
+* [Logio](#logio)
+* [TCP / TLS](#tcp--tls-1)
 
 
 Inputs plugins
