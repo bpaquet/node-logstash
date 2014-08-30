@@ -31,7 +31,11 @@ vows.describe('Error buffer').addBatch({
       }, 1);
     },
     check: function(errors) {
-      assert.deepEqual(errors, ['my name start failing: toto', 'my name still failing.', 'my name still failing.', 'my name still failing.', 'my name is back to normal.']);
+      assert.equal(errors[0], 'my name start failing: toto');
+      assert.equal(errors[errors.length - 1], 'my name is back to normal.');
+      for(var i = 1; i < errors.length - 2; i ++) {
+        assert.equal(errors[i], 'my name still failing.');
+      }
     }
   }
 }).export(module);
