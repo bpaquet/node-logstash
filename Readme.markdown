@@ -116,6 +116,9 @@ Signals
 Changelog
 ===
 
+* Add GAE input
+* Fix issue #70 with reconnect on TCP Output
+* Fix issue #75 when stopping with TCP input
 * Add only\_field\_match\_ options
 * Do not log error with Geo IP filter and local ips
 * Fix bug #62 : only_type not honored when component have no config (thx to @ryepup)
@@ -161,6 +164,7 @@ Inputs
 * [Redis](#redis)
 * [HTTP](#http)
 * [TCP / TLS](#tcp--tls)
+* [Google app engine](#google-app-engine)
 
 Filters
 ---
@@ -314,6 +318,24 @@ Parameters:
 * ``appendPeerCert``: Optional. In SSL mode, adds details of the peer certificate to the @tls field if the peer certificate was received from the client using requestCert option. Default: true in SSL mode
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
+
+Google App Engine
+---
+This plugin is used to collect logs from a running Google App Engine Application.
+
+You have to add a [servlet in your App Engine App](docs/gae/Readme.md). The plugin will poll the logs from this servlet.
+
+Examples:
+
+* ``input://gae://myapp.appspot.com:80?key=toto``. Will grab the logs from myapp GAE app, every minutes, on url ``http://myapp.appspot.com:80/logs?log_key=toto``
+
+Parameters:
+
+* ``key``. The security key which will be sent in the http query to Google App Engine.
+* ``ssl``: use ssl for grabbing logs. Use port 443 in this case. Default : false
+* ``response``: Polling delay. Default: 60s.
+* ``servlet_name``: Name of the servlet which serve logs. Default : ``logs``.
+* ``access_logs_field_name`` and ``access_logs_type``. If the received line of log has a field ``access_logs_field_name``, the plugin will set the type of the line to ``access_logs_type``. It's used to differentiate access logs from application logs, to apply specific filter on access_logs. No default value.
 
 Outputs and filter, commons parameters
 ===

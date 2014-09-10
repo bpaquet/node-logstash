@@ -1,10 +1,14 @@
 GAE Input
 =========
 
-A servlet in GAE should render the logs in text format.
+You have to deploy a servlet in your GAE app to get the logs.
+This servler should render the logs in text format.
 Each line must be a JSON that logstash can use.
+
 Here is an exemple of a servlet rendering the access logs & application logs.
 We use Gson for generating Json.
+
+We use a very simple authentication system : a query string param ``log_key``.
 
 
 ````java
@@ -13,6 +17,10 @@ We use Gson for generating Json.
 
   @Override
   void doGet(HttpServletRequest req, HttpServletResponse response) throws ServletException, IOException {
+    if(!"my_key".equals(request.getParameter("log_key"))) {
+      return response.sendError(401);
+    }
+
     StringBuilder builder = new StringBuilder();
 
     //Get the timestamp from when getting the logs
