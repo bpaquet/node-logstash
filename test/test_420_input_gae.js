@@ -136,10 +136,14 @@ vows.describe('Integration input gae:').addBatchRetry({
         ], function(agent) {
           setTimeout(function() {
             agent.close(function() {
-              http.globalAgent.sockets['localhost:56534'].forEach(function(x) {
-                x.end();
+              if ( http.globalAgent.sockets['localhost:56534']) {
+                http.globalAgent.sockets['localhost:56534'].forEach(function(x) {
+                  x.end();
+                });
+              }
+              server.close(function() {
+                callback();
               });
-              server.close(callback);
             });
           }, 1500);
         }, function() {
