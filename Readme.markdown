@@ -325,6 +325,8 @@ This plugin is used to collect logs from a running Google App Engine Application
 
 You have to add a [servlet in your App Engine App](docs/gae/Readme.md). The plugin will poll the logs from this servlet.
 
+This plugin collects logs 10s in the past to allow GAE internal logs propagation.
+
 Examples:
 
 * ``input://gae://myapp.appspot.com:80?key=toto``. Will grab the logs from myapp GAE app, every minutes, on url ``http://myapp.appspot.com:80/logs?log_key=toto``
@@ -332,10 +334,10 @@ Examples:
 Parameters:
 
 * ``key``. The security key which will be sent in the http query to Google App Engine.
-* ``ssl``: use ssl for grabbing logs. Use port 443 in this case. Default : false
-* ``response``: Polling delay. Default: 60s.
+* ``ssl``: use ssl for grabbing logs. Use port 443 in this case. Default : false.
+* ``polling``: Polling delay. Default: 60s.
 * ``servlet_name``: Name of the servlet which serve logs. Default : ``logs``.
-* ``access_logs_field_name`` and ``access_logs_type``. If the received line of log has a field ``access_logs_field_name``, the plugin will set the type of the line to ``access_logs_type``. It's used to differentiate access logs from application logs, to apply specific filter on access_logs. No default value.
+* ``access_logs_field_name`` and ``access_logs_type``. If the received line of log has a field ``access_logs_field_name``, the plugin will set the type of the line to ``access_logs_type``. It's used to differentiate access logs from application logs, to apply specific filter on access_logs. Standard config is : ``access_logs_type=nginx_access_logs&access_logs_field_name=http_method``. No default value.
 
 Outputs and filter, commons parameters
 ===
