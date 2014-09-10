@@ -1,8 +1,6 @@
-Inputs
-=====
+GAE Input
+=========
 
-GAE
----
 A servlet in GAE should render the logs in text format.
 Each line must be a JSON that logstash can use.
 Here is an exemple of a servlet rendering the access logs & application logs.
