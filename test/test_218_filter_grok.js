@@ -1,5 +1,4 @@
 var vows = require('vows'),
-  assert = require('assert'),
   path = require('path'),
   filter_helper = require('./filter_helper');
 
