@@ -557,9 +557,7 @@ Note: fields with empty values will not be set.
 Grok
 ---
 
-The grok filter is used to extract data using [grok patterns](http://logstash.net/docs/latest/filters/grok).
-(patterns were copied from [elasticsearch/patterns](https://github.com/elasticsearch/logstash/tree/master/patterns))
-The lines of logs are not modified by this filter.
+The grok filter is used to extract data using [grok patterns](http://logstash.net/docs/latest/filters/grok). The lines of logs are not modified by this filter.
 
 Grok is a simple pattern defining language. The syntax for a grok pattern is ``%{SYNTAX:SEMANTIC}``.
 
@@ -571,6 +569,7 @@ Grok rides on the Origuruma regular expressions library, so any valid regular ex
 You can find the fully supported syntax on the [Origuruma site](http://www.geocities.jp/kosako3/oniguruma/doc/RE.txt).
 
 The grok filter has many built-in grok patterns. The full list can be found in the [patterns folder](lib/patterns/grok).
+(Note: patterns were copied from [elasticsearch/patterns](https://github.com/elasticsearch/logstash/tree/master/patterns)).
 
 Example 1: ``filter://grok://?grok=%{WORD:w1} %{NUMBER:num1}``, on an input of ``hello 123`` will add the field ``w1`` with value ``hello`` and field ``num1`` with value ``123``.
 
