@@ -568,7 +568,7 @@ The ``SEMANTIC`` is the field name to assign the value of the matched text.
 Grok rides on the Origuruma regular expressions library, so any valid regular expression in that syntax is valid for grok.
 You can find the fully supported syntax on the [Origuruma site](http://www.geocities.jp/kosako3/oniguruma/doc/RE.txt).
 
-The grok filter has many built-in grok patterns. The full list can be found in the [patterns folder](lib/patters/grok).
+The grok filter has many built-in grok patterns. The full list can be found in the [patterns folder](lib/patterns/grok).
 
 Example 1: ``filter://grok://?grok=%{WORD:w1} %{NUMBER:num1}``, on an input of ``hello 123`` will add the field ``w1`` with value ``hello`` and field ``num1`` with value ``123``.
 
