@@ -557,7 +557,9 @@ Note: fields with empty values will not be set.
 Grok
 ---
 
-The grok filter is used to extract data using [grok patterns](http://logstash.net/docs/latest/filters/grok). The lines of logs are not modified by this filter.
+The grok filter is used to extract data using [grok patterns](http://logstash.net/docs/latest/filters/grok).
+(patterns were copied from [elasticsearch/patterns](https://github.com/elasticsearch/logstash/tree/master/patterns))
+The lines of logs are not modified by this filter.
 
 Grok is a simple pattern defining language. The syntax for a grok pattern is ``%{SYNTAX:SEMANTIC}``.
 
