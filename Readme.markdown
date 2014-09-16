@@ -36,9 +36,9 @@ How it's works ?
 
 The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules:
 
-* [inputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
-* [filter plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/filters): extract fields from logs, like timestamps. Example: regex plugin
-* [outputs plugins](https://github.com/bpaquet/node-logstash/tree/master/lib/outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
+* [inputs plugins](#inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
+* [filter plugins](#filters): extract fields from logs, like timestamps. Example: regex plugin
+* [outputs plugins](#outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
 
 
 A typical node-logstash deployement contains agents to crawl logs and a log server.
@@ -116,6 +116,9 @@ Signals
 Changelog
 ===
 
+* Add GAE input
+* Fix issue #70 with reconnect on TCP Output
+* Fix issue #75 when stopping with TCP input
 * Add only\_field\_match\_ options
 * Do not log error with Geo IP filter and local ips
 * Fix bug #62 : only_type not honored when component have no config (thx to @ryepup)
@@ -148,6 +151,51 @@ Changelog
 
 * Add redis input and output plugin
 * Add tail -f input file plugin
+
+Plugins list
+===
+
+Inputs
+---
+
+* [File](#file)
+* [Syslog](#syslog)
+* [ZeroMQ](#zeromq)
+* [Redis](#redis)
+* [HTTP](#http)
+* [TCP / TLS](#tcp--tls)
+* [Google app engine](#google-app-engine)
+
+Filters
+---
+
+* [Regex](#regex)
+* [Mutate Replace](#mutate-replace)
+* [Grep](#grep)
+* [Reverse DNS](#reverse-dns)
+* [Compute field](#compute-field)
+* [Compute date field](#compute-date-field)
+* [Split](#split)
+* [Multiline](#multiline)
+* [Json fields](#json-fields)
+* [Geoip](#geoip)
+* [Eval](#eval)
+* [Bunyan](#bunyan)
+* [HTTP Status Classifier](#http-status-classifier)
+
+Outputs
+---
+
+* [ZeroMQ](#zeromq-1)
+* [ElasticSearch](#elasticsearch)
+* [Statsd](#statsd)
+* [Gelf](#gelf)
+* [File](#file-1)
+* [HTTP Post](#http-post)
+* [Redis](#redis-1)
+* [Logio](#logio)
+* [TCP / TLS](#tcp--tls-1)
+
 
 Inputs plugins
 ===
@@ -271,19 +319,25 @@ Parameters:
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
-Zabbix
+Google App Engine
 ---
-This plugin is used on agents to receive tcp messages from a [zabbix](http://www.zabbix.com/) agent. This plugin should be used in conjunction with the zabbix output plugin on the server.
-Zabbix agents communicate with the zabbix server over TCP, which might be blocked if the agent is behind a firewall or proxy that only enables HTTP/S.
-Use of this plugin in conjunction with the http input and output plugins enables sending zabbix messages over a secure http channel.
+This plugin is used to collect logs from a running Google App Engine Application.
 
-The setup should be as follows:
-* on the agent: zabbix agent => zabbix input plugin => http_post output plugin. Example: ``node-logstash-agent input://zabbix://localhost:10051 output://http_post://zabbix.server.com:8080?serializer=json_logstash``
-* on the server:  http input plugin => zabbix output plugin => zabbix server. Example: ``node-logstash-agent input://http://zabbix.server.com:8080 output://zabbix://localhost:10051``
+You have to add a [servlet in your App Engine App](docs/gae/Readme.md). The plugin will poll the logs from this servlet.
+
+This plugin collects logs 10s in the past to allow GAE internal logs propagation.
+
+Examples:
+
+* ``input://gae://myapp.appspot.com:80?key=toto``. Will grab the logs from myapp GAE app, every minutes, on url ``http://myapp.appspot.com:80/logs?log_key=toto``
 
 Parameters:
-* ``type`` - specify a type for the zabbix messages. The default is ``zabbix``.
 
+* ``key``. The security key which will be sent in the http query to Google App Engine.
+* ``ssl``: use ssl for grabbing logs. Use port 443 in this case. Default : false.
+* ``polling``: Polling delay. Default: 60s.
+* ``servlet_name``: Name of the servlet which serve logs. Default : ``logs``.
+* ``access_logs_field_name`` and ``access_logs_type``. If the received line of log has a field ``access_logs_field_name``, the plugin will set the type of the line to ``access_logs_type``. It's used to differentiate access logs from application logs, to apply specific filter on access_logs. Standard config is : ``access_logs_type=nginx_access_logs&access_logs_field_name=http_method``. No default value.
 
 Outputs and filter, commons parameters
 ===
@@ -338,7 +392,7 @@ Parameters:
 * ``zmq_threshold_down``: if the NodeJS driver queues size goes down this threshold and inputs plugins are stopped, node-losgstash will start every inputs plugins. Default : no value.
 * ``zmq_check_interval``: if set, the plugin will check the NodeJS driver queue status to go out of alarm mode. Default : no value. Unit is milliseconds
 
-Elastic search
+ElasticSearch
 ---
 
 This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
