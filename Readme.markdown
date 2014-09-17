@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* Add Grok filter
 * Add GAE input
 * Fix issue #70 with reconnect on TCP Output
 * Fix issue #75 when stopping with TCP input
@@ -125,8 +126,8 @@ Changelog
 * Allow ZeroMQ output to multiple hosts (thx to @dax)
 * Add bunyan filter (thx to @JonGretar)
 * Implement BLPOP / RPUSH mechanism for redis, and use it by default. Thx to @perrinood.
-* ElasticSearch indexes now use UTC, and defaut type value is logs instead of data
-* Add wilcard for input file plugin
+* ElasticSearch indexes now use UTC, and default type value is logs instead of data
+* Add wildcard for input file plugin
 * Add delimiter for file and tcp plugins
 * Auth on redis
 * Improve dns reverse filter
