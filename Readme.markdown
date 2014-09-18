@@ -333,6 +333,7 @@ Examples:
 
 Parameters:
 
+* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=mygaeappp``. No default value.
 * ``key``. The security key which will be sent in the http query to Google App Engine.
 * ``ssl``: use ssl for grabbing logs. Use port 443 in this case. Default : false.
 * ``polling``: Polling delay. Default: 60s.

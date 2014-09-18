@@ -68,8 +68,8 @@ vows.describe('Integration input gae:').addBatchRetry({
       server.listen(56534);
       server.on('listening', function() {
         helper.createAgent([
-          'input://gae://localhost:56534?key=toto&polling=1',
-          'output://file://output1.txt',
+          'input://gae://localhost:56534?key=toto&polling=1&type=titi',
+          'output://file://output1.txt?only_type=titi',
         ], function(agent) {
           setTimeout(function() {
             agent.close(function() {
