@@ -87,8 +87,8 @@ The urls can be specified:
 Others params:
 
 * ``--log_level`` to change the log level (emergency, alert, critical, error, warning, notice, info, debug)
-* ``--log_file`` to redirect log to a log file
-* ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin
+* ``--log_file`` to redirect log to a log file.
+* ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin and grok plugins. Grok patterns files must be located under a ``grok`` subdirectory for each specified directory.
 * ``--db_file`` to specify the file to use as database for file inputs (see below)
 * ``--http_max_sockets`` to specify the max sockets of [http.globalAgent.maxSockets](http://nodejs.org/api/http.html#http_agent_maxsockets). Default to 100.
 * ``--alarm_file`` to specify a file which will be created if node-logstash goes in alarm mode (see below).
@@ -116,7 +116,7 @@ Signals
 Changelog
 ===
 
-* Add Grok filter
+* Add Grok filter (thx to @fujifish)
 * Add GAE input
 * Fix issue #70 with reconnect on TCP Output
 * Fix issue #75 when stopping with TCP input
@@ -577,14 +577,14 @@ Example 1: ``filter://grok://?grok=%{WORD:w1} %{NUMBER:num1}``, on an input of `
 
 Example 2: ``filter://grok://only_type=haproxy&grok=%{HAPROXYHTTP}``, to extract fields from a haproxy log. The ``HAPROXYHTTP`` pattern is already built-in to the grok filter.
 
-Example 3: ``filter://grok://?extra_patterns=/path/to/file&grok=%{MY_PATTERN}``, to load custom patterns from the ``/path/to/file`` file that defines the ``MY_PATTERN`` pattern.
+Example 3: ``filter://grok://?extra_patterns_file=/path/to/file&grok=%{MY_PATTERN}``, to load custom patterns from the ``/path/to/file`` file that defines the ``MY_PATTERN`` pattern.
 
 Parameters:
 
 * ``grok``: the grok pattern to apply.
-* ``extra_patterns``: path to a file containing custom patterns to load.
+* ``extra_patterns_file``: path to a file containing custom patterns to load.
 
-Note: no fields are added if the line does not completely match the pattern.
+Note: fields with empty values will not be set.
 
 Mutate replace
 ---

@@ -1,6 +1,8 @@
 var vows = require('vows'),
-  path = require('path'),
+    patterns_loader = require('../lib/lib/patterns_loader'),
   filter_helper = require('./filter_helper');
+
+patterns_loader.add('lib/patterns');
 
 vows.describe('Filter grok ').addBatch({
   'normal': filter_helper.create('grok', '?grok=%{NUMBER:fnumber} %{WORD:fword} %{GREEDYDATA:fgreedy}', [
@@ -80,7 +82,7 @@ vows.describe('Filter grok ').addBatch({
       'http_version': '1.1'
     },
   ]),
-  'extra patterns': filter_helper.create('grok', '?grok=%{GROKTEST}&extra_patterns='+path.resolve(__dirname, 'grok/extra'), [
+  'extra patterns': filter_helper.create('grok', '?grok=%{GROKTEST}&extra_patterns_file=' + __dirname + '/grok/extra', [
     {
       'message': '123 abc def jhi ABC123'
     },
@@ -92,5 +94,14 @@ vows.describe('Filter grok ').addBatch({
       'fgreedy': 'def jhi',
       'ftestpattern': 'ABC123'
     },
+  ]),
+  'wrong grok pattern syntax error': filter_helper.create('grok', '?grok=%{GROKTEST3}&extra_patterns_file=' + __dirname + '/grok/extra', [
+    {
+      'message': 'toto'
+    },
+  ], [
+    {
+      'message': 'toto'
+    }
   ]),
 }).export(module);

@@ -6,8 +6,8 @@ var vows = require('vows'),
 
 var n = moment();
 
-patterns_loader.add('/toto');
-patterns_loader.add('/tata');
+patterns_loader.add('/toto42');
+patterns_loader.add('/tata43');
 patterns_loader.add('lib/patterns');
 
 vows.describe('Filter regex ').addBatch({
