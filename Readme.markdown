@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* End of NodeJS 0.8 compatibility
 * Add Grok filter (thx to @fujifish)
 * Add GAE input
 * Fix issue #70 with reconnect on TCP Output
