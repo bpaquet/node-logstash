@@ -584,6 +584,8 @@ Parameters:
 
 * ``grok``: the grok pattern to apply.
 * ``extra_patterns_file``: path to a file containing custom patterns to load.
+* ``numerical_fields``: name of fields which have to contain a numerical value. If value is not numerical, field will not be set.
+* ``date_format``: if ``date_format`` is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
 
 Note: fields with empty values will not be set.
 
