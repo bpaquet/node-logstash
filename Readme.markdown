@@ -31,7 +31,7 @@ Moreover it's written in NodeJS, which is a perfect language for programs with m
 
 node-logstash is compatible with logstash. You can replace a node-logstash node by a logstash one. The data are formatted in the same way to be compatible with logstash UIs.
 
-How it's works ?
+How does it works ?
 ===
 
 The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules:
@@ -58,7 +58,7 @@ How to use it ?
 Installation
 ---
 
-* Install NodeJS, version > 0.8.
+* Install NodeJS, version >= 0.10.
 * Install build tools
   * Debian based system: `apt-get install build-essential`
   * Centos system: `yum install gcc gcc-c++ make`

@@ -365,13 +365,7 @@ vows.describe('Monitor ').addBatch({
   }, function(m) {
     fs.unlinkSync(m.file);
     no_error(m);
-    // buffer.toString('ascii') is bugged with old node version
-    if (process.versions.node.split('.')[1] < 10) {
-      assert.deepEqual(m.lines, ['é', 'line2']);
-    }
-    else {
-      assert.deepEqual(m.lines, ['C)', 'line2']);
-    }
+    assert.deepEqual(m.lines, ['C)', 'line2']);
   }, undefined, {
     buffer_encoding: 'ascii'
   }),

@@ -5,8 +5,7 @@ var vows = require('vows-batch-retry'),
   monitor_file = require('lib/monitor_file');
 
 function file100(config) {
-  // tail forking under node 0.8 is very very slow
-  var timer = process.versions.node.split('.')[1] < 10 ? 1500 : 200;
+  var timer = 200;
   return {
     topic: function() {
       monitor_file.setFileStatus({});
@@ -47,9 +46,6 @@ function file100(config) {
       var splitted = c.split('\n');
       assert.equal(splitted.length, 91);
       assert.equal('', splitted[splitted.length - 1]);
-      if (process.versions.node.split('.')[1] < 10) {
-        splitted = splitted.slice(0, 90).sort();
-      }
       for (var k = 10; k < 100; k++) {
         helper.checkResult(splitted[k - 10], {
           '@version': '1',
