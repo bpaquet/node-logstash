@@ -24,6 +24,9 @@ function createWithCallback(filter_name, filter_config, inputs, number_of_events
           }
         });
         m.init(filter_config, function(err) {
+          if (err) {
+            console.error('Unable to load filter', filter_name, filter_config, err);
+          }
           assert.ifError(err);
           inputs.forEach(function(d) {
             m.emit('input', d);

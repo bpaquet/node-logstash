@@ -6,8 +6,8 @@ var vows = require('vows'),
 
 var n = moment();
 
-patterns_loader.add('/toto');
-patterns_loader.add('/tata');
+patterns_loader.add('/toto42');
+patterns_loader.add('/tata43');
 patterns_loader.add('lib/patterns');
 
 vows.describe('Filter regex ').addBatch({
@@ -222,7 +222,7 @@ vows.describe('Filter regex ').addBatch({
   ], [
     {
       'message': '18:02:28',
-      '@timestamp': n.year() + '-01-01T18:02:28.000+0000'
+      '@timestamp': n.format().substring(0, 10) + 'T18:02:28.000+0000'
     },
   ]),
   'change message': filter_helper.create('regex', '?regex=^abcd(.*)efgh$&fields=message', [

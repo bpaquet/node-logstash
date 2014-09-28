@@ -365,13 +365,7 @@ vows.describe('Monitor ').addBatch({
   }, function(m) {
     fs.unlinkSync(m.file);
     no_error(m);
-    // buffer.toString('ascii') is bugged with old node version
-    if (process.versions.node.split('.')[1] < 10) {
-      assert.deepEqual(m.lines, ['é', 'line2']);
-    }
-    else {
-      assert.deepEqual(m.lines, ['C)', 'line2']);
-    }
+    assert.deepEqual(m.lines, ['C)', 'line2']);
   }, undefined, {
     buffer_encoding: 'ascii'
   }),
@@ -713,14 +707,14 @@ vows.describe('Monitor ').addBatch({
   'Monitor fifo': {
     topic: function() {
       var callback = this.callback;
-      run('mkfifo', ['toto'], function(exitCode) {
+      run('mkfifo', ['toto_fifo'], function(exitCode) {
         assert.equal(0, exitCode);
-        var m = new TestMonitor('toto', {});
+        var m = new TestMonitor('toto_fifo', {});
         m.monitor.start(function(err) {
           assert.ifError(err);
-          run('sh', ['-c', 'echo x1 > toto'], function(exitCode) {
+          run('sh', ['-c', 'echo x1 > toto_fifo'], function(exitCode) {
             assert.equal(0, exitCode);
-            run('sh', ['-c', 'echo x2 > toto'], function(exitCode) {
+            run('sh', ['-c', 'echo x2 > toto_fifo'], function(exitCode) {
               assert.equal(0, exitCode);
               setTimeout(function() {
                 m.monitor.close(function() {
@@ -735,7 +729,7 @@ vows.describe('Monitor ').addBatch({
 
     check: function(err, m) {
       assert.ifError(err);
-      fs.unlinkSync('toto');
+      fs.unlinkSync('toto_fifo');
       no_error(m);
       assert.deepEqual(m.lines, ['x1', 'x2']);
     }

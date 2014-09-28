@@ -31,7 +31,7 @@ Moreover it's written in NodeJS, which is a perfect language for programs with m
 
 node-logstash is compatible with logstash. You can replace a node-logstash node by a logstash one. The data are formatted in the same way to be compatible with logstash UIs.
 
-How it's works ?
+How does it works ?
 ===
 
 The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules:
@@ -58,7 +58,7 @@ How to use it ?
 Installation
 ---
 
-* Install NodeJS, version > 0.8.
+* Install NodeJS, version >= 0.10.
 * Install build tools
   * Debian based system: `apt-get install build-essential`
   * Centos system: `yum install gcc gcc-c++ make`
@@ -87,8 +87,8 @@ The urls can be specified:
 Others params:
 
 * ``--log_level`` to change the log level (emergency, alert, critical, error, warning, notice, info, debug)
-* ``--log_file`` to redirect log to a log file
-* ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin
+* ``--log_file`` to redirect log to a log file.
+* ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin and grok plugins. Grok patterns files must be located under a ``grok`` subdirectory for each specified directory.
 * ``--db_file`` to specify the file to use as database for file inputs (see below)
 * ``--http_max_sockets`` to specify the max sockets of [http.globalAgent.maxSockets](http://nodejs.org/api/http.html#http_agent_maxsockets). Default to 100.
 * ``--alarm_file`` to specify a file which will be created if node-logstash goes in alarm mode (see below).
@@ -116,6 +116,8 @@ Signals
 Changelog
 ===
 
+* End of NodeJS 0.8 compatibility
+* Add Grok filter (thx to @fujifish)
 * Add GAE input
 * Fix issue #70 with reconnect on TCP Output
 * Fix issue #75 when stopping with TCP input
@@ -125,8 +127,8 @@ Changelog
 * Allow ZeroMQ output to multiple hosts (thx to @dax)
 * Add bunyan filter (thx to @JonGretar)
 * Implement BLPOP / RPUSH mechanism for redis, and use it by default. Thx to @perrinood.
-* ElasticSearch indexes now use UTC, and defaut type value is logs instead of data
-* Add wilcard for input file plugin
+* ElasticSearch indexes now use UTC, and default type value is logs instead of data
+* Add wildcard for input file plugin
 * Add delimiter for file and tcp plugins
 * Auth on redis
 * Improve dns reverse filter
@@ -170,6 +172,7 @@ Filters
 ---
 
 * [Regex](#regex)
+* [Grok](#grok)
 * [Mutate Replace](#mutate-replace)
 * [Grep](#grep)
 * [Reverse DNS](#reverse-dns)
@@ -333,6 +336,7 @@ Examples:
 
 Parameters:
 
+* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=mygaeappp``. No default value.
 * ``key``. The security key which will be sent in the http query to Google App Engine.
 * ``ssl``: use ssl for grabbing logs. Use port 443 in this case. Default : false.
 * ``polling``: Polling delay. Default: 60s.
@@ -559,10 +563,42 @@ Example 3: ``filter://regex://?regex=(\d+|-)&fields=a&numerical_fields=a``, to f
 Parameters:
 
 * ``regex``: regex to apply.
-* ``regex_flags: regex flags (eg : g, i, m).
+* ``regex_flags``: regex flags (eg : g, i, m).
 * ``fields``: name of fields which will receive the pattern extracted (see below for the special field @timestamp).
 * ``numerical_fields``: name of fields which have to contain a numerical value. If value is not numerical, field will not be set.
-* ``date_format``: if ``date_format` is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
+* ``date_format``: if ``date_format`` is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
+
+Note: fields with empty values will not be set.
+
+Grok
+---
+
+The grok filter is used to extract data using [grok patterns](http://logstash.net/docs/latest/filters/grok). The lines of logs are not modified by this filter.
+
+Grok is a simple pattern defining language. The syntax for a grok pattern is ``%{SYNTAX:SEMANTIC}``.
+
+The ``SYNTAX`` is the name of the pattern that will match the text.
+
+The ``SEMANTIC`` is the field name to assign the value of the matched text.
+
+Grok rides on the Origuruma regular expressions library, so any valid regular expression in that syntax is valid for grok.
+You can find the fully supported syntax on the [Origuruma site](http://www.geocities.jp/kosako3/oniguruma/doc/RE.txt).
+
+The grok filter has many built-in grok patterns. The full list can be found in the [patterns folder](lib/patterns/grok).
+(Note: patterns were copied from [elasticsearch/patterns](https://github.com/elasticsearch/logstash/tree/master/patterns)).
+
+Example 1: ``filter://grok://?grok=%{WORD:w1} %{NUMBER:num1}``, on an input of ``hello 123`` will add the field ``w1`` with value ``hello`` and field ``num1`` with value ``123``.
+
+Example 2: ``filter://grok://only_type=haproxy&grok=%{HAPROXYHTTP}``, to extract fields from a haproxy log. The ``HAPROXYHTTP`` pattern is already built-in to the grok filter.
+
+Example 3: ``filter://grok://?extra_patterns_file=/path/to/file&grok=%{MY_PATTERN}``, to load custom patterns from the ``/path/to/file`` file that defines the ``MY_PATTERN`` pattern.
+
+Parameters:
+
+* ``grok``: the grok pattern to apply.
+* ``extra_patterns_file``: path to a file containing custom patterns to load.
+* ``numerical_fields``: name of fields which have to contain a numerical value. If value is not numerical, field will not be set.
+* ``date_format``: if ``date_format`` is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
 
 Note: fields with empty values will not be set.
 
