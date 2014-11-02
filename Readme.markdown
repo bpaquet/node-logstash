@@ -399,13 +399,24 @@ ElasticSearch
 ---
 
 This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
+Bulk updates are supported such that messages are stored in memory and sent to the elastic search server in a single bulk update.
+A bulk update is triggered if the maximum number of messages per bulk is reached, or a specified timeout elapses since a first bulk message is buffered.
 
-Note : for better performance, you can also use the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
+Note : for better performance, you should use bulk updates or the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
 
-Example: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
+Example 1: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
+Example 2: ``output://elasticsearch://localhost:9001&index_type=audit&data_type=audits`` to send to index ``audit-<date>`` and type ``audits``.
+Example 3: ``output://elasticsearch://localhost:9001?bulk=true&bulk_limit=10&bulk_timeout=2000`` to perform bulk updates with a limit of 10 messages per bulk update and a timeout of 2 seconds
+to wait for 'limit' messages.
 
 Parameters:
-
+* ``index_type``: specifies the index that messages will be stored under. (default is ``logstash-<date>``)
+* ``data_type``: specifies the type under the index that messages will be stored under. (default is ``logs``)
+* ``bulk``: ``true`` to use bulk updates (default is ``false``).
+* ``bulk_limit``: (ignored if ``bulk`` is not ``true``) specifies the maximum number of messages to store in memory
+after which a bulk update is performed sending all stored messages in a single REST api call. (default is 100).
+* ``bulk_timeout``: (ignored if ``bulk`` is not ``true``) specifies the maximum number of milliseconds to wait for ``bulk_limit`` messages,
+after which a bulk update is performed sending all stored messages in a single REST api call. (default is 1000).
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
