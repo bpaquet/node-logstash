@@ -307,7 +307,7 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
 
       assert.equal(reqs[0].req.method, 'POST');
       assert.match(reqs[0].req.url, new RegExp('^\/audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/audits\/_bulk'));
-      var lines = reqs[0].body.split('\n').filter(function(line) {return line.length > 0});
+      var lines = reqs[0].body.split('\n').filter(function(line) {return line.length > 0;});
       assert.equal(lines.length, 4);
       helper.checkResult(lines[0], {
         'index': {}
@@ -332,7 +332,7 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
 
       assert.equal(reqs[1].req.method, 'POST');
       assert.match(reqs[1].req.url, new RegExp('^\/audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/audits\/_bulk'));
-      lines = reqs[1].body.split('\n').filter(function(line) {return line.length > 0});
+      lines = reqs[1].body.split('\n').filter(function(line) {return line.length > 0;});
       assert.equal(lines.length, 2);
       helper.checkResult(lines[0], {
         'index': {}
