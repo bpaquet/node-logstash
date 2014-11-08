@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* Add AMQP / RabbitMQ input and output
 * End of NodeJS 0.8 compatibility
 * Add Grok filter (thx to @fujifish)
 * Add GAE input
@@ -167,6 +168,7 @@ Inputs
 * [HTTP](#http)
 * [TCP / TLS](#tcp--tls)
 * [Google app engine](#google-app-engine)
+* [AMQP](#amqp)
 
 Filters
 ---
@@ -198,6 +200,7 @@ Outputs
 * [Redis](#redis-1)
 * [Logio](#logio)
 * [TCP / TLS](#tcp--tls-1)
+* [AMQP](#amqp-1)
 
 
 Inputs plugins
@@ -342,6 +345,24 @@ Parameters:
 * ``polling``: Polling delay. Default: 60s.
 * ``servlet_name``: Name of the servlet which serve logs. Default : ``logs``.
 * ``access_logs_field_name`` and ``access_logs_type``. If the received line of log has a field ``access_logs_field_name``, the plugin will set the type of the line to ``access_logs_type``. It's used to differentiate access logs from application logs, to apply specific filter on access_logs. Standard config is : ``access_logs_type=nginx_access_logs&access_logs_field_name=http_method``. No default value.
+
+AMQP
+---
+This plugin is used to get logs from an [AMQP exchange], like a [RabbitMQ](http://www.rabbitmq.com/) exchange.
+
+Examples:
+
+* Fanout mode: ``input://amqp://localhost:5672?exchange_name=toto`` : Receive message from fanout exchange ``toto``
+* Topic mode: ``input://amqp://localhost:5672?exchange_name=toto_topic&topic=test`` : Receive message from topic ``test`` on  exchange ``toto_topic``
+
+Parameters:
+
+* ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
+* ``durable``: Optional. Set exchange durability. Default : true.
+* ``retry_delay``: Optional. Retry delay (in ms) to connect amqp broker. Default : 3000.
+* ``heartbeat``: Optional. Amqp heartbeat in s. Default: 10
+* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
+* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 Outputs and filter, commons parameters
 ===
@@ -532,6 +553,27 @@ Parameters:
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 * ``format``: Optional. Please see above. Used by the ``raw``serializer.
 * ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
+
+
+AMQP
+---
+This plugin is used to send logs to an [AMQP exchange], like a [RabbitMQ](http://www.rabbitmq.com/) exchange.
+
+Examples:
+
+* Fanout mode: ``output://amqp://localhost:5672?exchange_name=toto`` : Receive message from fanout exchange ``toto``
+* Topic mode: ``output://amqp://localhost:5672?exchange_name=toto_topic&topic=test`` : Receive message from topic ``test`` on  exchange ``toto_topic``
+
+Parameters:
+
+* ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
+* ``durable``: Optional. Set exchange durability. Default : true.
+* ``retry_delay``: Optional. Retry delay (in ms) to connect amqp broker. Default : 3000.
+* ``heartbeat``: Optional. Amqp heartbeat in s. Default: 10
+* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
+* ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
+
+
 
 Filters
 ===
