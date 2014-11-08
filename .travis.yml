@@ -1,4 +1,6 @@
 language: node_js
+services:
+  - rabbitmq
 node_js:
   - "0.10"
 env:
@@ -10,6 +12,5 @@ before_install:
   - sudo add-apt-repository ppa:bpaquet/zeromq4-precise -y
   - sudo apt-get update
   - sudo apt-get install -y logrotate
-  - sudo apt-get install -y rabbitmq-server
   - sudo apt-get install -y libzmq1=${ZEROMQ_VERSION} libzmq-dev=${ZEROMQ_VERSION}
   - npm install -g npm
