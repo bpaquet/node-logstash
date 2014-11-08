@@ -348,7 +348,7 @@ Parameters:
 
 AMQP
 ---
-This plugin is used to get logs from an [AMQP exchange], like a [RabbitMQ](http://www.rabbitmq.com/) exchange.
+This plugin is used to get logs from an [AMQP exchange](https://www.rabbitmq.com/tutorials/amqp-concepts.html), like a [RabbitMQ](http://www.rabbitmq.com/) exchange. This plugin is compatible with the original AMQP logstash plugin.
 
 Examples:
 
@@ -359,8 +359,8 @@ Parameters:
 
 * ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
 * ``durable``: Optional. Set exchange durability. Default : true.
-* ``retry_delay``: Optional. Retry delay (in ms) to connect amqp broker. Default : 3000.
-* ``heartbeat``: Optional. Amqp heartbeat in s. Default: 10
+* ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
+* ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
@@ -557,7 +557,7 @@ Parameters:
 
 AMQP
 ---
-This plugin is used to send logs to an [AMQP exchange], like a [RabbitMQ](http://www.rabbitmq.com/) exchange.
+This plugin is used to send logs to an [AMQP exchange](https://www.rabbitmq.com/tutorials/amqp-concepts.html), like a [RabbitMQ](http://www.rabbitmq.com/) exchange. This plugin is compatible with the original AMQP logstash plugin.
 
 Examples:
 
@@ -568,8 +568,8 @@ Parameters:
 
 * ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
 * ``durable``: Optional. Set exchange durability. Default : true.
-* ``retry_delay``: Optional. Retry delay (in ms) to connect amqp broker. Default : 3000.
-* ``heartbeat``: Optional. Amqp heartbeat in s. Default: 10
+* ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
+* ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 
