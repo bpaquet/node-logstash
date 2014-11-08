@@ -12,7 +12,7 @@ It's a [NodeJS](http://nodejs.org) implementation of [Logstash](http://logstash.
 What to do with node-logstash ?
 ---
 
-node-logstash is a tool to collect logs on servers. It allow to send its to a central server and to [elastic search](http://www.elasticsearch.org/) for indexing.
+node-logstash is a tool to collect logs on servers. It allow to send its to a central server and to [ElasticSearch](http://www.elasticsearch.org/) for indexing.
 
 In top of elastic search, you can use a specialized interface like [kibana](http://rashidkpc.github.com/Kibana/) to dive into your logs.
 
@@ -38,14 +38,14 @@ The architecture is identical to logstash architecture. You have to instanciates
 
 * [inputs plugins](#inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
 * [filter plugins](#filters): extract fields from logs, like timestamps. Example: regex plugin
-* [outputs plugins](#outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
+* [outputs plugins](#outputs): where datas leave from node-logstash: Examples: ElasticSearch , zeromq transport layer.
 
 
 A typical node-logstash deployement contains agents to crawl logs and a log server.
 
 On agent, node-logstash is configured whith inputs plugins to get logs from your software stack, and one output plugin to send logs to log server (eg. zeromq output plugin).
 
-On log server, logs come trough a zeromq input plugin, are processed (fields and timestamps extraction), and send to elastic search.
+On log server, logs come trough a zeromq input plugin, are processed (fields and timestamps extraction), and send to ElasticSearch.
 
 How to get help ?
 ===
@@ -116,6 +116,8 @@ Signals
 Changelog
 ===
 
+* Add bulk insert for ElasticSearch (thx to @fujifish)
+* Add index_prefix configuration parameter for ElasticSearch (thx to @fujifish)
 * Add AMQP / RabbitMQ input and output
 * End of NodeJS 0.8 compatibility
 * Add Grok filter (thx to @fujifish)
@@ -419,25 +421,21 @@ Parameters:
 ElasticSearch
 ---
 
-This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
-Bulk updates are supported such that messages are stored in memory and sent to the elastic search server in a single bulk update.
-A bulk update is triggered if the maximum number of messages per bulk is reached, or a specified timeout elapses since a first bulk message is buffered.
+This plugin is used on log server to send logs to ElasticSearch, using HTTP REST interface.
 
-Note : for better performance, you should use bulk updates or the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
+By default, each incoming message generate one HTTP request to ElasticSearch. The bulk feature allows to send grouped messages. For example, under heavy traffic, you can send messages to ElasticSearch by bulk of 1000 messages. In this mode, the bulk is send even if incomplete after a configured timeout (100 ms by default).
 
-Example 1: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
-Example 2: ``output://elasticsearch://localhost:9001&index_type=audit&data_type=audits`` to send to index ``audit-<date>`` and type ``audits``.
-Example 3: ``output://elasticsearch://localhost:9001?bulk=true&bulk_limit=10&bulk_timeout=2000`` to perform bulk updates with a limit of 10 messages per bulk update and a timeout of 2 seconds
-to wait for 'limit' messages.
+Note : for better performance, you can use the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
+
+Example 1: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an ElasticSearch server listening on port 9001.
+Example 2: ``output://elasticsearch://localhost:9001&index_prefix=audit&data_type=audits`` to send to index ``audit-<date>`` and type ``audits``.
+Example 3: ``output://elasticsearch://localhost:9001?bulk_limit=1000&bulk_timeout=100`` to perform bulk updates with a limit of 1000 messages per bulk update and a timeout of 100 ms to wait for 'limit' messages.
 
 Parameters:
-* ``index_type``: specifies the index that messages will be stored under. (default is ``logstash-<date>``)
+* ``index_prefix``: specifies the index prefix that messages will be stored under. Default : ``logstash``. Default index will be ``logstash-<date>``
 * ``data_type``: specifies the type under the index that messages will be stored under. (default is ``logs``)
-* ``bulk``: ``true`` to use bulk updates (default is ``false``).
-* ``bulk_limit``: (ignored if ``bulk`` is not ``true``) specifies the maximum number of messages to store in memory
-after which a bulk update is performed sending all stored messages in a single REST api call. (default is 100).
-* ``bulk_timeout``: (ignored if ``bulk`` is not ``true``) specifies the maximum number of milliseconds to wait for ``bulk_limit`` messages,
-after which a bulk update is performed sending all stored messages in a single REST api call. (default is 1000).
+* ``bulk_limit``: Enable bulk mode. Dpecifies the maximum number of messages to store in memory before bulking to ElasticSearch. No default value.
+* ``bulk_timeout``: Specifies the maximum number of milliseconds to wait for ``bulk_limit`` messages,. Default is 100.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
@@ -817,14 +815,14 @@ The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` whic
   * proxy port
   * NTLM : for ntlm authent, userinfo have to be ``ntlm:domain:hostname:username:password``. Hostname can be empty.
 
-Force fields typing in Elastic Search
+Force fields typing in ElasticSearch
 ---
 
 If you have a custom field with an hashcode
-- if the first hashcode of the day contains only digits, Elastic Search will guess the field type and will choose integer and it will fail to index the next values that contains letters.
-- by default elastic search will tokenize it like some real text instead of treating it like a blob, it won't impact tools like kibana but may prevent you from doing custom queries.
+- if the first hashcode of the day contains only digits, ElasticSearch will guess the field type and will choose integer and it will fail to index the next values that contains letters.
+- by default ElasticSearch will tokenize it like some real text instead of treating it like a blob, it won't impact tools like kibana but may prevent you from doing custom queries.
 
-For both cases you should add a `default-mapping.json` file in Elastic Search config directory :
+For both cases you should add a `default-mapping.json` file in ElasticSearch config directory :
 
 ```json
 {

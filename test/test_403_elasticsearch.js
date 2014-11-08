@@ -4,50 +4,56 @@ var vows = require('vows-batch-retry'),
   assert = require('assert'),
   helper = require('./integration_helper.js');
 
+function es_server(max, agent, port, callback) {
+  var reqs = [];
+  var s = http.createServer(function(req, res) {
+    var body = '';
+    req.on('data', function(chunk) {
+      body += chunk;
+    });
+    req.on('end', function() {
+      reqs.push({
+        req: req,
+        body: body
+      });
+      res.writeHead(201);
+      res.end();
+      if (reqs.length === max) {
+        agent.close(function() {
+          s.close(function() {
+            callback(null, reqs);
+          });
+        });
+      }
+    });
+  }).listen(port);
+}
+
+function tcp_send(text, port, callback) {
+  var c = net.createConnection({
+    port: port,
+  }, function() {
+    c.write(text);
+    c.end();
+    if (callback) {
+      callback();
+    }
+  });
+}
+
 vows.describe('Integration Elastic search event :').addBatchRetry({
   'elastic_search test': {
     topic: function() {
       var callback = this.callback;
-      var reqs = [];
       helper.createAgent([
         'input://tcp://0.0.0.0:17874?type=nginx',
         'input://tcp://0.0.0.0:17875',
         'output://elasticsearch://localhost:17876',
       ], function(agent) {
-        var es_server = http.createServer(function(req, res) {
-          var body = '';
-          req.on('data', function(chunk) {
-            body += chunk;
-          });
-          req.on('end', function() {
-            reqs.push({
-              req: req,
-              body: body
-            });
-            res.writeHead(201);
-            res.end();
-            if (reqs.length === 2) {
-              agent.close(function() {
-                es_server.close(function() {
-                  callback(null, reqs);
-                });
-              });
-            }
-          });
-        }).listen(17876);
-        var c1 = net.createConnection({
-          port: 17874
-        }, function() {
-          c1.write('toto');
-          c1.end();
-        });
+        es_server(2, agent, 17876, callback);
+        tcp_send('toto', 17874);
         setTimeout(function() {
-          var c2 = net.createConnection({
-            port: 17875
-          }, function() {
-            c2.write('titi');
-            c2.end();
-          });
+          tcp_send('titi', 17875);
         }, 200);
       });
     },
@@ -76,50 +82,19 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
       });
     }
   },
-
+}, 5, 20000).addBatchRetry({
   'elastic_search with custom data type and index test': {
     topic: function() {
       var callback = this.callback;
-      var reqs = [];
       helper.createAgent([
         'input://tcp://0.0.0.0:17874?type=nginx',
         'input://tcp://0.0.0.0:17875',
-        'output://elasticsearch://localhost:17876?data_type=audits&index_type=audit',
+        'output://elasticsearch://localhost:17876?data_type=audits&index_prefix=audit',
       ], function(agent) {
-        var es_server = http.createServer(function(req, res) {
-          var body = '';
-          req.on('data', function(chunk) {
-            body += chunk;
-          });
-          req.on('end', function() {
-            reqs.push({
-              req: req,
-              body: body
-            });
-            res.writeHead(201);
-            res.end();
-            if (reqs.length === 2) {
-              agent.close(function() {
-                es_server.close(function() {
-                  callback(null, reqs);
-                });
-              });
-            }
-          });
-        }).listen(17876);
-        var c1 = net.createConnection({
-          port: 17874
-        }, function() {
-          c1.write('toto');
-          c1.end();
-        });
+        es_server(2, agent, 17876, callback);
+        tcp_send('toto', 17874);
         setTimeout(function() {
-          var c2 = net.createConnection({
-            port: 17875
-          }, function() {
-            c2.write('titi');
-            c2.end();
-          });
+          tcp_send('titi', 17875);
         }, 200);
       });
     },
@@ -148,59 +123,23 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
       });
     }
   },
-
+}, 5, 20000).addBatchRetry({
   'elastic_search bulk timer test': {
     topic: function() {
       var callback = this.callback;
-      var reqs = [];
       helper.createAgent([
         'input://tcp://0.0.0.0:17874?type=nginx',
         'input://tcp://0.0.0.0:17875?type=haproxy',
         'input://tcp://0.0.0.0:17876?type=stud',
-        'output://elasticsearch://localhost:17877?bulk=true&bulk_timeout=500&data_type=audits&index_type=audit',
+        'output://elasticsearch://localhost:17877?bulk_limit=3&bulk_timeout=1000&data_type=audits&index_prefix=audit',
       ], function(agent) {
-        var es_server = http.createServer(function(req, res) {
-          var body = '';
-          req.on('data', function(chunk) {
-            body += chunk;
-          });
-          req.on('end', function() {
-            reqs.push({
-              req: req,
-              body: body
-            });
-            res.writeHead(201);
-            res.end();
-            if (reqs.length === 1) {
-              agent.close(function() {
-                es_server.close(function() {
-                  callback(null, reqs);
-                });
-              });
-            }
-          });
-        }).listen(17877);
-        var c1 = net.createConnection({
-          port: 17874
-        }, function() {
-          c1.write('toto');
-          c1.end();
-        });
+        es_server(1, agent, 17877, callback);
+        tcp_send('toto', 17874);
         setTimeout(function() {
-          var c2 = net.createConnection({
-            port: 17875
-          }, function() {
-            c2.write('titi');
-            c2.end();
-          });
+          tcp_send('titi', 17875);
         }, 100);
         setTimeout(function() {
-          var c2 = net.createConnection({
-            port: 17876
-          }, function() {
-            c2.write('tata');
-            c2.end();
-          });
+          tcp_send('tata', 17876);
         }, 200);
       });
     },
@@ -212,6 +151,7 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
       assert.equal(reqs[0].req.method, 'POST');
       assert.match(reqs[0].req.url, new RegExp('^\/audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/audits\/_bulk'));
       var lines = reqs[0].body.split('\n');
+      assert.equal(lines.length, 6);
       helper.checkResult(lines[0], {
         'index': {}
       });
@@ -244,60 +184,24 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
       });
     }
   },
-
+}, 5, 20000).addBatchRetry({
   'elastic_search bulk limit test': {
     topic: function() {
       var callback = this.callback;
-      var reqs = [];
       helper.createAgent([
         'input://tcp://0.0.0.0:17874?type=nginx',
         'input://tcp://0.0.0.0:17875?type=haproxy',
         'input://tcp://0.0.0.0:17876?type=stud',
-        'output://elasticsearch://localhost:17877?bulk=true&bulk_timeout=500&bulk_limit=2&data_type=audits&index_type=audit',
+        'output://elasticsearch://localhost:17877?bulk_timeout=200&bulk_limit=2&data_type=audits&index_prefix=audit',
       ], function(agent) {
-        var es_server = http.createServer(function(req, res) {
-          var body = '';
-          req.on('data', function(chunk) {
-            body += chunk;
-          });
-          req.on('end', function() {
-            reqs.push({
-              req: req,
-              body: body
-            });
-            res.writeHead(201);
-            res.end();
-            if (reqs.length === 2) {
-              agent.close(function() {
-                es_server.close(function() {
-                  callback(null, reqs);
-                });
-              });
-            }
-          });
-        }).listen(17877);
-        var c1 = net.createConnection({
-          port: 17874
-        }, function() {
-          c1.write('toto');
-          c1.end();
-        });
+        es_server(2, agent, 17877, callback);
+        tcp_send('toto', 17874);
         setTimeout(function() {
-          var c2 = net.createConnection({
-            port: 17875
-          }, function() {
-            c2.write('titi');
-            c2.end();
-          });
+          tcp_send('titi', 17875);
+        }, 50);
+        setTimeout(function() {
+          tcp_send('tata', 17876);
         }, 100);
-        setTimeout(function() {
-          var c2 = net.createConnection({
-            port: 17876
-          }, function() {
-            c2.write('tata');
-            c2.end();
-          });
-        }, 200);
       });
     },
 
