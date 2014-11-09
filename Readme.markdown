@@ -116,6 +116,8 @@ Signals
 Changelog
 ===
 
+* 9/11/2014 : publish 0.0.3 on NPM
+
 * Add SSL Suport to AMPQ plugins
 * Add bulk insert for ElasticSearch (thx to @fujifish)
 * Add index_prefix configuration parameter for ElasticSearch (thx to @fujifish)
@@ -145,16 +147,8 @@ Changelog
 * Add serializer and unserializer support
 * Allow to use input file plugin on non existent directory
 * Utf-8 is now the default encoding for input file plugin
-
-0.0.3
----
-
 * Add [Log.io](http://logio.org) output
 * Use the 1.2 logstash json format
-
-0.0.2
----
-
 * Add redis input and output plugin
 * Add tail -f input file plugin
 
@@ -807,7 +801,7 @@ For changing SSL ciphers, add ``ssl_ciphers=AES128-GCM-SHA256``.
 
 To use a client certificate, add ``ssl_cert=/client.cer&ssl_key=/client.key&ssl_ca=/tmp/ca.key``.
 
-To ignore ssl error, add ``ssl_rejectUnauthorized=false``.
+To ignore ssl errors, add ``ssl_rejectUnauthorized=false`.
 
 HTTP Proxy
 ---
