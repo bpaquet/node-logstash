@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* Add SSL Suport to AMPQ plugins
 * Add bulk insert for ElasticSearch (thx to @fujifish)
 * Add index_prefix configuration parameter for ElasticSearch (thx to @fujifish)
 * Add AMQP / RabbitMQ input and output
@@ -364,6 +365,7 @@ Parameters:
 * ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
 * ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 Outputs and filter, commons parameters
@@ -540,9 +542,9 @@ Example:
 
 * ``output://logio://localhost:28777``
 
-Others params:
+Parameters:
 
-* ``--priority`` to change the line priority. Can reference log line properties. Default value: ``info``.
+* ``priority`` to change the line priority. Can reference log line properties. Default value: ``info``.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
@@ -580,9 +582,8 @@ Parameters:
 * ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
 * ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
-
-
 
 Filters
 ===
@@ -803,6 +804,10 @@ For example, for a HTTPS server : ``ssl=true&ssl_cert=/path/to/cert&ssl_key=/pat
 For using a Certificate authority, add ``&ssl_ca=/path/to/ca``.
 
 For changing SSL ciphers, add ``ssl_ciphers=AES128-GCM-SHA256``.
+
+To use a client certificate, add ``ssl_cert=/client.cer&ssl_key=/client.key&ssl_ca=/tmp/ca.key``.
+
+To ignore ssl error, add ``ssl_rejectUnauthorized=false``.
 
 HTTP Proxy
 ---
