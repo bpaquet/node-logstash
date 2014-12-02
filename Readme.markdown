@@ -184,6 +184,7 @@ Filters
 * [Eval](#eval)
 * [Bunyan](#bunyan)
 * [HTTP Status Classifier](#http-status-classifier)
+* [Remove field when equal](#remove-field-when-equal)
 
 Outputs
 ---
@@ -783,6 +784,17 @@ Example: ``filter://http_status_classifier://http_status`` parse the ``http_stat
 Parameters:
 * ``target_field``: field to store the result. Default : ``http_class``.
 * ``special_codes``: http status codes to be kept as is. Eg, with ``498,499`` value in ``special_codes``, the filter will put 499 in the ``http_class`` field when receiving a ``499`` http code, and not ``4xx``. Mutlipe values must be separated with ``,``. Default value: empty.
+
+Remove field when equal
+---
+
+The remove field when equal filter allow to remove a message when equal to a given value. Typical usage is to remove field containing ``-`` in apache or nginx logs.
+
+Example : ``filter://remove_field_when_equal://http_user?value=-`` will remove the field ``http_user`` when equal to  ``-``.
+
+Parameters:
+
+* ``value``: value to check. Required params.
 
 Misc
 ===
