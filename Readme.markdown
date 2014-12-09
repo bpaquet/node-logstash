@@ -12,7 +12,7 @@ It's a [NodeJS](http://nodejs.org) implementation of [Logstash](http://logstash.
 What to do with node-logstash ?
 ---
 
-node-logstash is a tool to collect logs on servers. It allow to send its to a central server and to [elastic search](http://www.elasticsearch.org/) for indexing.
+node-logstash is a tool to collect logs on servers. It allow to send its to a central server and to [ElasticSearch](http://www.elasticsearch.org/) for indexing.
 
 In top of elastic search, you can use a specialized interface like [kibana](http://rashidkpc.github.com/Kibana/) to dive into your logs.
 
@@ -38,14 +38,14 @@ The architecture is identical to logstash architecture. You have to instanciates
 
 * [inputs plugins](#inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
 * [filter plugins](#filters): extract fields from logs, like timestamps. Example: regex plugin
-* [outputs plugins](#outputs): where datas leave from node-logstash: Examples: elastic search , zeromq transport layer.
+* [outputs plugins](#outputs): where datas leave from node-logstash: Examples: ElasticSearch , zeromq transport layer.
 
 
 A typical node-logstash deployement contains agents to crawl logs and a log server.
 
 On agent, node-logstash is configured whith inputs plugins to get logs from your software stack, and one output plugin to send logs to log server (eg. zeromq output plugin).
 
-On log server, logs come trough a zeromq input plugin, are processed (fields and timestamps extraction), and send to elastic search.
+On log server, logs come trough a zeromq input plugin, are processed (fields and timestamps extraction), and send to ElasticSearch.
 
 How to get help ?
 ===
@@ -116,6 +116,12 @@ Signals
 Changelog
 ===
 
+* 9/11/2014 : publish 0.0.3 on NPM
+
+* Add SSL Suport to AMPQ plugins
+* Add bulk insert for ElasticSearch (thx to @fujifish)
+* Add index_prefix configuration parameter for ElasticSearch (thx to @fujifish)
+* Add AMQP / RabbitMQ input and output
 * End of NodeJS 0.8 compatibility
 * Add Grok filter (thx to @fujifish)
 * Add GAE input
@@ -141,16 +147,8 @@ Changelog
 * Add serializer and unserializer support
 * Allow to use input file plugin on non existent directory
 * Utf-8 is now the default encoding for input file plugin
-
-0.0.3
----
-
 * Add [Log.io](http://logio.org) output
 * Use the 1.2 logstash json format
-
-0.0.2
----
-
 * Add redis input and output plugin
 * Add tail -f input file plugin
 
@@ -167,6 +165,7 @@ Inputs
 * [HTTP](#http)
 * [TCP / TLS](#tcp--tls)
 * [Google app engine](#google-app-engine)
+* [AMQP](#amqp)
 
 Filters
 ---
@@ -185,6 +184,7 @@ Filters
 * [Eval](#eval)
 * [Bunyan](#bunyan)
 * [HTTP Status Classifier](#http-status-classifier)
+* [Remove field when equal](#remove-field-when-equal)
 
 Outputs
 ---
@@ -198,6 +198,7 @@ Outputs
 * [Redis](#redis-1)
 * [Logio](#logio)
 * [TCP / TLS](#tcp--tls-1)
+* [AMQP](#amqp-1)
 
 
 Inputs plugins
@@ -343,6 +344,25 @@ Parameters:
 * ``servlet_name``: Name of the servlet which serve logs. Default : ``logs``.
 * ``access_logs_field_name`` and ``access_logs_type``. If the received line of log has a field ``access_logs_field_name``, the plugin will set the type of the line to ``access_logs_type``. It's used to differentiate access logs from application logs, to apply specific filter on access_logs. Standard config is : ``access_logs_type=nginx_access_logs&access_logs_field_name=http_method``. No default value.
 
+AMQP
+---
+This plugin is used to get logs from an [AMQP exchange](https://www.rabbitmq.com/tutorials/amqp-concepts.html), like a [RabbitMQ](http://www.rabbitmq.com/) exchange. This plugin is compatible with the original AMQP logstash plugin.
+
+Examples:
+
+* Fanout mode: ``input://amqp://localhost:5672?exchange_name=toto`` : Receive message from fanout exchange ``toto``
+* Topic mode: ``input://amqp://localhost:5672?exchange_name=toto_topic&topic=test`` : Receive message from topic ``test`` on  exchange ``toto_topic``
+
+Parameters:
+
+* ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
+* ``durable``: Optional. Set exchange durability. Default : true.
+* ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
+* ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
+* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
+
 Outputs and filter, commons parameters
 ===
 
@@ -399,14 +419,21 @@ Parameters:
 ElasticSearch
 ---
 
-This plugin is used on log server to send logs to elastic search, using HTTP REST interface.
+This plugin is used on log server to send logs to ElasticSearch, using HTTP REST interface.
 
-Note : for better performance, you can also use the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
+By default, each incoming message generate one HTTP request to ElasticSearch. The bulk feature allows to send grouped messages. For example, under heavy traffic, you can send messages to ElasticSearch by bulk of 1000 messages. In this mode, the bulk is send even if incomplete after a configured timeout (100 ms by default).
 
-Example: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an elastic search server listening on port 9001.
+Note : for better performance, you can use the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
+
+Example 1: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an ElasticSearch server listening on port 9001.
+Example 2: ``output://elasticsearch://localhost:9001&index_prefix=audit&data_type=audits`` to send to index ``audit-<date>`` and type ``audits``.
+Example 3: ``output://elasticsearch://localhost:9001?bulk_limit=1000&bulk_timeout=100`` to perform bulk updates with a limit of 1000 messages per bulk update and a timeout of 100 ms to wait for 'limit' messages.
 
 Parameters:
-
+* ``index_prefix``: specifies the index prefix that messages will be stored under. Default : ``logstash``. Default index will be ``logstash-<date>``
+* ``data_type``: specifies the type under the index that messages will be stored under. (default is ``logs``)
+* ``bulk_limit``: Enable bulk mode. Dpecifies the maximum number of messages to store in memory before bulking to ElasticSearch. No default value.
+* ``bulk_timeout``: Specifies the maximum number of milliseconds to wait for ``bulk_limit`` messages,. Default is 100.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
@@ -511,9 +538,9 @@ Example:
 
 * ``output://logio://localhost:28777``
 
-Others params:
+Parameters:
 
-* ``--priority`` to change the line priority. Can reference log line properties. Default value: ``info``.
+* ``priority`` to change the line priority. Can reference log line properties. Default value: ``info``.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
@@ -545,6 +572,26 @@ The setup should be as follows:
 * on the agent: zabbix agent => zabbix input plugin => http_post output plugin. Example: ``node-logstash-agent input://zabbix://localhost:10051 output://http_post://zabbix.server.com:8080?serializer=json_logstash``
 
 Use ``not_type=zabbix`` on other output plugins to suppress sending zabbix messages to them.
+
+
+AMQP
+---
+This plugin is used to send logs to an [AMQP exchange](https://www.rabbitmq.com/tutorials/amqp-concepts.html), like a [RabbitMQ](http://www.rabbitmq.com/) exchange. This plugin is compatible with the original AMQP logstash plugin.
+
+Examples:
+
+* Fanout mode: ``output://amqp://localhost:5672?exchange_name=toto`` : Receive message from fanout exchange ``toto``
+* Topic mode: ``output://amqp://localhost:5672?exchange_name=toto_topic&topic=test`` : Receive message from topic ``test`` on  exchange ``toto_topic``
+
+Parameters:
+
+* ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
+* ``durable``: Optional. Set exchange durability. Default : true.
+* ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
+* ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
+* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 Filters
 ===
@@ -751,6 +798,17 @@ Parameters:
 * ``target_field``: field to store the result. Default : ``http_class``.
 * ``special_codes``: http status codes to be kept as is. Eg, with ``498,499`` value in ``special_codes``, the filter will put 499 in the ``http_class`` field when receiving a ``499`` http code, and not ``4xx``. Mutlipe values must be separated with ``,``. Default value: empty.
 
+Remove field when equal
+---
+
+The remove field when equal filter allow to remove a message when equal to a given value. Typical usage is to remove field containing ``-`` in apache or nginx logs.
+
+Example : ``filter://remove_field_when_equal://http_user?value=-`` will remove the field ``http_user`` when equal to  ``-``.
+
+Parameters:
+
+* ``value``: value to check. Required params.
+
 Misc
 ===
 
@@ -766,6 +824,10 @@ For using a Certificate authority, add ``&ssl_ca=/path/to/ca``.
 
 For changing SSL ciphers, add ``ssl_ciphers=AES128-GCM-SHA256``.
 
+To use a client certificate, add ``ssl_cert=/client.cer&ssl_key=/client.key&ssl_ca=/tmp/ca.key``.
+
+To ignore ssl errors, add ``ssl_rejectUnauthorized=false`.
+
 HTTP Proxy
 ---
 
@@ -777,14 +839,14 @@ The proxy url must have the format ``http[s]://[userinfo@]hostname[:port]`` whic
   * proxy port
   * NTLM : for ntlm authent, userinfo have to be ``ntlm:domain:hostname:username:password``. Hostname can be empty.
 
-Force fields typing in Elastic Search
+Force fields typing in ElasticSearch
 ---
 
 If you have a custom field with an hashcode
-- if the first hashcode of the day contains only digits, Elastic Search will guess the field type and will choose integer and it will fail to index the next values that contains letters.
-- by default elastic search will tokenize it like some real text instead of treating it like a blob, it won't impact tools like kibana but may prevent you from doing custom queries.
+- if the first hashcode of the day contains only digits, ElasticSearch will guess the field type and will choose integer and it will fail to index the next values that contains letters.
+- by default ElasticSearch will tokenize it like some real text instead of treating it like a blob, it won't impact tools like kibana but may prevent you from doing custom queries.
 
-For both cases you should add a `default-mapping.json` file in Elastic Search config directory :
+For both cases you should add a `default-mapping.json` file in ElasticSearch config directory :
 
 ```json
 {

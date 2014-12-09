@@ -181,4 +181,8 @@ vows.describe('Integration file2x2x2file :').addBatchRetry({
   'tls': file2x2x2fileNotOrdered(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_rejectUnauthorized=false'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt']),
 }, 5, 20000).addBatchRetry({
   'tls with ca': file2x2x2fileNotOrdered(['output://tcp://localhost:17874?serializer=json_logstash&ssl=true&ssl_ca=test/ssl/root-ca.crt&ssl_key=test/ssl/client.key&ssl_cert=test/ssl/client.crt'], ['input://tcp://127.0.0.1:17874?ssl=true&ssl_key=test/ssl/server.key&ssl_cert=test/ssl/server.crt&ssl_requestCert=true&ssl_ca=test/ssl/root-ca.crt&ssl_rejectUnauthorized=true']),
+}, 5, 20000).addBatchRetry({
+  'rabbitmq standard': file2x2x2file(['output://amqp://localhost:5672?exchange_name=test_node_logstash'], ['input://amqp://localhost:5672?exchange_name=test_node_logstash']),
+}, 5, 20000).addBatchRetry({
+  'rabbitmq topic': file2x2x2file(['output://amqp://localhost:5672?exchange_name=test_node_logstash_topic&topic=23'], ['input://amqp://localhost:5672?exchange_name=test_node_logstash_topic&topic=23']),
 }, 5, 20000).export(module);
