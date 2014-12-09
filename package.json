@@ -1,7 +1,7 @@
 {
   "name": "node-logstash-capriza",
   "description": "Logstash implementation in node JS (Capriza fork from bpaquet/node-logstash)",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "author": "Nadav Fischer <devops@capriza.com>",
   "keywords": ["logstash", "log", "zmq", "zeromq"],
   "main": "./lib/log4node.js",
