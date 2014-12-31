@@ -216,7 +216,13 @@ if (argv.db_file) {
           log_error('Error while reading', argv.db_file, ':', err);
         }
         else {
-          monitor_file.setFileStatus(JSON.parse(data));
+          try {
+            var parsed = JSON.parse(data);
+            monitor_file.setFileStatus(parsed);
+          }
+          catch(err) {
+            log_error('Error while parsing db file, please delete it', argv.db_file, ':', err);
+          }
         }
         main_start();
       });

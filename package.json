@@ -20,7 +20,7 @@
     "vows": "0.7.0",
     "vows-batch-retry": "0.0.4",
     "js-beautify": "1.4.x",
-    "whereis": "0.0.2",
+    "whereis": "0.4.x",
     "jshint": "2.x",
     "istanbul": "0.1.x"
   },
@@ -28,14 +28,16 @@
     "test": "./test-runner.sh"
   },
   "dependencies": {
-    "log4node": "0.1.2",
-    "optimist": "0.3.4"
+    "log4node": "0.1.6",
+    "optimist": "0.6.1"
   },
   "optionalDependencies":{
-    "zmq": "2.5.1",
-    "moment": "1.7.0",
-    "redis": "0.8.x",
-    "msgpack": "0.1.8",
+    "amqplib": "0.3.0",
+    "zmq": "2.8.x",
+    "moment": "2.8.3",
+    "redis": "0.12.x",
+    "oniguruma": "3.0.4",
+    "msgpack": "0.2.4",
     "geoip-lite": "1.1.x",
     "proxying-agent": "0.1.x"
   },

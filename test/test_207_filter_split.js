@@ -56,4 +56,22 @@ vows.describe('Filter split ').addBatch({
       'z': 2
     },
   ]),
+  'with carring return in regex': filter_helper.create('split', '?delimiter=toto%0Atiti', [
+    {
+      'message': 'l1 toto\ntitil2 toto\ntitil3 toto\ntitil4',
+    },
+  ], [
+    {
+      'message': 'l1 ',
+    },
+    {
+      'message': 'l2 ',
+    },
+    {
+      'message': 'l3 ',
+    },
+    {
+      'message': 'l4',
+    },
+  ]),
 }).export(module);

@@ -110,4 +110,22 @@ vows.describe('Filter multiline ').addBatch({
       'host': 'b'
     },
   ]),
+  'with carring return in regex': filter_helper.create('multiline', '?start_line_regex=^titi&regex_flags=m', [
+    {
+      'message': 'titil1 toto\ntataabc\ntitil2',
+    },
+    {
+      'message': 'bouh',
+    },
+    {
+      'message': 'abc\ntiti',
+    },
+  ], [
+    {
+      'message': 'titil1 toto\ntataabc\ntitil2\nbouh',
+    },
+    {
+      'message': 'abc\ntiti',
+    },
+  ]),
 }).export(module);
