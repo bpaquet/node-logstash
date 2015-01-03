@@ -76,7 +76,7 @@ Configuration
 ---
 
 Configuration is done by url. A plugin is instanciated by an url. Example: ``input://file:///tmp/toto.log``. This url
-instanciate an input file plugin which monitor the file ``/tmp/toto.log`.
+instanciate an input file plugin which monitor the file ``/tmp/toto.log``.
 
 The urls can be specified:
 
