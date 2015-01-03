@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* 3/12/2015 : Add SQS Input / Output
 * 9/11/2014 : publish 0.0.3 on NPM
 
 * Add SSL Suport to AMPQ plugins
@@ -166,6 +167,7 @@ Inputs
 * [TCP / TLS](#tcp--tls)
 * [Google app engine](#google-app-engine)
 * [AMQP](#amqp)
+* [SQS](#sqs)
 
 Filters
 ---
@@ -199,6 +201,7 @@ Outputs
 * [Logio](#logio)
 * [TCP / TLS](#tcp--tls-1)
 * [AMQP](#amqp-1)
+* [SQS](#sqs-1)
 
 
 Inputs plugins
@@ -361,6 +364,19 @@ Parameters:
 * ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
+
+SQS
+---
+This plugin is used to get logs from [SQS](https://aws.amazon.com/en/sqs/). This plugin use [long polling](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html) to get messages faster.
+
+Example :
+* ``input://sqs://sqs.eu-west-1.amazonaws.com/66171255634/test?aws_access_key_id=key&aws_secret_access_key=secret``: get messages from the SQS queue ``sqs.eu-west-1.amazonaws.com/66171255634/test``
+
+Parameters :
+* ``aws_access_key_id``: your AWS Access Key Id. Required.
+* ``aws_secret_access_key``: your AWS Secret Access Key Id. Required.
+* ``polling_delay``: the long polling max delay, in seconds. Default value : 10.
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 Outputs and filter, commons parameters
@@ -578,6 +594,18 @@ Parameters:
 * ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
+
+SQS
+---
+This plugin is used to send logs to [SQS](https://aws.amazon.com/en/sqs/).
+
+Example :
+* ``output://sqs://sqs.eu-west-1.amazonaws.com/66171255634/test?aws_access_key_id=key&aws_secret_access_key=secret``: send messages to the SQS queue ``sqs.eu-west-1.amazonaws.com/66171255634/test``
+
+Parameters :
+* ``aws_access_key_id``: your AWS Access Key Id. Required.
+* ``aws_secret_access_key``: your AWS Secret Access Key Id. Required.
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 Filters

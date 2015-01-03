@@ -32,6 +32,7 @@
     "optimist": "0.6.1"
   },
   "optionalDependencies":{
+    "aws-lib": "0.0.6",
     "amqplib": "0.3.0",
     "zmq": "2.8.x",
     "moment": "2.8.3",

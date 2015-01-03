@@ -5,7 +5,7 @@ var vows = require('vows-batch-retry'),
   monitor_file = require('lib/monitor_file'),
   redis_driver = require('redis_driver');
 
-function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, check) {
+function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, check, wait_delay) {
   return {
     topic: function() {
       start_callback = start_callback || function(callback) {
@@ -33,7 +33,7 @@ function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_c
                       });
                     });
                   });
-                }, 200);
+                }, wait_delay || 200);
               });
             }, 200);
           }, 200);
@@ -61,7 +61,7 @@ function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_c
   };
 }
 
-function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callback, stop_callback) {
+function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callback, stop_callback, wait_delay) {
   return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
     splitted.sort();
     helper.checkResult(splitted[0], {
@@ -82,10 +82,10 @@ function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callbac
       'type': 'test',
       '@version': '1'
     }, true);
-  });
+  }, wait_delay);
 }
 
-function file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback) {
+function file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, wait_delay) {
   return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
     helper.checkResult(splitted[0], {
       'path': 'main_input.txt',
@@ -105,10 +105,10 @@ function file2x2x2file(config1, config2, clean_callback, start_callback, stop_ca
       'type': 'test',
       '@version': '1'
     }, true);
-  });
+  }, wait_delay);
 }
 
-vows.describe('Integration file2x2x2file :').addBatchRetry({
+var test = vows.describe('Integration file2x2x2file :').addBatchRetry({
   'redis queue channel transport': file2x2x2file(['output://redis://localhost:17874?key=toto'], ['input://redis://localhost:17874?key=toto'], undefined, function(callback) {
     var r = new redis_driver.RedisDriver();
     r.start({
@@ -185,4 +185,16 @@ vows.describe('Integration file2x2x2file :').addBatchRetry({
   'rabbitmq standard': file2x2x2file(['output://amqp://localhost:5672?exchange_name=test_node_logstash'], ['input://amqp://localhost:5672?exchange_name=test_node_logstash']),
 }, 5, 20000).addBatchRetry({
   'rabbitmq topic': file2x2x2file(['output://amqp://localhost:5672?exchange_name=test_node_logstash_topic&topic=23'], ['input://amqp://localhost:5672?exchange_name=test_node_logstash_topic&topic=23']),
-}, 5, 20000).export(module);
+}, 5, 20000);
+
+if (fs.existsSync('.sqs')) {
+  var sqs = fs.readFileSync('.sqs').toString().trim();
+  test = test.addBatchRetry({
+    'sqs': file2x2x2fileNotOrdered(['output://sqs://' + sqs], ['input://sqs://' + sqs], undefined, undefined, undefined, 5000),
+  }, 1, 20000);
+}
+
+test.export(module);
+
+
+
