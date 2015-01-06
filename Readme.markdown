@@ -179,6 +179,7 @@ Filters
 * [Compute field](#compute-field)
 * [Compute date field](#compute-date-field)
 * [Split](#split)
+* [Truncate](#truncate)
 * [Multiline](#multiline)
 * [Json fields](#json-fields)
 * [Geoip](#geoip)
