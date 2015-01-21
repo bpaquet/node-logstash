@@ -597,7 +597,6 @@ Parameters:
 * ``durable``: Optional. Set exchange durability. Default : true.
 * ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
 * ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
-* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
 * ``username``: username for PLAIN authentication to amqp broker. No default value.
 * ``password``: password for PLAIN authentication to amqp broker. No default value.
 * ``vhost``: amqp vhost to use. No default value.
