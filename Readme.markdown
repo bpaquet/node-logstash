@@ -116,7 +116,7 @@ Signals
 Changelog
 ===
 
-* 21/01/2015 : AMQP plain authentication
+* 21/01/2015 : AMQP plain authentication, AMQP vhost
 * 3/01/2015 : Add SQS Input / Output
 * 9/11/2014 : publish 0.0.3 on NPM
 
@@ -367,6 +367,7 @@ Parameters:
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
 * ``username``: username for PLAIN authentication to amqp broker. No default value.
 * ``password``: password for PLAIN authentication to amqp broker. No default value.
+* ``vhost``: amqp vhost to use. No default value.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
@@ -599,6 +600,7 @@ Parameters:
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
 * ``username``: username for PLAIN authentication to amqp broker. No default value.
 * ``password``: password for PLAIN authentication to amqp broker. No default value.
+* ``vhost``: amqp vhost to use. No default value.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 
