@@ -595,6 +595,7 @@ Parameters:
 
 * ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
 * ``durable``: Optional. Set exchange durability. Default : true.
+* ``persistent``: Optional. Set persistent flag on each send message. Default: false.
 * ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
 * ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
 * ``username``: username for PLAIN authentication to amqp broker. No default value.
