@@ -677,7 +677,7 @@ Mutate replace
 
 The mutate replace filter is used to run regex on specified field.
 
-Example: ``filter://mutate_replace?toto&from=\\.&to=-`` replace all ``.`` in ``toto`` field by ``-``
+Example: ``filter://mutate_replace://toto?from=\\.&to=-`` replace all ``.`` in ``toto`` field by ``-``
 
 Parameters:
 
