@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* 7/03/2015 : Allow to use fixed index name for ElasticSearch output
 * 21/01/2015 : AMQP plain authentication, AMQP vhost
 * 3/01/2015 : Add SQS Input / Output
 * 9/11/2014 : publish 0.0.3 on NPM
@@ -451,6 +452,7 @@ Example 3: ``output://elasticsearch://localhost:9001?bulk_limit=1000&bulk_timeou
 
 Parameters:
 * ``index_prefix``: specifies the index prefix that messages will be stored under. Default : ``logstash``. Default index will be ``logstash-<date>``
+* ``index_name``: specifies a fixed name for the index that messages will be stored under. Disable the ``index_prefix`` option. No default value.
 * ``data_type``: specifies the type under the index that messages will be stored under. (default is ``logs``)
 * ``bulk_limit``: Enable bulk mode. Dpecifies the maximum number of messages to store in memory before bulking to ElasticSearch. No default value.
 * ``bulk_timeout``: Specifies the maximum number of milliseconds to wait for ``bulk_limit`` messages,. Default is 100.
