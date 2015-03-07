@@ -1,7 +1,7 @@
 var vows = require('vows'),
   assert = require('assert'),
   moment = require('moment'),
-  patterns_loader = require('lib/patterns_loader'),
+  patterns_loader = require('../lib/lib/patterns_loader'),
   filter_helper = require('./filter_helper');
 
 var n = moment();
