@@ -124,6 +124,47 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
     }
   },
 }, 5, 20000).addBatchRetry({
+  'elastic_search with index name': {
+    topic: function() {
+      var callback = this.callback;
+      helper.createAgent([
+        'input://tcp://0.0.0.0:17874?type=nginx',
+        'input://tcp://0.0.0.0:17875',
+        'output://elasticsearch://localhost:17876?data_type=audits&index_name=myindex',
+      ], function(agent) {
+        es_server(2, agent, 17876, callback);
+        tcp_send('toto', 17874);
+        setTimeout(function() {
+          tcp_send('titi', 17875);
+        }, 200);
+      });
+    },
+
+    check: function(err, reqs) {
+      assert.ifError(err);
+      assert.equal(reqs.length, 2);
+
+      assert.equal(reqs[0].req.method, 'POST');
+      assert.equal(reqs[0].req.url, '/myindex/audits/');
+      helper.checkResult(reqs[0].body, {
+        '@version': '1',
+        'message': 'toto',
+        'host': '127.0.0.1',
+        'type': 'nginx',
+        'tcp_port': 17874
+      });
+
+      assert.equal(reqs[1].req.method, 'POST');
+      assert.equal(reqs[1].req.url, '/myindex/audits/');
+      helper.checkResult(reqs[1].body, {
+        '@version': '1',
+        'message': 'titi',
+        'host': '127.0.0.1',
+        'tcp_port': 17875
+      });
+    }
+  },
+}, 5, 20000).addBatchRetry({
   'elastic_search bulk timer test': {
     topic: function() {
       var callback = this.callback;
