@@ -99,7 +99,7 @@ function createConnectTest(config, check_callback) {
   };
 }
 
-if (process.version.match(/v0.1.*/)) {
+if (process.version.match(/v0.10.*/)) {
   vows.describe('Integration Http proxy :').addBatchRetry({
     'no proxy': createHttpTest('http_post://localhost:17875?path=/#{type}', function(req) {
       assert.equal(req.req.method, 'POST');
