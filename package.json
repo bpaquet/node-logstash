@@ -17,7 +17,7 @@
     }
   ],
   "devDependencies": {
-    "vows": "0.7.0",
+    "vows": "0.8.0",
     "vows-batch-retry": "0.0.4",
     "js-beautify": "1.4.x",
     "whereis": "0.4.x",
@@ -33,12 +33,12 @@
   },
   "optionalDependencies":{
     "aws-lib": "0.0.6",
-    "amqplib": "0.3.0",
-    "zmq": "2.8.x",
-    "moment": "2.8.3",
+    "amqplib": "0.3.x",
+    "zmq": "2.10.x",
+    "moment": "2.9.x",
     "redis": "0.12.x",
-    "oniguruma": "3.0.4",
-    "msgpack": "0.2.4",
+    "oniguruma": "4.0.x",
+    "msgpack": "0.2.6",
     "geoip-lite": "1.1.x",
     "proxying-agent": "0.1.x"
   },

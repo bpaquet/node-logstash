@@ -99,80 +99,82 @@ function createConnectTest(config, check_callback) {
   };
 }
 
-vows.describe('Integration Http proxy :').addBatchRetry({
-  'no proxy': createHttpTest('http_post://localhost:17875?path=/#{type}', function(req) {
-    assert.equal(req.req.method, 'POST');
-    assert.equal(req.req.url, '/pouet');
-    assert.equal(req.body, 'toto');
-    assert.equal(req.req.headers['proxy-authorization'], undefined);
-  }),
-}, 5, 20000).addBatchRetry({
-  'no proxy elastic search': createHttpTest('elasticsearch://localhost:17875', function(req) {
-    assert.equal(req.req.method, 'POST');
-    assert.match(req.req.url, /logstash.*logs/);
-    assert.equal(req.req.headers['proxy-authorization'], undefined);
-  }),
-}, 5, 20000).addBatchRetry({
-  'http proxy': createHttpTest('http_post://toto.com:1234?path=/#{type}&proxy=http://localhost:17875', function(req) {
-    assert.equal(req.req.method, 'POST');
-    assert.equal(req.req.url, 'http://toto.com:1234/pouet');
-    assert.equal(req.body, 'toto');
-    assert.equal(req.req.headers['proxy-authorization'], undefined);
-  }),
-}, 5, 20000).addBatchRetry({
-  'http proxy elastic search': createHttpTest('elasticsearch://toto.com:1234?proxy=http://localhost:17875', function(req) {
-    assert.equal(req.req.method, 'POST');
-    assert.match(req.req.url, /http:\/\/toto.com:1234\/logstash.*logs/);
-    assert.equal(req.req.headers['proxy-authorization'], undefined);
-  }),
-}, 5, 20000).addBatchRetry({
-  'http proxy basic auth': createHttpTest('http_post://toto.com:1234?path=/#{type}&proxy=http://a:bc@localhost:17875', function(req) {
-    assert.equal(req.req.method, 'POST');
-    assert.equal(req.req.url, 'http://toto.com:1234/pouet');
-    assert.equal(req.body, 'toto');
-    assert.equal(req.req.headers['proxy-authorization'], 'Basic YTpiYw==');
-  }),
-}, 5, 20000).addBatchRetry({
-  'http proxy basic auth base 64': createHttpTest('http_post://toto.com:1234?path=/#{type}&proxy=http://YTpiYw==@localhost:17875', function(req) {
-    assert.equal(req.req.method, 'POST');
-    assert.equal(req.req.url, 'http://toto.com:1234/pouet');
-    assert.equal(req.body, 'toto');
-    assert.equal(req.req.headers['proxy-authorization'], 'Basic YTpiYw==');
-  }),
-}, 5, 20000).addBatchRetry({
-  'https proxy': createConnectTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://localhost:17875', function(req) {
-    assert.equal(req.req.method, 'CONNECT');
-    assert.equal(req.req.url, 'toto.com:1234');
-    assert.equal(req.req.headers['proxy-authorization'], undefined);
-  }),
-}, 5, 20000).addBatchRetry({
-  'https proxy basic auth': createConnectTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://a:bc@localhost:17875', function(req) {
-    assert.equal(req.req.method, 'CONNECT');
-    assert.equal(req.req.url, 'toto.com:1234');
-    assert.equal(req.req.headers['proxy-authorization'], 'Basic YTpiYw==');
-  }),
-}, 5, 20000).addBatchRetry({
-  'http ntlm no hostname': createHttpTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://ntlm:mydomain::a:bc@localhost:17875', undefined, function(err, req) {
-    assert.match(err.toString(), /did not receive NTLM type 2 message/);
-    assert.equal(req.req.method, 'GET');
-    assert.equal(req.req.url, 'http://toto.com:1234/pouet');
-    var auth = req.req.headers['proxy-authorization'];
-    assert.match(auth, /^NTLM (.*)/);
-    var res = auth.match(/^NTLM (.*)/);
-    var body = (new Buffer(res[1], 'base64')).toString();
-    var l = (os.hostname() + 'mydomain').toUpperCase();
-    assert.match(body, new RegExp(l + '$'));
-  }),
-}, 5, 20000).addBatchRetry({
-  'http ntlm with workstation': createHttpTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://ntlm:mydomain:titi:a:bc@localhost:17875', undefined, function(err, req) {
-    assert.match(err.toString(), /did not receive NTLM type 2 message/);
-    assert.equal(req.req.method, 'GET');
-    assert.equal(req.req.url, 'http://toto.com:1234/pouet');
-    var auth = req.req.headers['proxy-authorization'];
-    assert.match(auth, /^NTLM (.*)/);
-    var res = auth.match(/^NTLM (.*)/);
-    var body = (new Buffer(res[1], 'base64')).toString();
-    var l = ('titi' + 'mydomain').toUpperCase();
-    assert.match(body, new RegExp(l + '$'));
-  }),
-}, 5, 20000).export(module);
+if (process.version.match(/v0.1.*/)) {
+  vows.describe('Integration Http proxy :').addBatchRetry({
+    'no proxy': createHttpTest('http_post://localhost:17875?path=/#{type}', function(req) {
+      assert.equal(req.req.method, 'POST');
+      assert.equal(req.req.url, '/pouet');
+      assert.equal(req.body, 'toto');
+      assert.equal(req.req.headers['proxy-authorization'], undefined);
+    }),
+  }, 5, 20000).addBatchRetry({
+    'no proxy elastic search': createHttpTest('elasticsearch://localhost:17875', function(req) {
+      assert.equal(req.req.method, 'POST');
+      assert.match(req.req.url, /logstash.*logs/);
+      assert.equal(req.req.headers['proxy-authorization'], undefined);
+    }),
+  }, 5, 20000).addBatchRetry({
+    'http proxy': createHttpTest('http_post://toto.com:1234?path=/#{type}&proxy=http://localhost:17875', function(req) {
+      assert.equal(req.req.method, 'POST');
+      assert.equal(req.req.url, 'http://toto.com:1234/pouet');
+      assert.equal(req.body, 'toto');
+      assert.equal(req.req.headers['proxy-authorization'], undefined);
+    }),
+  }, 5, 20000).addBatchRetry({
+    'http proxy elastic search': createHttpTest('elasticsearch://toto.com:1234?proxy=http://localhost:17875', function(req) {
+      assert.equal(req.req.method, 'POST');
+      assert.match(req.req.url, /http:\/\/toto.com:1234\/logstash.*logs/);
+      assert.equal(req.req.headers['proxy-authorization'], undefined);
+    }),
+  }, 5, 20000).addBatchRetry({
+    'http proxy basic auth': createHttpTest('http_post://toto.com:1234?path=/#{type}&proxy=http://a:bc@localhost:17875', function(req) {
+      assert.equal(req.req.method, 'POST');
+      assert.equal(req.req.url, 'http://toto.com:1234/pouet');
+      assert.equal(req.body, 'toto');
+      assert.equal(req.req.headers['proxy-authorization'], 'Basic YTpiYw==');
+    }),
+  }, 5, 20000).addBatchRetry({
+    'http proxy basic auth base 64': createHttpTest('http_post://toto.com:1234?path=/#{type}&proxy=http://YTpiYw==@localhost:17875', function(req) {
+      assert.equal(req.req.method, 'POST');
+      assert.equal(req.req.url, 'http://toto.com:1234/pouet');
+      assert.equal(req.body, 'toto');
+      assert.equal(req.req.headers['proxy-authorization'], 'Basic YTpiYw==');
+    }),
+  }, 5, 20000).addBatchRetry({
+    'https proxy': createConnectTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://localhost:17875', function(req) {
+      assert.equal(req.req.method, 'CONNECT');
+      assert.equal(req.req.url, 'toto.com:1234');
+      assert.equal(req.req.headers['proxy-authorization'], undefined);
+    }),
+  }, 5, 20000).addBatchRetry({
+    'https proxy basic auth': createConnectTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://a:bc@localhost:17875', function(req) {
+      assert.equal(req.req.method, 'CONNECT');
+      assert.equal(req.req.url, 'toto.com:1234');
+      assert.equal(req.req.headers['proxy-authorization'], 'Basic YTpiYw==');
+    }),
+  }, 5, 20000).addBatchRetry({
+    'http ntlm no hostname': createHttpTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://ntlm:mydomain::a:bc@localhost:17875', undefined, function(err, req) {
+      assert.match(err.toString(), /did not receive NTLM type 2 message/);
+      assert.equal(req.req.method, 'GET');
+      assert.equal(req.req.url, 'http://toto.com:1234/pouet');
+      var auth = req.req.headers['proxy-authorization'];
+      assert.match(auth, /^NTLM (.*)/);
+      var res = auth.match(/^NTLM (.*)/);
+      var body = (new Buffer(res[1], 'base64')).toString();
+      var l = (os.hostname() + 'mydomain').toUpperCase();
+      assert.match(body, new RegExp(l + '$'));
+    }),
+  }, 5, 20000).addBatchRetry({
+    'http ntlm with workstation': createHttpTest('http_post://toto.com:1234?path=/#{type}&ssl=true&proxy=http://ntlm:mydomain:titi:a:bc@localhost:17875', undefined, function(err, req) {
+      assert.match(err.toString(), /did not receive NTLM type 2 message/);
+      assert.equal(req.req.method, 'GET');
+      assert.equal(req.req.url, 'http://toto.com:1234/pouet');
+      var auth = req.req.headers['proxy-authorization'];
+      assert.match(auth, /^NTLM (.*)/);
+      var res = auth.match(/^NTLM (.*)/);
+      var body = (new Buffer(res[1], 'base64')).toString();
+      var l = ('titi' + 'mydomain').toUpperCase();
+      assert.match(body, new RegExp(l + '$'));
+    }),
+  }, 5, 20000).export(module);
+}

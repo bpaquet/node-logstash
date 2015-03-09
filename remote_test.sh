@@ -8,7 +8,7 @@ if [ "$TARGET" = "" ]; then
 fi
 
 if [ "$NODE_VERSION" = "" ]; then
-  NODE_VERSION=0.10.36
+  NODE_VERSION=v0.10.36
 fi
 
 COMMAND="npm test"
@@ -27,7 +27,7 @@ fi
 
 echo "Using node version $NODE_VERSION"
 rsync -avh --delete --exclude=.git --exclude=node_modules --exclude=coverage ../node-logstash/ $TARGET:node-logstash_$NODE_VERSION/
-ssh $TARGET "source .nvm/nvm.sh && nvm use v$NODE_VERSION && cd node-logstash_$NODE_VERSION && echo $NODE_VERSION > .node_version && $COMMAND"
+ssh $TARGET "source .nvm/nvm.sh && nvm use $NODE_VERSION && cd node-logstash_$NODE_VERSION && echo $NODE_VERSION > .node_version && $COMMAND"
 
 if [ "$COVER" != "" ]; then
   rsync -avh --delete $TARGET:node-logstash_$NODE_VERSION/coverage/ coverage/
