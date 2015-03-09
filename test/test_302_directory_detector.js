@@ -32,14 +32,15 @@ function create_test(directory, start_callback, check_callback) {
           return callback(err);
         }
         start_callback(function() {
-          callback(null, detector);
+          detector.detector.close(function(err) {
+            callback(err, detector);
+          });
         }, detector);
       });
     },
 
     check: function(err, detector) {
       assert.ifError(err);
-      detector.detector.close();
       check_callback(detector);
     }
   };
