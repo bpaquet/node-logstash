@@ -58,7 +58,7 @@ How to use it ?
 Installation
 ---
 
-* Install NodeJS, version >= 0.10, or iojs.
+* Install NodeJS, version >= 0.10, or [io.js](https://iojs.org).
 * Install build tools
   * Debian based system: `apt-get install build-essential`
   * Centos system: `yum install gcc gcc-c++ make`
@@ -867,7 +867,7 @@ To ignore ssl errors, add ``ssl_rejectUnauthorized=false`.
 HTTP Proxy
 ---
 
-WARNING : due to lot of API changes, the HTTP proxy does not work with node 0.12x or iojs :(
+WARNING : due to lot of API changes, the HTTP proxy does not work with node 0.12x or io.js :(
 
 The proxy parameter allow to use an http proxy.
 
