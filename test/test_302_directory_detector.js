@@ -7,14 +7,19 @@ var vows = require('vows-batch-retry'),
 
 function TestDirectoryDetector(directory, callback) {
   this.exists = [];
+  this.errors = [];
   this.detector = new directory_detector.DirectoryDetector();
   this.detector.on('exists', function(d) {
     this.exists.push(d);
+  }.bind(this));
+  this.detector.on('error', function(err) {
+    this.errors.push(err);
   }.bind(this));
   this.detector.start(directory, callback);
 }
 
 function check(detector, exists) {
+  assert.equal(detector.errors.length, 0);
   assert.deepEqual(detector.exists.sort(), exists.sort());
 }
 
@@ -22,10 +27,10 @@ function create_test(directory, start_callback, check_callback) {
   return {
     topic: function() {
       var callback = this.callback;
-      var detector = new TestDirectoryDetector(directory, function(err) {
-        if (err) {
-          return callback(err);
-        }
+      var already = false;
+      var detector = new TestDirectoryDetector(directory, function() {
+        assert.isFalse(already);
+        already = true;
         start_callback(function(detector2) {
           detector.detector.close(function(err) {
             callback(err, detector, detector2);
@@ -45,16 +50,21 @@ function create_test_init_failed(directory, pattern) {
   return {
     topic: function() {
       var callback = this.callback;
+      var start_called = false;
       var detector = new directory_detector.DirectoryDetector();
-      detector.start(directory, function(err) {
+      detector.on('error', function(err) {
         assert.isDefined(err);
         assert.match(err.toString(), new RegExp(pattern));
-        callback(null);
+        callback(null, start_called);
+      });
+      detector.start(directory, function() {
+        start_called = true;
       });
     },
 
-    check: function(err) {
+    check: function(err, start_called) {
       assert.ifError(err);
+      assert.isFalse(start_called);
     }
   };
 }
@@ -218,13 +228,13 @@ vows.describe('Directory detector ').addBatchRetry({
                       setTimeout(function() {
                         var detector2 = new TestDirectoryDetector(path.resolve('.') + '/toto45/1*/45', function(err) {
                           assert.ifError(err);
-                          setTimeout(function() {
-                            detector2.detector.close(function(err) {
-                              assert.ifError(err);
-                              callback(detector2);
-                            });
-                          }, 100);
                         });
+                        setTimeout(function() {
+                          detector2.detector.close(function(err) {
+                            assert.ifError(err);
+                            callback(detector2);
+                          });
+                        }, 100);
                       }, 50);
                     });
                   });
@@ -245,7 +255,6 @@ vows.describe('Directory detector ').addBatchRetry({
     fs.rmdirSync('toto45/20');
     fs.rmdirSync('toto45');
     check(detector, [path.resolve('.') + '/toto45/12/45', path.resolve('.') + '/toto45/13/45']);
-    // console.log(detector2.exists);
     check(detector2, [path.resolve('.') + '/toto45/12/45', path.resolve('.') + '/toto45/13/45']);
   }),
 }, 5, 10000).export(module);
