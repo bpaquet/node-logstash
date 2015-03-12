@@ -15,4 +15,3 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -y logrotate
   - sudo apt-get install -y libzmq1=${ZEROMQ_VERSION} libzmq-dev=${ZEROMQ_VERSION}
-  - npm install -g npm
