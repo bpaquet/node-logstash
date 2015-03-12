@@ -1,5 +1,6 @@
 var vows = require('vows-batch-retry'),
   fs = require('fs'),
+  path = require('path'),
   assert = require('assert'),
   helper = require('./integration_helper.js'),
   monitor_file = require('lib/monitor_file');
@@ -49,7 +50,7 @@ function file100(config) {
       for (var k = 10; k < 100; k++) {
         helper.checkResult(splitted[k - 10], {
           '@version': '1',
-          'path': 'input' + k + '.txt',
+          'path': path.resolve('.') + '/input' + k + '.txt',
           'message': 'line' + k
         }, true);
       }
@@ -105,12 +106,12 @@ vows.describe('Integration file wildcard :').addBatchRetry({
       assert.equal('', splitted[splitted.length - 1]);
       helper.checkResult(splitted[0], {
         '@version': '1',
-        'path': 'input01.txt',
+        'path': path.resolve('.') + '/input01.txt',
         'message': 'tata'
       }, true);
       helper.checkResult(splitted[1], {
         '@version': '1',
-        'path': 'input01.txt',
+        'path': path.resolve('.') + '/input01.txt',
         'message': 'titi'
       }, true);
     }
@@ -159,7 +160,7 @@ vows.describe('Integration file wildcard :').addBatchRetry({
       assert.equal('', splitted[splitted.length - 1]);
       helper.checkResult(splitted[0], {
         '@version': '1',
-        'path': 'input01.txt',
+        'path': path.resolve('.') + '/input01.txt',
         'message': 'tata'
       }, true);
     }

@@ -57,18 +57,18 @@ vows.describe('Integration file 2 file :').addBatchRetry({
       assert.equal('', splitted[splitted.length - 1]);
       helper.checkResult(splitted[0], {
         '@version': '1',
-        'path': 'input1.txt',
+        'path': path.resolve('.') + '/input1.txt',
         'message': 'line1'
       }, true);
       helper.checkResult(splitted[1], {
         '@version': '1',
-        'path': 'input2.txt',
+        'path': path.resolve('.') + '/input2.txt',
         'message': 'line2',
         'type': 'input2'
       }, true);
       helper.checkResult(splitted[2], {
         '@version': '1',
-        'path': 'input1.txt',
+        'path': path.resolve('.') + '/input1.txt',
         'message': 'line3'
       }, true);
 
@@ -177,6 +177,116 @@ vows.describe('Integration file 2 file :').addBatchRetry({
       fs.unlinkSync('toto.txt');
       fs.unlinkSync('output.txt');
       assert.deepEqual(data, ['e1', 'line2', '']);
+    }
+  },
+}, 5, 20000).addBatchRetry({
+  'wildcard': {
+    topic: function() {
+      monitor_file.setFileStatus({});
+      var callback = this.callback;
+      helper.createAgent([
+        'output://file://output.txt',
+        'input://file://log/*-2005/access.log',
+      ], function(agent) {
+        setTimeout(function() {
+          fs.mkdir('log', function(err) {
+            assert.ifError(err);
+            fs.mkdir('log/10-02-2005', function(err) {
+              assert.ifError(err);
+              fs.appendFile('log/10-02-2005/access.log', 'z1\n', function(err) {
+                assert.ifError(err);
+                fs.appendFile('log/10-02-2005/error.log', 'z2\n', function(err) {
+                  assert.ifError(err);
+                  fs.mkdir('log/10-03-2005', function(err) {
+                    assert.ifError(err);
+                    fs.appendFile('log/10-03-2005/access.log', 'z3\n', function(err) {
+                      assert.ifError(err);
+                      fs.mkdir('log/10-03-2006', function(err) {
+                        assert.ifError(err);
+                        fs.appendFile('log/10-03-2006/access.log', 'z4\n', function(err) {
+                          assert.ifError(err);
+                          agent.close(function() {
+                            setTimeout(callback, 500);
+                          });
+                        });
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        }, 200);
+      });
+    },
+
+    check: function(err) {
+      assert.ifError(err);
+      var data = fs.readFileSync('output.txt').toString().split('\n');
+      fs.unlinkSync('log/10-02-2005/access.log');
+      fs.unlinkSync('log/10-02-2005/error.log');
+      fs.unlinkSync('log/10-03-2005/access.log');
+      fs.unlinkSync('log/10-03-2006/access.log');
+      fs.rmdirSync('log/10-02-2005');
+      fs.rmdirSync('log/10-03-2005');
+      fs.rmdirSync('log/10-03-2006');
+      fs.rmdirSync('log');
+      fs.unlinkSync('output.txt');
+      assert.deepEqual(data, ['z1', 'z3', '']);
+    }
+  },
+}, 5, 20000).addBatchRetry({
+  'wildcard create destroy': {
+    topic: function() {
+      monitor_file.setFileStatus({});
+      var callback = this.callback;
+      helper.createAgent([
+        'output://file://output.txt',
+        'input://file://log/*-2005/access.log',
+      ], function(agent) {
+        setTimeout(function() {
+          fs.mkdir('log', function(err) {
+            assert.ifError(err);
+            fs.mkdir('log/10-02-2005', function(err) {
+              assert.ifError(err);
+              fs.appendFile('log/10-02-2005/access.log', 'z1\n', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  fs.unlink('log/10-02-2005/access.log', function(err) {
+                    assert.ifError(err);
+                    fs.rmdir('log/10-02-2005', function(err) {
+                      assert.ifError(err);
+                      setTimeout(function() {
+                        fs.mkdir('log/10-02-2005', function(err) {
+                          assert.ifError(err);
+                          fs.appendFile('log/10-02-2005/access.log', 'z2\n', function(err) {
+                            assert.ifError(err);
+                            setTimeout(function() {
+                              agent.close(function() {
+                                setTimeout(callback, 500);
+                              });
+                            }, 100);
+                          });
+                        });
+                      }, 100);
+                    });
+                  });
+                }, 100);
+              });
+            });
+          });
+        }, 200);
+      });
+    },
+
+    check: function(err) {
+      assert.ifError(err);
+      var data = fs.readFileSync('output.txt').toString().split('\n');
+      fs.unlinkSync('log/10-02-2005/access.log');
+      fs.rmdirSync('log/10-02-2005');
+      fs.rmdirSync('log');
+      fs.unlinkSync('output.txt');
+      assert.deepEqual(data, ['z1', 'z2', '']);
     }
   },
 }, 5, 20000).export(module);

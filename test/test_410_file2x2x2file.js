@@ -1,6 +1,7 @@
 var vows = require('vows-batch-retry'),
   assert = require('assert'),
   fs = require('fs'),
+  path = require('path'),
   helper = require('./integration_helper.js'),
   monitor_file = require('lib/monitor_file'),
   redis_driver = require('redis_driver');
@@ -65,19 +66,19 @@ function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callbac
   return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
     splitted.sort();
     helper.checkResult(splitted[0], {
-      'path': 'main_input.txt',
+      'path': path.resolve('.') + '/main_input.txt',
       'message': '234 tgerhe grgh',
       'type': 'test',
       '@version': '1'
     }, true);
     helper.checkResult(splitted[1], {
-      'path': 'main_input.txt',
+      'path': path.resolve('.') + '/main_input.txt',
       'message': 'line3',
       'type': 'test',
       '@version': '1'
     }, true);
     helper.checkResult(splitted[2], {
-      'path': 'main_input.txt',
+      'path': path.resolve('.') + '/main_input.txt',
       'message': 'éè',
       'type': 'test',
       '@version': '1'
@@ -88,19 +89,19 @@ function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callbac
 function file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, wait_delay) {
   return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
     helper.checkResult(splitted[0], {
-      'path': 'main_input.txt',
+      'path': path.resolve('.') + '/main_input.txt',
       'message': '234 tgerhe grgh',
       'type': 'test',
       '@version': '1'
     }, true);
     helper.checkResult(splitted[1], {
-      'path': 'main_input.txt',
+      'path': path.resolve('.') + '/main_input.txt',
       'message': 'éè',
       'type': 'test',
       '@version': '1'
     }, true);
     helper.checkResult(splitted[2], {
-      'path': 'main_input.txt',
+      'path': path.resolve('.') + '/main_input.txt',
       'message': 'line3',
       'type': 'test',
       '@version': '1'

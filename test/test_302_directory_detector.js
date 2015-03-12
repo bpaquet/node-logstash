@@ -8,9 +8,14 @@ var vows = require('vows-batch-retry'),
 function TestDirectoryDetector(directory, callback) {
   this.exists = [];
   this.errors = [];
+  this.removed = [];
   this.detector = new directory_detector.DirectoryDetector();
-  this.detector.on('exists', function(d) {
+  this.detector.on('exists', function(d, newly_created) {
     this.exists.push(d);
+    this.exists.push(newly_created);
+  }.bind(this));
+  this.detector.on('removed', function(d) {
+    this.removed.push(d);
   }.bind(this));
   this.detector.on('error', function(err) {
     this.errors.push(err);
@@ -18,9 +23,10 @@ function TestDirectoryDetector(directory, callback) {
   this.detector.start(directory, callback);
 }
 
-function check(detector, exists) {
+function check(detector, exists, removed) {
   assert.equal(detector.errors.length, 0);
   assert.deepEqual(detector.exists.sort(), exists.sort());
+  assert.deepEqual(detector.removed, removed || []);
 }
 
 function create_test(directory, start_callback, check_callback) {
@@ -75,7 +81,7 @@ vows.describe('Directory detector ').addBatchRetry({
       callback();
     }, 50);
   }, function(detector) {
-    check(detector, [path.resolve('.')]);
+    check(detector, [path.resolve('.'), false]);
   }),
 }, 5, 10000).addBatchRetry({
   'directory does not exists at startup': create_test(path.resolve('.') + '/toto32', function(callback) {
@@ -124,7 +130,7 @@ vows.describe('Directory detector ').addBatchRetry({
     }, 50);
   }, function(detector) {
     fs.rmdirSync('toto44');
-    check(detector, [path.resolve('.') + '/toto44']);
+    check(detector, [path.resolve('.') + '/toto44', true]);
   }),
 }, 5, 10000).addBatchRetry({
   '2 subdirectory, file manipulation': create_test(path.resolve('.') + '/toto48/yuo', function(callback, detector) {
@@ -157,7 +163,7 @@ vows.describe('Directory detector ').addBatchRetry({
   }, function(detector) {
     fs.rmdirSync('toto48/yuo');
     fs.rmdirSync('toto48');
-    check(detector, [path.resolve('.') + '/toto48/yuo']);
+    check(detector, [path.resolve('.') + '/toto48/yuo', true]);
   }),
 }, 5, 10000).addBatchRetry({
   '4 subdirectory': create_test(path.resolve('.') + '/toto45/12/45/87', function(callback, detector) {
@@ -184,7 +190,7 @@ vows.describe('Directory detector ').addBatchRetry({
     fs.rmdirSync('toto45/12/45');
     fs.rmdirSync('toto45/12');
     fs.rmdirSync('toto45');
-    check(detector, [path.resolve('.') + '/toto45/12/45/87']);
+    check(detector, [path.resolve('.') + '/toto45/12/45/87', true]);
   }),
 }, 5, 10000).addBatchRetry({
   '4 subdirectory mkdir -p': create_test(path.resolve('.') + '/toto49/12/45/87', function(callback, detector) {
@@ -203,7 +209,7 @@ vows.describe('Directory detector ').addBatchRetry({
     fs.rmdirSync('toto49/12/45');
     fs.rmdirSync('toto49/12');
     fs.rmdirSync('toto49');
-    check(detector, [path.resolve('.') + '/toto49/12/45/87']);
+    check(detector, [path.resolve('.') + '/toto49/12/45/87', true]);
   }),
 }, 5, 10000).addBatchRetry({
   'using filter': create_test(path.resolve('.') + '/toto45/1*/45', function(callback, detector) {
@@ -254,7 +260,34 @@ vows.describe('Directory detector ').addBatchRetry({
     fs.rmdirSync('toto45/20/45');
     fs.rmdirSync('toto45/20');
     fs.rmdirSync('toto45');
-    check(detector, [path.resolve('.') + '/toto45/12/45', path.resolve('.') + '/toto45/13/45']);
-    check(detector2, [path.resolve('.') + '/toto45/12/45', path.resolve('.') + '/toto45/13/45']);
+    check(detector, [path.resolve('.') + '/toto45/12/45', true, path.resolve('.') + '/toto45/13/45', true]);
+    check(detector2, [path.resolve('.') + '/toto45/12/45', true, path.resolve('.') + '/toto45/13/45', true]);
+  }),
+}, 5, 10000).addBatchRetry({
+  '2 subdirectory, create and removed': create_test(path.resolve('.') + '/toto44/t*', function(callback, detector) {
+    setTimeout(function() {
+      check(detector, []);
+      fs.mkdir('toto44', function(err) {
+        assert.ifError(err);
+        fs.mkdir('toto44/titi', function(err) {
+          assert.ifError(err);
+          setTimeout(function() {
+            check(detector, [path.resolve('.') + '/toto44/titi', true]);
+            console.log('salut');
+            fs.rmdir('toto44/titi', function(err) {
+              assert.ifError(err);
+              fs.rmdir('toto44', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  callback();
+                }, 50);
+              });
+            });
+          }, 50);
+        });
+      });
+    }, 50);
+  }, function(detector) {
+    assert.deepEqual(detector.exists, [path.resolve('.') + '/toto44/titi', true], [path.resolve('.') + '/toto44/titi']);
   }),
 }, 5, 10000).export(module);
