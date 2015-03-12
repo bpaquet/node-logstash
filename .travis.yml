@@ -4,6 +4,7 @@ services:
 node_js:
   - "0.10"
   - "0.12"
+  - "iojs-1.5.1"
 env:
   - ZEROMQ_VERSION=2.1.11-1ubuntu1
   - ZEROMQ_VERSION=3.2.4-bpa~precise1
