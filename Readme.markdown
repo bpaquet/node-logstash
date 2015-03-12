@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* 12/03/2015 : Allow wildcard in path for input file plugin
 * 7/03/2015 : Allow to use fixed index name for ElasticSearch output
 * 21/01/2015 : AMQP plain authentication, AMQP vhost
 * 3/01/2015 : Add SQS Input / Output
@@ -223,7 +224,7 @@ File
 
 This plugin monitor log files.
 
-Wildcard (* and ?) can be used.
+Wildcard (* and ?) can be used, in path, and basename.
 
 This plugin is compatible with logrotate.
 
@@ -232,6 +233,7 @@ If a db file is specified on node-logstash command line (``--db_file``), this pl
 Example:
 * ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
 * ``input://file:///var/log/*.log``, to monitor all log file in ``/var/log``.
+* ``input://file:///var/log/httpd/*/access.log``, to monitor all log ``access.log`` files in directories ``/var/log/httpd/*``.
 * ``input://file:///var/log/auth%3F.log``, to monitor all files matching ``auth?.log`` in ``/var/log``. ``%3F`` is the encoding of ``?``.
 
 Parameters:
