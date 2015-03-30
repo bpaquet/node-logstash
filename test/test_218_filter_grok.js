@@ -4,6 +4,7 @@ var vows = require('vows'),
   filter_helper = require('./filter_helper');
 
 patterns_loader.add('lib/patterns');
+patterns_loader.add('lib/toto');
 
 vows.describe('Filter grok ').addBatch({
   'normal': filter_helper.create('grok', '?grok=%{NUMBER:fnumber} %{WORD:fword} %{GREEDYDATA:fgreedy}', [

@@ -58,7 +58,7 @@ How to use it ?
 Installation
 ---
 
-* Install NodeJS, version >= 0.10.
+* Install NodeJS, version >= 0.10, or [io.js](https://iojs.org).
 * Install build tools
   * Debian based system: `apt-get install build-essential`
   * Centos system: `yum install gcc gcc-c++ make`
@@ -76,7 +76,7 @@ Configuration
 ---
 
 Configuration is done by url. A plugin is instanciated by an url. Example: ``input://file:///tmp/toto.log``. This url
-instanciate an input file plugin which monitor the file ``/tmp/toto.log`.
+instanciate an input file plugin which monitor the file ``/tmp/toto.log``.
 
 The urls can be specified:
 
@@ -116,6 +116,10 @@ Signals
 Changelog
 ===
 
+* 12/03/2015 : Allow wildcard in path for input file plugin
+* 7/03/2015 : Allow to use fixed index name for ElasticSearch output
+* 21/01/2015 : AMQP plain authentication, AMQP vhost
+* 3/01/2015 : Add SQS Input / Output
 * 9/11/2014 : publish 0.0.3 on NPM
 
 * Add SSL Suport to AMPQ plugins
@@ -166,6 +170,7 @@ Inputs
 * [TCP / TLS](#tcp--tls)
 * [Google app engine](#google-app-engine)
 * [AMQP](#amqp)
+* [SQS](#sqs)
 
 Filters
 ---
@@ -178,6 +183,7 @@ Filters
 * [Compute field](#compute-field)
 * [Compute date field](#compute-date-field)
 * [Split](#split)
+* [Truncate](#truncate)
 * [Multiline](#multiline)
 * [Json fields](#json-fields)
 * [Geoip](#geoip)
@@ -199,6 +205,7 @@ Outputs
 * [Logio](#logio)
 * [TCP / TLS](#tcp--tls-1)
 * [AMQP](#amqp-1)
+* [SQS](#sqs-1)
 
 
 Inputs plugins
@@ -217,7 +224,7 @@ File
 
 This plugin monitor log files.
 
-Wildcard (* and ?) can be used.
+Wildcard (* and ?) can be used, in path, and basename.
 
 This plugin is compatible with logrotate.
 
@@ -226,6 +233,7 @@ If a db file is specified on node-logstash command line (``--db_file``), this pl
 Example:
 * ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
 * ``input://file:///var/log/*.log``, to monitor all log file in ``/var/log``.
+* ``input://file:///var/log/httpd/*/access.log``, to monitor all log ``access.log`` files in directories ``/var/log/httpd/*``.
 * ``input://file:///var/log/auth%3F.log``, to monitor all files matching ``auth?.log`` in ``/var/log``. ``%3F`` is the encoding of ``?``.
 
 Parameters:
@@ -360,7 +368,23 @@ Parameters:
 * ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
 * ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
+* ``username``: username for PLAIN authentication to amqp broker. No default value.
+* ``password``: password for PLAIN authentication to amqp broker. No default value.
+* ``vhost``: amqp vhost to use. No default value.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
+
+SQS
+---
+This plugin is used to get logs from [SQS](https://aws.amazon.com/en/sqs/). This plugin use [long polling](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html) to get messages faster.
+
+Example :
+* ``input://sqs://sqs.eu-west-1.amazonaws.com/66171255634/test?aws_access_key_id=key&aws_secret_access_key=secret``: get messages from the SQS queue ``sqs.eu-west-1.amazonaws.com/66171255634/test``
+
+Parameters :
+* ``aws_access_key_id``: your AWS Access Key Id. Required.
+* ``aws_secret_access_key``: your AWS Secret Access Key Id. Required.
+* ``polling_delay``: the long polling max delay, in seconds. Default value : 10.
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 Outputs and filter, commons parameters
@@ -431,6 +455,7 @@ Example 3: ``output://elasticsearch://localhost:9001?bulk_limit=1000&bulk_timeou
 
 Parameters:
 * ``index_prefix``: specifies the index prefix that messages will be stored under. Default : ``logstash``. Default index will be ``logstash-<date>``
+* ``index_name``: specifies a fixed name for the index that messages will be stored under. Disable the ``index_prefix`` option. No default value.
 * ``data_type``: specifies the type under the index that messages will be stored under. (default is ``logs``)
 * ``bulk_limit``: Enable bulk mode. Dpecifies the maximum number of messages to store in memory before bulking to ElasticSearch. No default value.
 * ``bulk_timeout``: Specifies the maximum number of milliseconds to wait for ``bulk_limit`` messages,. Default is 100.
@@ -587,10 +612,25 @@ Parameters:
 
 * ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
 * ``durable``: Optional. Set exchange durability. Default : true.
+* ``persistent``: Optional. Set persistent flag on each send message. Default: false.
 * ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
 * ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
-* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
+* ``username``: username for PLAIN authentication to amqp broker. No default value.
+* ``password``: password for PLAIN authentication to amqp broker. No default value.
+* ``vhost``: amqp vhost to use. No default value.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
+
+SQS
+---
+This plugin is used to send logs to [SQS](https://aws.amazon.com/en/sqs/).
+
+Example :
+* ``output://sqs://sqs.eu-west-1.amazonaws.com/66171255634/test?aws_access_key_id=key&aws_secret_access_key=secret``: send messages to the SQS queue ``sqs.eu-west-1.amazonaws.com/66171255634/test``
+
+Parameters :
+* ``aws_access_key_id``: your AWS Access Key Id. Required.
+* ``aws_secret_access_key``: your AWS Secret Access Key Id. Required.
 * ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 Filters
@@ -654,7 +694,7 @@ Mutate replace
 
 The mutate replace filter is used to run regex on specified field.
 
-Example: ``filter://mutate_replace?toto&from=\\.&to=-`` replace all ``.`` in ``toto`` field by ``-``
+Example: ``filter://mutate_replace://toto?from=\\.&to=-`` replace all ``.`` in ``toto`` field by ``-``
 
 Parameters:
 
@@ -724,6 +764,17 @@ Example 1: ``filter://split://?delimiter=|`` split all lines of logs on ``|`` ch
 Parameters:
 
 * ``delimiter``: delimiter used to split.
+
+Truncate
+---
+
+The truncate filter is used to truncate the log message at a certain size.
+
+Example 1: ``filter://truncate://?max_size=200`` truncate the message to a max size of 200.
+
+Parameters:
+
+* ``max_size``: Maximum size of a message.
 
 Multiline
 ---
@@ -830,6 +881,8 @@ To ignore ssl errors, add ``ssl_rejectUnauthorized=false`.
 
 HTTP Proxy
 ---
+
+WARNING : due to lot of API changes, the HTTP proxy does not work with node 0.12x or io.js :(
 
 The proxy parameter allow to use an http proxy.
 

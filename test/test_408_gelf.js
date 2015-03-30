@@ -1,6 +1,7 @@
 var vows = require('vows-batch-retry'),
   fs = require('fs'),
   os = require('os'),
+  path = require('path'),
   zlib = require('zlib'),
   dgram = require('dgram'),
   assert = require('assert'),
@@ -60,7 +61,7 @@ vows.describe('Integration gelf :').addBatchRetry({
           facility: 'toto',
           level: '6',
           _a: 'b',
-          _path: 'input1.txt',
+          _path: path.resolve('.') + '/input1.txt',
           _type: 'toto',
         },
         {
@@ -70,7 +71,7 @@ vows.describe('Integration gelf :').addBatchRetry({
           host: os.hostname(),
           facility: 'no_facility',
           level: '6',
-          _path: 'input2.txt',
+          _path: path.resolve('.') + '/input2.txt',
         }
       ].sort());
     }

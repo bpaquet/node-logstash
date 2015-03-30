@@ -3,6 +3,8 @@ services:
   - rabbitmq
 node_js:
   - "0.10"
+  - "0.12"
+  - "iojs-1.5.1"
 env:
   - ZEROMQ_VERSION=2.1.11-1ubuntu1
   - ZEROMQ_VERSION=3.2.4-bpa~precise1
@@ -13,4 +15,3 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install -y logrotate
   - sudo apt-get install -y libzmq1=${ZEROMQ_VERSION} libzmq-dev=${ZEROMQ_VERSION}
-  - npm install -g npm
