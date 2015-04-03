@@ -6,7 +6,7 @@ var vows = require('vows-batch-retry'),
   monitor_file = require('lib/monitor_file'),
   redis_driver = require('redis_driver');
 
-function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, check, wait_delay) {
+function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, check, wait_delay, extra_input) {
   return {
     topic: function() {
       start_callback = start_callback || function(callback) {
@@ -21,7 +21,7 @@ function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_c
       var callback = this.callback;
       start_callback(function(o) {
         monitor_file.setFileStatus({});
-        helper.createAgent(['input://file://main_input.txt?type=test'].concat(config1), function(a1) {
+        helper.createAgent(['input://file://main_input.txt?type=test'+(extra_input ? extra_input : '')].concat(config1), function(a1) {
           helper.createAgent(config2.concat(['output://file://main_output.txt?serializer=json_logstash']), function(a2) {
             setTimeout(function() {
               fs.appendFile('main_input.txt', '234 tgerhe grgh\néè\nline3\n', function(err) {
@@ -62,8 +62,8 @@ function _file2x2x2file(config1, config2, clean_callback, start_callback, stop_c
   };
 }
 
-function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callback, stop_callback, wait_delay) {
-  return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
+function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callback, stop_callback, wait_delay, extra_input) {
+  return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, extra_input, function(splitted) {
     splitted.sort();
     helper.checkResult(splitted[0], {
       'path': path.resolve('.') + '/main_input.txt',
@@ -86,8 +86,8 @@ function file2x2x2fileNotOrdered(config1, config2, clean_callback, start_callbac
   }, wait_delay);
 }
 
-function file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, wait_delay) {
-  return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, function(splitted) {
+function file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, wait_delay, extra_input) {
+  return _file2x2x2file(config1, config2, clean_callback, start_callback, stop_callback, extra_input, function(splitted) {
     helper.checkResult(splitted[0], {
       'path': path.resolve('.') + '/main_input.txt',
       'message': '234 tgerhe grgh',
@@ -161,6 +161,12 @@ var test = vows.describe('Integration file2x2x2file :').addBatchRetry({
     }
   }),
 }, 5, 20000).addBatchRetry({
+  'file transport raw input': file2x2x2file(['output://file://main_middle.txt?serializer=json_logstash'], ['input://file://main_middle.txt'], function() {
+    if (fs.existsSync('main_middle.txt')) {
+      fs.unlinkSync('main_middle.txt');
+    }
+  }, undefined, undefined, undefined, '&unserializer=raw'),
+}, 5, 20000).addBatchRetry({
   'tcp transport': file2x2x2file(['output://tcp://localhost:17874'], ['input://tcp://0.0.0.0:17874']),
 }, 5, 20000).addBatchRetry({
   'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:17874'], ['input://zeromq://tcp://*:17874']),
@@ -196,6 +202,3 @@ if (fs.existsSync('.sqs')) {
 }
 
 test.export(module);
-
-
-
