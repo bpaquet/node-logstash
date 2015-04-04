@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* 4/04/2015 : Add raw unserializer (thx to @nfisher)
 * 12/03/2015 : Allow wildcard in path for input file plugin
 * 7/03/2015 : Allow to use fixed index name for ElasticSearch output
 * 21/01/2015 : AMQP plain authentication, AMQP vhost
@@ -218,6 +219,7 @@ Supported unserializer for input plugin :
 
 * ``json_logstash``: the unserializer try to parse data as a json object. If fail, raw data is returned. Some input plugins can not accept raw data.
 * ``msgpack``: the unserializer try to parse data as a [msgpack](http://msgpack.org) object. If fail, raw data is returned. Some input plugins can not accept raw data.
+* ``raw``: the unserializer does not try to parse the input line. Best for performances.
 
 File
 ---
