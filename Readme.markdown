@@ -168,6 +168,7 @@ Inputs
 * [ZeroMQ](#zeromq)
 * [Redis](#redis)
 * [HTTP](#http)
+* [Websocket](#websocket)
 * [TCP / TLS](#tcp--tls)
 * [Google app engine](#google-app-engine)
 * [AMQP](#amqp)
@@ -202,6 +203,7 @@ Outputs
 * [Gelf](#gelf)
 * [File](#file-1)
 * [HTTP Post](#http-post)
+* [Websocket](#websocket-1)
 * [Redis](#redis-1)
 * [Logio](#logio)
 * [TCP / TLS](#tcp--tls-1)
@@ -305,7 +307,8 @@ HTTP
 ---
 
 This plugin is used on log server to receive logs from an HTTP/HTTPS stream. This is useful
-in case the agent can only output logs through an HTTP/HTTPS channel.
+in case the agent can only output logs through an HTTP/HTTPS channel. Consider using websocket as it is much faster
+than HTTP.
 
 Example:
 
@@ -316,6 +319,23 @@ Parameters:
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=http``. No default value.
 * ``unserializer``: please see above. Default value to ``json_logstash``.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+
+Websocket
+---
+This plugin is used on log server to receive data over a websocket, optionally with SSL/TLS encryption. Websockets are
+like TCP, but are proxy and firewall friendly.
+
+Examples:
+
+* Regular mode: ``input://websocket://0.0.0.0:12345``
+* TLS mode: ``input://websocket://0.0.0.0:443?ssl=true&ssl_key=/etc/ssl/private/logstash-server.key&ssl_cert=/etc/ssl/private/logstash-server.crt&ssl_requestCert=true&ssl_rejectUnauthorized=true``
+
+Parameters:
+
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``appendPeerCert``: Optional. In SSL mode, adds details of the peer certificate to the @tls field if the peer certificate was received from the client using requestCert option. Default: true in SSL mode
+* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
+* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 TCP / TLS
 ---
@@ -529,6 +549,24 @@ Parameters:
 * ``path``: path to use in the HTTP request. Can reference log line properties (see above).
 * ``serializer``: please see above. Default value to ``json_logstash``.
 * ``format``: please see above. Used by the ``raw``serializer.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
+
+Websocket
+---
+
+This plugin is used on log clients to send data over a websocket, optionally with SSL/TLS encryption. Websockets are like
+TCP connections but they are proxy and firewall friendly.
+
+Example:
+
+* Regular mode:  ``output://webocket://192.168.1.1:12345``
+* TLS Mode: ``output://webocket://192.168.1.1:443?ssl=true&ssl_key=/etc/ssl/private/logstash-client.key&ssl_cert=/etc/ssl/private/logstash-client.crt&ssl_rejectUnauthorized=true``
+
+Parameters:
+
+* ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
+* ``format``: Optional. Please see above. Used by the ``raw``serializer.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
 
