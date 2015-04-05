@@ -4,7 +4,7 @@ var vows = require('vows-batch-retry'),
   assert = require('assert'),
   helper = require('./integration_helper.js');
 
-function createHttpTest(output_url, input_url, check_callback) {
+function setupTest(output_url, input_url, check_callback) {
   return {
     topic: function() {
       var callback = this.callback;
@@ -62,7 +62,7 @@ function createHttpTest(output_url, input_url, check_callback) {
 }
 
 vows.describe('Integration Websocket :').addBatchRetry({
-  'websocket test raw': createHttpTest('output://websocket://127.0.0.1:17875?serializer=raw', 'input://websocket://0.0.0.0:17875?type=wspouet', function(reqs) {
+  'websocket test raw': setupTest('output://websocket://127.0.0.1:17875?serializer=raw', 'input://websocket://0.0.0.0:17875?type=wspouet', function(reqs) {
     assert.equal(reqs[0].req.method, 'POST');
     assert.equal(reqs[0].req.headers['content-type'], 'application/json');
     helper.checkResult(reqs[0].body, {
@@ -83,7 +83,7 @@ vows.describe('Integration Websocket :').addBatchRetry({
     });
   }),
 }, 5, 20000).addBatchRetry({
-    'websocket test json': createHttpTest('output://websocket://localhost:17875?serializer=json_logstash', 'input://websocket://localhost:17875', function(reqs) {
+    'websocket test json': setupTest('output://websocket://localhost:17875?serializer=json_logstash', 'input://websocket://localhost:17875', function(reqs) {
       assert.equal(reqs[0].req.method, 'POST');
       assert.equal(reqs[0].req.headers['content-type'], 'application/json');
       helper.checkResult(reqs[0].body, {
