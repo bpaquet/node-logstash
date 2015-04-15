@@ -9,7 +9,7 @@ vows.describe('Check directory watcher').addBatch({
     },
 
     check: function(l) {
-      assert.equal(Object.keys(l), 0);
+      assert.equal(Object.keys(l).length, 0);
     }
   }
 }).export(module);

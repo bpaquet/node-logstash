@@ -190,7 +190,6 @@ vows.describe('Integration zeromq:').addBatch({
                 ], function(agent2) {
                   setTimeout(function() {
                     assert.ifError(err);
-                    console.log(received);
                     assert.equal(false, agent.closed_inputs);
                     assert.equal(true, received);
                     socket.close();
