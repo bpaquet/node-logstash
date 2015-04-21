@@ -1,0 +1,100 @@
+#!/bin/bash
+
+### BEGIN INIT INFO ###
+# Provides: logstash
+# Required-Start: $local_fs $remote_fs $network
+# Required-Stop:  $local_fs $remote_fs $network
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Short-Description: start and stop logstash service
+### END INIT INFO
+
+# set -e
+
+NAME="logstash"
+DESC="logstash"
+PID_FILE="/opt/logstash/shared/logstash.pid"
+DAEMON="/opt/logstash/shared/run_node.sh"
+OPTIONS="/opt/logstash/current/bin/node-logstash-agent"
+START_STOP_DAEMON=/sbin/start-stop-daemon
+
+test -f /opt/logstash/current/bin/node-logstash-agent || exit 0
+
+test -x $DAEMON || exit 0
+
+test -d /opt/logstash/current/node_modules || exit 0
+
+# unset NVM_DIR
+
+
+
+# umask 022
+
+# Source function library.
+# RH
+. /etc/rc.d/init.d/functions
+# Deb
+# . /lib/lsb/init-functions
+
+status_logstash() {
+  # status_of_proc -p "$PID_FILE" "logstash" "$NAME"
+  status -p "$PID_FILE" "logstash" "$NAME"
+	RETVAL=$?
+}
+
+kill_logstash() {
+  SIGNAL=$1
+
+  if [ ! "$PID_FILE" = "" ]; then
+    if [ -f $PID_FILE ]; then
+      kill $SIGNAL `cat $PID_FILE` || true
+      rm -f $PID_FILE
+    fi
+  fi
+}
+
+run_logstash() {
+ echo "Running $NAME :"
+  su logstash -c "cd /opt/logstash/current && $DAEMON $OPTIONS "
+}
+
+start_logstash() {
+  # $START_STOP_DAEMON  -m -b -c logstash -d /opt/logstash/current --oknodo --start --pidfile $PID_FILE --exec /bin/sh -- -c "exec $DAEMON $OPTIONS "
+
+  # the RedHat port of start-stop-daemon is slightly different
+  $START_STOP_DAEMON  -m -b -c logstash  --oknodo --pidfile $PID_FILE --start --exec /bin/sh -- -c "exec $DAEMON $OPTIONS "
+  sleep 1
+  status_logstash
+  chown logstash $PID_FILE
+}
+
+case "$1" in
+  run)
+    run_logstash
+    ;;
+  start)
+    echo -n "Starting $DESC: "
+    start_logstash
+    echo "$NAME."
+    ;;
+  stop)
+    echo -n "Stopping $DESC: "
+    kill_logstash
+    echo "$NAME."
+    ;;
+  restart)
+    echo -n "Restarting $DESC: "
+    kill_logstash || true
+    sleep 1
+    start_logstash
+    echo "$NAME."
+    ;;
+  status)
+    status_logstash
+    ;;
+  *)
+    echo "Usage: /etc/init.d/logstash {start|stop|restart|status|run}"
+    exit 1
+esac
+
+exit 0
