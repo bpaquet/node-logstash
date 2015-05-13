@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* 13/05/2015 : Add websockets support (thx to @fujifish)
 * 4/04/2015 : Add raw unserializer (thx to @nfisher)
 * 12/03/2015 : Allow wildcard in path for input file plugin
 * 7/03/2015 : Allow to use fixed index name for ElasticSearch output
@@ -307,8 +308,7 @@ HTTP
 ---
 
 This plugin is used on log server to receive logs from an HTTP/HTTPS stream. This is useful
-in case the agent can only output logs through an HTTP/HTTPS channel. Consider using websocket as it is much faster
-than HTTP.
+in case the agent can only output logs through an HTTP/HTTPS channel.
 
 Example:
 
@@ -327,13 +327,12 @@ like TCP, but are proxy and firewall friendly.
 
 Examples:
 
-* Regular mode: ``input://websocket://0.0.0.0:12345``
-* TLS mode: ``input://websocket://0.0.0.0:443?ssl=true&ssl_key=/etc/ssl/private/logstash-server.key&ssl_cert=/etc/ssl/private/logstash-server.crt&ssl_requestCert=true&ssl_rejectUnauthorized=true``
+* Regular mode: ``input://ws://0.0.0.0:12345``
+* TLS mode: ``input://ws://0.0.0.0:443?ssl=true&ssl_key=/etc/ssl/private/logstash-server.key&ssl_cert=/etc/ssl/private/logstash-server.crt&ssl_requestCert=true&ssl_rejectUnauthorized=true``
 
 Parameters:
 
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
-* ``appendPeerCert``: Optional. In SSL mode, adds details of the peer certificate to the @tls field if the peer certificate was received from the client using requestCert option. Default: true in SSL mode
 * ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
 * ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
@@ -560,8 +559,8 @@ TCP connections but they are proxy and firewall friendly.
 
 Example:
 
-* Regular mode:  ``output://webocket://192.168.1.1:12345``
-* TLS Mode: ``output://webocket://192.168.1.1:443?ssl=true&ssl_key=/etc/ssl/private/logstash-client.key&ssl_cert=/etc/ssl/private/logstash-client.crt&ssl_rejectUnauthorized=true``
+* Regular mode:  ``output://ws://192.168.1.1:12345``
+* TLS Mode: ``output://ws://192.168.1.1:443?ssl=true&ssl_key=/etc/ssl/private/logstash-client.key&ssl_cert=/etc/ssl/private/logstash-client.crt&ssl_rejectUnauthorized=true``
 
 Parameters:
 

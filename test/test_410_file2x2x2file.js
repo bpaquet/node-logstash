@@ -173,6 +173,8 @@ var test = vows.describe('Integration file2x2x2file :').addBatchRetry({
 }, 5, 20000).addBatchRetry({
   'tcp transport': file2x2x2file(['output://tcp://localhost:17874'], ['input://tcp://0.0.0.0:17874']),
 }, 5, 20000).addBatchRetry({
+  'websockets transport': file2x2x2file(['output://ws://localhost:17874?serializer=json_logstash'], ['input://ws://0.0.0.0:17874']),
+}, 5, 20000).addBatchRetry({
   'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:17874'], ['input://zeromq://tcp://*:17874']),
 }, 5, 20000).addBatchRetry({
   'zeromq transport using msgpack': file2x2x2file(['output://zeromq://tcp://localhost:17874?serializer=msgpack'], ['input://zeromq://tcp://*:17874?unserializer=msgpack']),
