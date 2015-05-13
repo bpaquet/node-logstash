@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* 13/05/2015 : Add basic auth for HTTP Output plugins (#100)
 * 13/05/2015 : Add websockets support (thx to @fujifish)
 * 4/04/2015 : Add raw unserializer (thx to @nfisher)
 * 12/03/2015 : Allow wildcard in path for input file plugin
@@ -481,6 +482,7 @@ Parameters:
 * ``bulk_timeout``: Specifies the maximum number of milliseconds to wait for ``bulk_limit`` messages,. Default is 100.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
+* ``basic_auth_user`` and ``basic_auth_password``: user and password for HTTP Basic Auth required by server. Default: none.
 
 Statsd
 ---
@@ -550,6 +552,7 @@ Parameters:
 * ``format``: please see above. Used by the ``raw``serializer.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
+* ``basic_auth_user`` and ``basic_auth_password``: user and password for HTTP Basic Auth required by server. Default: none.
 
 Websocket
 ---
@@ -568,6 +571,7 @@ Parameters:
 * ``format``: Optional. Please see above. Used by the ``raw``serializer.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
+* ``basic_auth_user`` and ``basic_auth_password``: user and password for HTTP Basic Auth required by server. Default: none.
 
 Redis
 ---
