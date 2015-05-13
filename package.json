@@ -37,6 +37,7 @@
     "zmq": "2.10.x",
     "moment": "2.9.x",
     "redis": "0.12.x",
+    "ws": "0.7.1",
     "oniguruma": "4.0.x",
     "msgpack": "0.2.6",
     "geoip-lite": "1.1.x",
