@@ -41,7 +41,8 @@
     "oniguruma": "4.0.x",
     "msgpack": "0.2.6",
     "geoip-lite": "1.1.x",
-    "proxying-agent": "0.1.x"
+    "proxying-agent": "0.1.x",
+    "kafka-node": "0.2.x"
   },
   "directories": {
     "test": "./test",
