@@ -89,8 +89,8 @@ vows.describe('Output file ').addBatchRetry({
           setTimeout(function() {
             assert.equal(Object.keys(p.writers).length, 0);
             p.close(callback);
-          }, 300);
-        }, 100);
+          }, 400);
+        }, 50);
       });
     },
     check: function(err) {
