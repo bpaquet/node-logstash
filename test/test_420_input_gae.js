@@ -153,11 +153,7 @@ vows.describe('Integration input gae:').addBatchRetry({
 
     check: function(err) {
       assert.ifError(err);
-      var c1 = fs.readFileSync('output1.txt').toString();
-      fs.unlinkSync('output1.txt');
-
-      var splitted = c1.split('\n');
-      assert.equal(splitted.length, 1);
+      assert.equal(false, fs.existsSync('output1.txt'));
     }
   },
 }, 5, 20000).export(module);
