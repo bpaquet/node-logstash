@@ -121,4 +121,14 @@ vows.describe('Filter compute field ').addBatch({
       'bouh1': 'tata2',
     },
   ]),
+  'date': filter_helper.create('compute_field', 'titi?value=#{now:YYYY/MM}', [
+    {
+      'message': 'toto',
+    },
+  ], [
+    {
+      'message': 'toto',
+      'titi': require('moment')().format('YYYY/MM'),
+    },
+  ]),
 }).export(module);

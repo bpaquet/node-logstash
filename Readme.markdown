@@ -116,6 +116,7 @@ Signals
 Changelog
 ===
 
+* 16/05/2015 : Allow to specify dates in computed values
 * 13/05/2015 : Add basic auth for HTTP Output plugins (#100)
 * 13/05/2015 : Add websockets support (thx to @fujifish)
 * 4/04/2015 : Add raw unserializer (thx to @nfisher)
@@ -417,7 +418,7 @@ Outputs and filter, commons parameters
 * ``only_field_equal_toto=aaa``: execute the filter / output plugin only on lines with a field ``toto``, with value ``aaa``. You can specify it multiple times, all fields have to exist and have the specified value.
 * ``only_field_match_toto=aaa$``: execute the filter / output plugin only on lines with a field ``toto``, with value match the regular expression ``aaa$``. You can specify it multiple times, all fields have to exist and match the regular expression.
 
-Access to line log properties
+Compute values : access to line log properties, or use current date
 ===
 
 Some params are string, which can reference line log properties:
@@ -426,6 +427,7 @@ Some params are string, which can reference line log properties:
 * ``#{type}`` will contain the type of log line
 * ``#{toto}`` will contain the value of the field ``toto``, which have to be extracted with a regex filter
 * ``2#{toto}`` will contain ``2`` followed by the value of the field ``toto``.
+* ``#{now:YYYY}`` will contain the current year. YYYY is a date format passed to [moment](http://momentjs.com/docs/#/parsing/string-format/) to format current date.
 
 Ouputs plugins
 ===
