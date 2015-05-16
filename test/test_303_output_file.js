@@ -57,7 +57,9 @@ vows.describe('Output file ').addBatchRetry({
       });
     },
     check: function(err, e) {
+      assert.ifError(err);
       assert.isDefined(e);
+      assert.match(e, /Unable to compute output filename/);
 
       var content_a = fs.readFileSync('output/toto_a.txt').toString().split('\n');
       fs.unlinkSync('output/toto_a.txt');
@@ -139,6 +141,39 @@ vows.describe('Output file ').addBatchRetry({
       assert.equal(content[1], 'line2');
       assert.equal(content[2], 'line3');
       assert.equal(content[3], '');
+    }
+  },
+}, 5, 10000).addBatchRetry({
+  'unable to open file': {
+    topic: function() {
+      var callback = this.callback;
+      var e;
+      fs.mkdirSync('output');
+      var p = output_file.create();
+      p.init('/root/toto.txt?delay_before_close=200', function(err) {
+        assert.ifError(err);
+        p.process({message: 'line1'});
+        p.process({message: 'line2'});
+        p.process({message: 'line3'});
+        setTimeout(function() {
+          assert.equal(Object.keys(p.writers).length, 1);
+          setTimeout(function() {
+            assert.equal(Object.keys(p.writers).length, 0);
+            p.close(function() {
+              callback(undefined, e);
+            });
+          }, 400);
+        }, 50);
+      });
+      p.once('error', function(err) {
+        e = err;
+      });
+    },
+    check: function(err, e) {
+      assert.ifError(err);
+
+      assert.isDefined(e);
+      assert.match(e, /EACCES/);
     }
   },
 }, 5, 10000).export(module);
