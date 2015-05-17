@@ -83,7 +83,7 @@ vows.describe('Output file ').addBatchRetry({
       var callback = this.callback;
       fs.mkdirSync('output');
       var p = output_file.create();
-      p.init('output/toto.txt?delay_before_close=200', function(err) {
+      p.init('output/toto.txt?idle_timeout=0.2', function(err) {
         assert.ifError(err);
         p.process({message: 'line1'});
         setTimeout(function() {
@@ -113,7 +113,7 @@ vows.describe('Output file ').addBatchRetry({
       var callback = this.callback;
       fs.mkdirSync('output');
       var p = output_file.create();
-      p.init('output/toto.txt?delay_before_close=200', function(err) {
+      p.init('output/toto.txt?idle_timeout=0.2', function(err) {
         assert.ifError(err);
         p.process({message: 'line1'});
         setTimeout(function() {
@@ -150,19 +150,20 @@ vows.describe('Output file ').addBatchRetry({
       var e;
       fs.mkdirSync('output');
       var p = output_file.create();
-      p.init('/root/toto.txt?delay_before_close=200', function(err) {
+      p.init('/root/toto.txt?retry_delay=0.3', function(err) {
         assert.ifError(err);
         p.process({message: 'line1'});
         p.process({message: 'line2'});
         p.process({message: 'line3'});
         setTimeout(function() {
+          p.process({message: 'line4'});
           assert.equal(Object.keys(p.writers).length, 1);
           setTimeout(function() {
             assert.equal(Object.keys(p.writers).length, 0);
             p.close(function() {
               callback(undefined, e);
             });
-          }, 400);
+          }, 500);
         }, 50);
       });
       p.once('error', function(err) {
