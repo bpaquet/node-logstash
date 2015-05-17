@@ -33,15 +33,15 @@
   },
   "optionalDependencies":{
     "aws-lib": "0.0.6",
-    "amqplib": "0.3.x",
-    "zmq": "2.10.x",
-    "moment": "2.9.x",
-    "redis": "0.12.x",
+    "amqplib": "0.3.2",
+    "zmq": "2.10.0",
+    "moment": "2.9.0",
+    "redis": "0.12.1",
     "ws": "0.7.1",
-    "oniguruma": "4.0.x",
+    "oniguruma": "4.0.0",
     "msgpack": "0.2.6",
-    "geoip-lite": "1.1.x",
-    "proxying-agent": "0.1.x"
+    "geoip-lite": "1.1.6",
+    "proxying-agent": "0.1.7"
   },
   "directories": {
     "test": "./test",
