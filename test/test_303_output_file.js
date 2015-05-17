@@ -2,6 +2,7 @@ var vows = require('vows-batch-retry'),
   assert = require('assert'),
   mkdirp = require('mkdirp'),
   rimraf = require('rimraf'),
+  moment = require('moment'),
   fs = require('fs'),
   output_file = require('lib/outputs/output_file');
 
@@ -174,6 +175,36 @@ vows.describe('Output file ').addBatchRetry({
 
       assert.isDefined(e);
       assert.match(e, /EACCES/);
+    }
+  },
+}, 5, 10000).addBatchRetry({
+  'directory test': {
+    topic: function() {
+      var callback = this.callback;
+      mkdirp.sync('output');
+      var p = output_file.create();
+      p.init('output/tata/#{now:YYYY}/toto.txt', function(err) {
+        assert.ifError(err);
+        p.process({message: 'line1'});
+        p.process({message: 'line2'});
+        p.process({message: 'line3'});
+        setTimeout(function() {
+          p.close(callback);
+        }, 200);
+      });
+    },
+    check: function(err) {
+      assert.ifError(err);
+
+      var year = moment().format('YYYY');
+      var content = fs.readFileSync('output/tata/' + year + '/toto.txt').toString().split('\n');
+      rimraf.sync('output');
+
+      assert.equal(content.length, 4);
+      assert.equal(content[0], 'line1');
+      assert.equal(content[1], 'line2');
+      assert.equal(content[2], 'line3');
+      assert.equal(content[3], '');
     }
   },
 }, 5, 10000).export(module);
