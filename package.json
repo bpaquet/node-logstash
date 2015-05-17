@@ -22,14 +22,16 @@
     "js-beautify": "1.4.x",
     "whereis": "0.4.x",
     "jshint": "2.x",
-    "istanbul": "0.1.x"
+    "istanbul": "0.1.x",
+    "rimraf": "2.3.x"
   },
   "scripts": {
     "test": "./test-runner.sh"
   },
   "dependencies": {
     "log4node": "0.1.6",
-    "optimist": "0.6.1"
+    "optimist": "0.6.1",
+    "mkdirp": "0.5.1"
   },
   "optionalDependencies":{
     "aws-lib": "0.0.6",

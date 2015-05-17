@@ -1,5 +1,7 @@
 var vows = require('vows-batch-retry'),
   assert = require('assert'),
+  mkdirp = require('mkdirp'),
+  rimraf = require('rimraf'),
   fs = require('fs'),
   output_file = require('lib/outputs/output_file');
 
@@ -7,7 +9,7 @@ vows.describe('Output file ').addBatchRetry({
   'standard test': {
     topic: function() {
       var callback = this.callback;
-      fs.mkdirSync('output');
+      mkdirp.sync('output');
       var p = output_file.create();
       p.init('output/toto.txt', function(err) {
         assert.ifError(err);
@@ -23,8 +25,7 @@ vows.describe('Output file ').addBatchRetry({
       assert.ifError(err);
 
       var content = fs.readFileSync('output/toto.txt').toString().split('\n');
-      fs.unlinkSync('output/toto.txt');
-      fs.rmdirSync('output');
+      rimraf.sync('output');
 
       assert.equal(content.length, 4);
       assert.equal(content[0], 'line1');
@@ -37,7 +38,7 @@ vows.describe('Output file ').addBatchRetry({
   'use variables in file name test': {
     topic: function() {
       var callback = this.callback;
-      fs.mkdirSync('output');
+      mkdirp.sync('output');
       var p = output_file.create();
       var e;
       p.once('error', function(err) {
@@ -62,10 +63,8 @@ vows.describe('Output file ').addBatchRetry({
       assert.match(e, /Unable to compute output filename/);
 
       var content_a = fs.readFileSync('output/toto_a.txt').toString().split('\n');
-      fs.unlinkSync('output/toto_a.txt');
       var content_b = fs.readFileSync('output/toto_b.txt').toString().split('\n');
-      fs.unlinkSync('output/toto_b.txt');
-      fs.rmdirSync('output');
+      rimraf.sync('output');
 
       assert.equal(content_a.length, 3);
       assert.equal(content_a[0], 'line1');
@@ -81,7 +80,7 @@ vows.describe('Output file ').addBatchRetry({
   'useless files closing': {
     topic: function() {
       var callback = this.callback;
-      fs.mkdirSync('output');
+      mkdirp.sync('output');
       var p = output_file.create();
       p.init('output/toto.txt?idle_timeout=0.2', function(err) {
         assert.ifError(err);
@@ -99,8 +98,7 @@ vows.describe('Output file ').addBatchRetry({
       assert.ifError(err);
 
       var content = fs.readFileSync('output/toto.txt').toString().split('\n');
-      fs.unlinkSync('output/toto.txt');
-      fs.rmdirSync('output');
+      rimraf.sync('output');
 
       assert.equal(content.length, 2);
       assert.equal(content[0], 'line1');
@@ -111,7 +109,7 @@ vows.describe('Output file ').addBatchRetry({
   'reopen': {
     topic: function() {
       var callback = this.callback;
-      fs.mkdirSync('output');
+      mkdirp.sync('output');
       var p = output_file.create();
       p.init('output/toto.txt?idle_timeout=0.2', function(err) {
         assert.ifError(err);
@@ -133,8 +131,7 @@ vows.describe('Output file ').addBatchRetry({
       assert.ifError(err);
 
       var content = fs.readFileSync('output/toto.txt').toString().split('\n');
-      fs.unlinkSync('output/toto.txt');
-      fs.rmdirSync('output');
+      rimraf.sync('output');
 
       assert.equal(content.length, 4);
       assert.equal(content[0], 'line1');
@@ -148,7 +145,7 @@ vows.describe('Output file ').addBatchRetry({
     topic: function() {
       var callback = this.callback;
       var e;
-      fs.mkdirSync('output');
+      mkdirp.sync('output');
       var p = output_file.create();
       p.init('/root/toto.txt?retry_delay=0.3', function(err) {
         assert.ifError(err);
@@ -172,6 +169,8 @@ vows.describe('Output file ').addBatchRetry({
     },
     check: function(err, e) {
       assert.ifError(err);
+
+      rimraf.sync('output');
 
       assert.isDefined(e);
       assert.match(e, /EACCES/);

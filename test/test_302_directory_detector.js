@@ -3,6 +3,8 @@ var vows = require('vows-batch-retry'),
   fs = require('fs'),
   path = require('path'),
   spawn = require('child_process').spawn,
+  mkdirp = require('mkdirp'),
+  rimraf = require('rimraf'),
   directory_detector = require('lib/directory_detector');
 
 function TestDirectoryDetector(directory, callback) {
@@ -121,7 +123,7 @@ vows.describe('Directory detector ').addBatchRetry({
   '1 subdirectory': create_test(path.resolve('.') + '/toto44', function(callback, detector) {
     setTimeout(function() {
       check(detector, []);
-      fs.mkdir('toto44', function(err) {
+      mkdirp('toto44', function(err) {
         assert.ifError(err);
         setTimeout(function() {
           callback();
@@ -129,26 +131,26 @@ vows.describe('Directory detector ').addBatchRetry({
       });
     }, 50);
   }, function(detector) {
-    fs.rmdirSync('toto44');
+    rimraf.sync('toto44');
     check(detector, [path.resolve('.') + '/toto44', true]);
   }),
 }, 5, 10000).addBatchRetry({
   '2 subdirectory, file manipulation': create_test(path.resolve('.') + '/toto48/yuo', function(callback, detector) {
     setTimeout(function() {
       check(detector, []);
-      fs.mkdir('toto48', function(err) {
+      mkdirp('toto48', function(err) {
         assert.ifError(err);
         fs.writeFile('toto48/tito', 'content', function(err) {
           assert.ifError(err);
           fs.unlink('toto48/tito', function(err) {
             assert.ifError(err);
-            fs.mkdir('toto48/truc', function(err) {
+            mkdirp('toto48/truc', function(err) {
               assert.ifError(err);
-              fs.rmdir('toto48/truc', function(err) {
+              rimraf('toto48/truc', function(err) {
                 assert.ifError(err);
                 setTimeout(function() {
                   check(detector, []);
-                  fs.mkdir('toto48/yuo', function() {
+                  mkdirp('toto48/yuo', function() {
                     setTimeout(function() {
                       callback();
                     }, 50);
@@ -161,21 +163,20 @@ vows.describe('Directory detector ').addBatchRetry({
       });
     }, 50);
   }, function(detector) {
-    fs.rmdirSync('toto48/yuo');
-    fs.rmdirSync('toto48');
+    rimraf.sync('toto48');
     check(detector, [path.resolve('.') + '/toto48/yuo', true]);
   }),
 }, 5, 10000).addBatchRetry({
   '4 subdirectory': create_test(path.resolve('.') + '/toto45/12/45/87', function(callback, detector) {
     setTimeout(function() {
       check(detector, []);
-      fs.mkdir('toto45', function(err) {
+      mkdirp('toto45', function(err) {
         assert.ifError(err);
-        fs.mkdir('toto45/12', function(err) {
+        mkdirp('toto45/12', function(err) {
           assert.ifError(err);
-          fs.mkdir('toto45/12/45', function(err) {
+          mkdirp('toto45/12/45', function(err) {
             assert.ifError(err);
-            fs.mkdir('toto45/12/45/87', function(err) {
+            mkdirp('toto45/12/45/87', function(err) {
               assert.ifError(err);
               setTimeout(function() {
                 callback();
@@ -186,10 +187,7 @@ vows.describe('Directory detector ').addBatchRetry({
       });
     }, 50);
   }, function(detector) {
-    fs.rmdirSync('toto45/12/45/87');
-    fs.rmdirSync('toto45/12/45');
-    fs.rmdirSync('toto45/12');
-    fs.rmdirSync('toto45');
+    rimraf.sync('toto45');
     check(detector, [path.resolve('.') + '/toto45/12/45/87', true]);
   }),
 }, 5, 10000).addBatchRetry({
@@ -205,61 +203,39 @@ vows.describe('Directory detector ').addBatchRetry({
       });
     }, 50);
   }, function(detector) {
-    fs.rmdirSync('toto49/12/45/87');
-    fs.rmdirSync('toto49/12/45');
-    fs.rmdirSync('toto49/12');
-    fs.rmdirSync('toto49');
+    rimraf.sync('toto49');
     check(detector, [path.resolve('.') + '/toto49/12/45/87', true]);
   }),
 }, 5, 10000).addBatchRetry({
   'using filter': create_test(path.resolve('.') + '/toto45/1*/45', function(callback, detector) {
     setTimeout(function() {
       check(detector, []);
-      fs.mkdir('toto45', function(err) {
+      mkdirp('toto45/12/45', function(err) {
         assert.ifError(err);
-        fs.mkdir('toto45/12', function(err) {
+        mkdirp('toto45/13/45', function(err) {
           assert.ifError(err);
-          fs.mkdir('toto45/13', function(err) {
+          mkdirp('toto45/20/45', function(err) {
             assert.ifError(err);
-            fs.mkdir('toto45/20', function(err) {
+            mkdirp('toto45/13/46', function(err) {
               assert.ifError(err);
-              fs.mkdir('toto45/12/45', function(err) {
-                assert.ifError(err);
-                fs.mkdir('toto45/13/45', function(err) {
+              setTimeout(function() {
+                var detector2 = new TestDirectoryDetector(path.resolve('.') + '/toto45/1*/45', function(err) {
                   assert.ifError(err);
-                  fs.mkdir('toto45/13/46', function(err) {
-                    assert.ifError(err);
-                    fs.mkdir('toto45/20/45', function(err) {
-                      assert.ifError(err);
-                      setTimeout(function() {
-                        var detector2 = new TestDirectoryDetector(path.resolve('.') + '/toto45/1*/45', function(err) {
-                          assert.ifError(err);
-                        });
-                        setTimeout(function() {
-                          detector2.detector.close(function(err) {
-                            assert.ifError(err);
-                            callback(detector2);
-                          });
-                        }, 100);
-                      }, 50);
-                    });
-                  });
                 });
-              });
+                setTimeout(function() {
+                  detector2.detector.close(function(err) {
+                    assert.ifError(err);
+                    callback(detector2);
+                  });
+                }, 100);
+              }, 50);
             });
           });
         });
       });
     }, 50);
   }, function(detector, detector2) {
-    fs.rmdirSync('toto45/12/45');
-    fs.rmdirSync('toto45/12');
-    fs.rmdirSync('toto45/13/45');
-    fs.rmdirSync('toto45/13/46');
-    fs.rmdirSync('toto45/13');
-    fs.rmdirSync('toto45/20/45');
-    fs.rmdirSync('toto45/20');
-    fs.rmdirSync('toto45');
+    rimraf.sync('toto45');
     check(detector, [path.resolve('.') + '/toto45/12/45', true, path.resolve('.') + '/toto45/13/45', true]);
     check(detector2, [path.resolve('.') + '/toto45/12/45', true, path.resolve('.') + '/toto45/13/45', true]);
   }),
@@ -267,24 +243,17 @@ vows.describe('Directory detector ').addBatchRetry({
   '2 subdirectory, create and removed': create_test(path.resolve('.') + '/toto44/t*', function(callback, detector) {
     setTimeout(function() {
       check(detector, []);
-      fs.mkdir('toto44', function(err) {
+      mkdirp('toto44/titi', function(err) {
         assert.ifError(err);
-        fs.mkdir('toto44/titi', function(err) {
-          assert.ifError(err);
-          setTimeout(function() {
-            check(detector, [path.resolve('.') + '/toto44/titi', true]);
-            console.log('salut');
-            fs.rmdir('toto44/titi', function(err) {
-              assert.ifError(err);
-              fs.rmdir('toto44', function(err) {
-                assert.ifError(err);
-                setTimeout(function() {
-                  callback();
-                }, 50);
-              });
-            });
-          }, 50);
-        });
+        setTimeout(function() {
+          check(detector, [path.resolve('.') + '/toto44/titi', true]);
+          rimraf('toto44', function(err) {
+            assert.ifError(err);
+            setTimeout(function() {
+              callback();
+            }, 50);
+          });
+        }, 50);
       });
     }, 50);
   }, function(detector) {
