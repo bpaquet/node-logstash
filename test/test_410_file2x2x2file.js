@@ -161,7 +161,19 @@ var test = vows.describe('Integration file2x2x2file :').addBatchRetry({
     }
   }),
 }, 5, 20000).addBatchRetry({
+  'file transport raw input': _file2x2x2file(['output://file://main_middle.txt?serializer=raw'], ['input://file://main_middle.txt?unserializer=raw'], function() {
+    if (fs.existsSync('main_middle.txt')) {
+      fs.unlinkSync('main_middle.txt');
+    }
+  }, undefined, undefined, function(l) {
+    assert.equal(JSON.parse(l[0]).message, '234 tgerhe grgh');
+    assert.equal(JSON.parse(l[1]).message, 'éè');
+    assert.equal(JSON.parse(l[2]).message, 'line3');
+  }),
+}, 5, 20000).addBatchRetry({
   'tcp transport': file2x2x2file(['output://tcp://localhost:17874'], ['input://tcp://0.0.0.0:17874']),
+}, 5, 20000).addBatchRetry({
+  'websockets transport': file2x2x2file(['output://ws://localhost:17874?serializer=json_logstash'], ['input://ws://0.0.0.0:17874']),
 }, 5, 20000).addBatchRetry({
   'zeromq transport': file2x2x2file(['output://zeromq://tcp://localhost:17874'], ['input://zeromq://tcp://*:17874']),
 }, 5, 20000).addBatchRetry({
@@ -196,6 +208,3 @@ if (fs.existsSync('.sqs')) {
 }
 
 test.export(module);
-
-
-

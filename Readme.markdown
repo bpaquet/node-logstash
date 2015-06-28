@@ -116,6 +116,10 @@ Signals
 Changelog
 ===
 
+* 16/05/2015 : Allow to specify dates in computed values
+* 13/05/2015 : Add basic auth for HTTP Output plugins (#100)
+* 13/05/2015 : Add websockets support (thx to @fujifish)
+* 4/04/2015 : Add raw unserializer (thx to @nfisher)
 * 12/03/2015 : Allow wildcard in path for input file plugin
 * 7/03/2015 : Allow to use fixed index name for ElasticSearch output
 * 21/01/2015 : AMQP plain authentication, AMQP vhost
@@ -167,6 +171,7 @@ Inputs
 * [ZeroMQ](#zeromq)
 * [Redis](#redis)
 * [HTTP](#http)
+* [Websocket](#websocket)
 * [TCP / TLS](#tcp--tls)
 * [Google app engine](#google-app-engine)
 * [AMQP](#amqp)
@@ -201,6 +206,7 @@ Outputs
 * [Gelf](#gelf)
 * [File](#file-1)
 * [HTTP Post](#http-post)
+* [Websocket](#websocket-1)
 * [Redis](#redis-1)
 * [Logio](#logio)
 * [TCP / TLS](#tcp--tls-1)
@@ -218,6 +224,7 @@ Supported unserializer for input plugin :
 
 * ``json_logstash``: the unserializer try to parse data as a json object. If fail, raw data is returned. Some input plugins can not accept raw data.
 * ``msgpack``: the unserializer try to parse data as a [msgpack](http://msgpack.org) object. If fail, raw data is returned. Some input plugins can not accept raw data.
+* ``raw``: the unserializer does not try to parse the input line. Best for performances.
 
 File
 ---
@@ -315,6 +322,22 @@ Parameters:
 * ``unserializer``: please see above. Default value to ``json_logstash``.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 
+Websocket
+---
+This plugin is used on log server to receive data over a websocket, optionally with SSL/TLS encryption. Websockets are
+like TCP, but are proxy and firewall friendly.
+
+Examples:
+
+* Regular mode: ``input://ws://0.0.0.0:12345``
+* TLS mode: ``input://ws://0.0.0.0:443?ssl=true&ssl_key=/etc/ssl/private/logstash-server.key&ssl_cert=/etc/ssl/private/logstash-server.crt&ssl_requestCert=true&ssl_rejectUnauthorized=true``
+
+Parameters:
+
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
+* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
+
 TCP / TLS
 ---
 This plugin is used on log server to receive data over TCP, optionnaly with SSL/TLS encryption.
@@ -396,7 +419,7 @@ Outputs and filter, commons parameters
 * ``only_field_equal_toto=aaa``: execute the filter / output plugin only on lines with a field ``toto``, with value ``aaa``. You can specify it multiple times, all fields have to exist and have the specified value.
 * ``only_field_match_toto=aaa$``: execute the filter / output plugin only on lines with a field ``toto``, with value match the regular expression ``aaa$``. You can specify it multiple times, all fields have to exist and match the regular expression.
 
-Access to line log properties
+Compute values : access to line log properties, or use current date
 ===
 
 Some params are string, which can reference line log properties:
@@ -405,6 +428,7 @@ Some params are string, which can reference line log properties:
 * ``#{type}`` will contain the type of log line
 * ``#{toto}`` will contain the value of the field ``toto``, which have to be extracted with a regex filter
 * ``2#{toto}`` will contain ``2`` followed by the value of the field ``toto``.
+* ``#{now:YYYY}`` will contain the current year. YYYY is a date format passed to [moment](http://momentjs.com/docs/#/parsing/string-format/) to format current date.
 
 Ouputs plugins
 ===
@@ -461,6 +485,7 @@ Parameters:
 * ``bulk_timeout``: Specifies the maximum number of milliseconds to wait for ``bulk_limit`` messages,. Default is 100.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
+* ``basic_auth_user`` and ``basic_auth_password``: user and password for HTTP Basic Auth required by server. Default: none.
 
 Statsd
 ---
@@ -496,7 +521,7 @@ Parameters:
 File
 ---
 
-This plugin is used to write data into files. There are two modes: JSON, and raw (default).
+This plugin is used to write data into files. There are two modes: JSON, and raw (default). This plugin will create directory and sub directories if needed. Variables can be used in filename or in path.
 
 In JSON mode, each line of log is dumped to target file as JSON object, containing all fields.
 
@@ -505,12 +530,16 @@ In raw mode, each line of log is dumped to target file as specified in ``format`
 Note: target files can be reopened by sending USR2 signal to node-logstash.
 
 Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each ``nginx`` log lines to ``/var/log/toto.log``.
+Example 2: ``output://file:///var/log/log_#{type}.log``, to write each ``nginx`` log lines to ``/var/log/log_nginx.log``.
+Example 3: ``output://file:///var/log/http/#{now:YYYY-MM}/http.log``, to create a new directory for each month, and write to a file ``http.log``.
 
 Parameters:
 
 * ``serializer``: please see above. Default value to ``raw``.
 * ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
 * ``format``: please see above. Used by the ``raw``serializer.
+* ``idle_timeout``: delay before closing a file without activity, in seconds. Default : 300.
+* ``retry_delay``: after an error, delay before retry, in seconds. Default : 300.
 
 HTTP Post
 ---
@@ -530,6 +559,26 @@ Parameters:
 * ``format``: please see above. Used by the ``raw``serializer.
 * ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 * ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
+* ``basic_auth_user`` and ``basic_auth_password``: user and password for HTTP Basic Auth required by server. Default: none.
+
+Websocket
+---
+
+This plugin is used on log clients to send data over a websocket, optionally with SSL/TLS encryption. Websockets are like
+TCP connections but they are proxy and firewall friendly.
+
+Example:
+
+* Regular mode:  ``output://ws://192.168.1.1:12345``
+* TLS Mode: ``output://ws://192.168.1.1:443?ssl=true&ssl_key=/etc/ssl/private/logstash-client.key&ssl_cert=/etc/ssl/private/logstash-client.crt&ssl_rejectUnauthorized=true``
+
+Parameters:
+
+* ``serializer``: Optional. Please see above. Default value to ``json_logstash``.
+* ``format``: Optional. Please see above. Used by the ``raw``serializer.
+* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
+* ``proxy``: use http proxy. See below for HTTP proxy. Default : none.
+* ``basic_auth_user`` and ``basic_auth_password``: user and password for HTTP Basic Auth required by server. Default: none.
 
 Redis
 ---

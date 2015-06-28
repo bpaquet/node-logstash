@@ -192,7 +192,7 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
       assert.equal(reqs[0].req.method, 'POST');
       assert.match(reqs[0].req.url, new RegExp('^\/audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/audits\/_bulk'));
       var lines = reqs[0].body.split('\n');
-      assert.equal(lines.length, 6);
+      assert.equal(lines.length, 7);
       helper.checkResult(lines[0], {
         'index': {}
       });
@@ -223,6 +223,7 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
         'type': 'stud',
         'tcp_port': 17876
       });
+      assert.equal(lines[6], '');
     }
   },
 }, 5, 20000).addBatchRetry({

@@ -1,5 +1,7 @@
 var vows = require('vows-batch-retry'),
   fs = require('fs'),
+  mkdirp = require('mkdirp'),
+  rimraf = require('rimraf'),
   assert = require('assert'),
   path = require('path'),
   helper = require('./integration_helper.js'),
@@ -75,6 +77,76 @@ vows.describe('Integration file 2 file :').addBatchRetry({
       assert.equal('_line1_\n_line2_\n_line3_\n', c3);
     }
   },
+}, 1, 20000).addBatchRetry({
+  'file2file raw unserializer': {
+    topic: function() {
+      monitor_file.setFileStatus({});
+      var callback = this.callback;
+      helper.createAgent([
+        'input://file://input1.txt?unserializer=raw',
+        'input://file://input2.txt?type=input2&unserializer=raw',
+        'output://file://output1.txt?serializer=json_logstash',
+        'output://file://output2.txt?serializer=json_logstash',
+        'output://file://output3.txt?serializer=raw&format=_#{message}_',
+      ], function(agent) {
+        setTimeout(function() {
+          fs.appendFile('input1.txt', 'line1\n', function(err) {
+            assert.ifError(err);
+            setTimeout(function() {
+              fs.appendFile('input2.txt', 'line2\n', function(err) {
+                assert.ifError(err);
+                setTimeout(function() {
+                  fs.appendFile('input1.txt', 'line3\n', function(err) {
+                    assert.ifError(err);
+                    setTimeout(function() {
+                      agent.close(function() {
+                        callback(null);
+                      });
+                    }, 200);
+                  });
+                }, 200);
+              });
+            }, 200);
+          });
+        }, 200);
+      });
+    },
+
+    check: function(err) {
+      assert.ifError(err);
+      var c1 = fs.readFileSync('output1.txt').toString();
+      var c2 = fs.readFileSync('output2.txt').toString();
+      var c3 = fs.readFileSync('output3.txt').toString();
+      fs.unlinkSync('input1.txt');
+      fs.unlinkSync('input2.txt');
+      fs.unlinkSync('output1.txt');
+      fs.unlinkSync('output2.txt');
+      fs.unlinkSync('output3.txt');
+
+      assert.equal(c1, c2);
+      var splitted = c1.split('\n');
+      assert.equal(splitted.length, 4);
+      assert.equal('', splitted[splitted.length - 1]);
+      helper.checkResult(splitted[0], {
+        '@version': '1',
+        'path': path.resolve('.') + '/input1.txt',
+        'message': 'line1'
+      }, true);
+      helper.checkResult(splitted[1], {
+        '@version': '1',
+        'path': path.resolve('.') + '/input2.txt',
+        'message': 'line2',
+        'type': 'input2'
+      }, true);
+      helper.checkResult(splitted[2], {
+        '@version': '1',
+        'path': path.resolve('.') + '/input1.txt',
+        'message': 'line3'
+      }, true);
+
+      assert.equal('_line1_\n_line2_\n_line3_\n', c3);
+    }
+  },
 }, 5, 20000).addBatchRetry({
   'file2file not existing dir': {
     topic: function() {
@@ -85,27 +157,21 @@ vows.describe('Integration file 2 file :').addBatchRetry({
         'output://file://output.txt?serializer=json_logstash',
       ], function(agent) {
         setTimeout(function() {
-          fs.mkdir('toto', function(err) {
+          mkdirp('toto/56/87', function(err) {
             assert.ifError(err);
-            fs.mkdir('toto/56', function(err) {
-              assert.ifError(err);
-              fs.mkdir('toto/56/87', function(err) {
+            setTimeout(function() {
+              fs.appendFile('toto/56/87/input.txt', 'line1\n', function(err) {
                 assert.ifError(err);
-                setTimeout(function() {
-                  fs.appendFile('toto/56/87/input.txt', 'line1\n', function(err) {
-                    assert.ifError(err);
-                    fs.appendFile('toto/56/87/input.txt', 'line2\n', function(err) {
-                      assert.ifError(err);
-                      setTimeout(function() {
-                        agent.close(function() {
-                          callback(null);
-                        });
-                      }, 200);
+                fs.appendFile('toto/56/87/input.txt', 'line2\n', function(err) {
+                  assert.ifError(err);
+                  setTimeout(function() {
+                    agent.close(function() {
+                      callback(null);
                     });
-                  });
-                }, 200);
+                  }, 200);
+                });
               });
-            });
+            }, 200);
           });
         }, 500);
       });
@@ -114,10 +180,7 @@ vows.describe('Integration file 2 file :').addBatchRetry({
     check: function(err) {
       assert.ifError(err);
       var c = fs.readFileSync('output.txt').toString();
-      fs.unlinkSync('toto/56/87/input.txt');
-      fs.rmdirSync('toto/56/87');
-      fs.rmdirSync('toto/56');
-      fs.rmdirSync('toto');
+      rimraf.sync('toto');
       fs.unlinkSync('output.txt');
 
       var splitted = c.split('\n');
@@ -189,25 +252,22 @@ vows.describe('Integration file 2 file :').addBatchRetry({
         'input://file://log/*-2005/access.log',
       ], function(agent) {
         setTimeout(function() {
-          fs.mkdir('log', function(err) {
+          mkdirp('log/10-02-2005', function(err) {
             assert.ifError(err);
-            fs.mkdir('log/10-02-2005', function(err) {
+            fs.appendFile('log/10-02-2005/access.log', 'z1\n', function(err) {
               assert.ifError(err);
-              fs.appendFile('log/10-02-2005/access.log', 'z1\n', function(err) {
+              fs.appendFile('log/10-02-2005/error.log', 'z2\n', function(err) {
                 assert.ifError(err);
-                fs.appendFile('log/10-02-2005/error.log', 'z2\n', function(err) {
+                mkdirp('log/10-03-2005', function(err) {
                   assert.ifError(err);
-                  fs.mkdir('log/10-03-2005', function(err) {
+                  fs.appendFile('log/10-03-2005/access.log', 'z3\n', function(err) {
                     assert.ifError(err);
-                    fs.appendFile('log/10-03-2005/access.log', 'z3\n', function(err) {
+                    mkdirp('log/10-03-2006', function(err) {
                       assert.ifError(err);
-                      fs.mkdir('log/10-03-2006', function(err) {
+                      fs.appendFile('log/10-03-2006/access.log', 'z4\n', function(err) {
                         assert.ifError(err);
-                        fs.appendFile('log/10-03-2006/access.log', 'z4\n', function(err) {
-                          assert.ifError(err);
-                          agent.close(function() {
-                            setTimeout(callback, 500);
-                          });
+                        agent.close(function() {
+                          setTimeout(callback, 500);
                         });
                       });
                     });
@@ -223,14 +283,7 @@ vows.describe('Integration file 2 file :').addBatchRetry({
     check: function(err) {
       assert.ifError(err);
       var data = fs.readFileSync('output.txt').toString().split('\n');
-      fs.unlinkSync('log/10-02-2005/access.log');
-      fs.unlinkSync('log/10-02-2005/error.log');
-      fs.unlinkSync('log/10-03-2005/access.log');
-      fs.unlinkSync('log/10-03-2006/access.log');
-      fs.rmdirSync('log/10-02-2005');
-      fs.rmdirSync('log/10-03-2005');
-      fs.rmdirSync('log/10-03-2006');
-      fs.rmdirSync('log');
+      rimraf.sync('log');
       fs.unlinkSync('output.txt');
       assert.deepEqual(data, ['z1', 'z3', '']);
     }
@@ -245,34 +298,28 @@ vows.describe('Integration file 2 file :').addBatchRetry({
         'input://file://log/*-2005/access.log',
       ], function(agent) {
         setTimeout(function() {
-          fs.mkdir('log', function(err) {
+          mkdirp('log/10-02-2005', function(err) {
             assert.ifError(err);
-            fs.mkdir('log/10-02-2005', function(err) {
+            fs.appendFile('log/10-02-2005/access.log', 'z1\n', function(err) {
               assert.ifError(err);
-              fs.appendFile('log/10-02-2005/access.log', 'z1\n', function(err) {
-                assert.ifError(err);
-                setTimeout(function() {
-                  fs.unlink('log/10-02-2005/access.log', function(err) {
-                    assert.ifError(err);
-                    fs.rmdir('log/10-02-2005', function(err) {
+              setTimeout(function() {
+                rimraf('log/10-02-2005', function(err) {
+                  assert.ifError(err);
+                  setTimeout(function() {
+                    mkdirp('log/10-02-2005', function(err) {
                       assert.ifError(err);
-                      setTimeout(function() {
-                        fs.mkdir('log/10-02-2005', function(err) {
-                          assert.ifError(err);
-                          fs.appendFile('log/10-02-2005/access.log', 'z2\n', function(err) {
-                            assert.ifError(err);
-                            setTimeout(function() {
-                              agent.close(function() {
-                                setTimeout(callback, 500);
-                              });
-                            }, 100);
+                      fs.appendFile('log/10-02-2005/access.log', 'z2\n', function(err) {
+                        assert.ifError(err);
+                        setTimeout(function() {
+                          agent.close(function() {
+                            setTimeout(callback, 500);
                           });
-                        });
-                      }, 100);
-                    });
+                        }, 100);
+                      });
+                    }, 100);
                   });
-                }, 100);
-              });
+                });
+              }, 100);
             });
           });
         }, 200);
@@ -282,9 +329,7 @@ vows.describe('Integration file 2 file :').addBatchRetry({
     check: function(err) {
       assert.ifError(err);
       var data = fs.readFileSync('output.txt').toString().split('\n');
-      fs.unlinkSync('log/10-02-2005/access.log');
-      fs.rmdirSync('log/10-02-2005');
-      fs.rmdirSync('log');
+      rimraf.sync('log');
       fs.unlinkSync('output.txt');
       assert.deepEqual(data, ['z1', 'z2', '']);
     }

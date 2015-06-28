@@ -83,10 +83,6 @@ vows.describe('Integration error :').addBatch({
     'output://stdout://'
   ], 'Error: watch EACCES'),
 }).addBatch({
-  'wrong_output_file_module': check_error_init([
-    'output://file:///path_which_does_not_exist/titi.txt'
-  ], 'ENOENT'),
-}).addBatch({
   'http unable to open port (access)': check_error_init([
     'input://http://localhost:80'
   ], 'listen EACCES'),
