@@ -41,6 +41,12 @@ function tcp_send(text, port, callback) {
   });
 }
 
+function checkIndexBulk(json, index_pattern, type) {
+  var o = JSON.parse(json);
+  assert.match(o.index._index, new RegExp(index_pattern));
+  assert.equal(o.index._type, type);
+}
+
 vows.describe('Integration Elastic search event :').addBatchRetry({
   'elastic_search test': {
     topic: function() {
@@ -172,7 +178,7 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
         'input://tcp://0.0.0.0:17874?type=nginx',
         'input://tcp://0.0.0.0:17875?type=haproxy',
         'input://tcp://0.0.0.0:17876?type=stud',
-        'output://elasticsearch://localhost:17877?bulk_limit=3&bulk_timeout=1000&data_type=audits&index_prefix=audit',
+        'output://elasticsearch://localhost:17877?bulk_limit=3&bulk_timeout=1000&data_type=audits&index_name=toto',
       ], function(agent) {
         es_server(1, agent, 17877, callback);
         tcp_send('toto', 17874);
@@ -190,12 +196,10 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
       assert.equal(reqs.length, 1);
 
       assert.equal(reqs[0].req.method, 'POST');
-      assert.match(reqs[0].req.url, new RegExp('^\/audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/audits\/_bulk'));
+      assert.equal(reqs[0].req.url, '/_bulk');
       var lines = reqs[0].body.split('\n');
       assert.equal(lines.length, 7);
-      helper.checkResult(lines[0], {
-        'index': {}
-      });
+      checkIndexBulk(lines[0], '^toto$', 'audits');
       helper.checkResult(lines[1], {
         '@version': '1',
         'message': 'toto',
@@ -203,9 +207,7 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
         'type': 'nginx',
         'tcp_port': 17874
       });
-      helper.checkResult(lines[2], {
-        'index':{}
-      });
+      checkIndexBulk(lines[2], '^toto$', 'audits');
       helper.checkResult(lines[3], {
         '@version': '1',
         'message': 'titi',
@@ -213,9 +215,7 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
         'type': 'haproxy',
         'tcp_port': 17875
       });
-      helper.checkResult(lines[4], {
-        'index':{}
-      });
+      checkIndexBulk(lines[4], '^toto$', 'audits');
       helper.checkResult(lines[5], {
         '@version': '1',
         'message': 'tata',
@@ -252,12 +252,10 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
       assert.equal(reqs.length, 2);
 
       assert.equal(reqs[0].req.method, 'POST');
-      assert.match(reqs[0].req.url, new RegExp('^\/audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/audits\/_bulk'));
+      assert.equal(reqs[0].req.url, '/_bulk');
       var lines = reqs[0].body.split('\n').filter(function(line) {return line.length > 0;});
       assert.equal(lines.length, 4);
-      helper.checkResult(lines[0], {
-        'index': {}
-      });
+      checkIndexBulk(lines[0], '^audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d$', 'audits');
       helper.checkResult(lines[1], {
         '@version': '1',
         'message': 'toto',
@@ -265,9 +263,8 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
         'type': 'nginx',
         'tcp_port': 17874
       });
-      helper.checkResult(lines[2], {
-        'index':{}
-      });
+      checkIndexBulk(lines[2], '^audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d$', 'audits');
+
       helper.checkResult(lines[3], {
         '@version': '1',
         'message': 'titi',
@@ -277,12 +274,10 @@ vows.describe('Integration Elastic search event :').addBatchRetry({
       });
 
       assert.equal(reqs[1].req.method, 'POST');
-      assert.match(reqs[1].req.url, new RegExp('^\/audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d\/audits\/_bulk'));
+      assert.equal(reqs[1].req.url, '/_bulk');
       lines = reqs[1].body.split('\n').filter(function(line) {return line.length > 0;});
       assert.equal(lines.length, 2);
-      helper.checkResult(lines[0], {
-        'index': {}
-      });
+      checkIndexBulk(lines[0], '^audit-' + (new Date()).getUTCFullYear() + '\\.\\d\\d\\.\\d\\d$', 'audits');
       helper.checkResult(lines[1], {
         '@version': '1',
         'message': 'tata',
