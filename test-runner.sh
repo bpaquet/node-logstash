@@ -17,7 +17,7 @@ if [ "$COVER" != "" ]; then
   rm -rf coverage
   istanbul cover node_modules/.bin/vows -- $TEST --spec
 else
-  vows $TEST --spec
+  node_modules/.bin/vows $TEST --spec
 fi
 
 echo ""
