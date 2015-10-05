@@ -384,9 +384,12 @@ Examples:
 
 * Fanout mode: ``input://amqp://localhost:5672?exchange_name=toto`` : Receive message from fanout exchange ``toto``
 * Topic mode: ``input://amqp://localhost:5672?exchange_name=toto_topic&topic=test`` : Receive message from topic ``test`` on  exchange ``toto_topic``
+* Queue mode: ``input://amqp://localhost:5672?queue_name=toto`` : Receive message from queue ``toto``
 
 Parameters:
 
+* ``exchange_name``: Optional. Name of the exchange to listen to. Default : 'amq.fanout'.
+* ``queue_name``: Optional. Name of the queue to listen to. Does then ignore ``exchange_name``. Default : none.
 * ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
 * ``durable``: Optional. Set exchange durability. Default : true.
 * ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
