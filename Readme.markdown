@@ -116,6 +116,8 @@ Signals
 Changelog
 ===
 
+* 24/10/2015 : drop 0.10 support, update test for node 4
+* 24/10/2015 : use aws-sdk for aws SQS plugin
 * 04/10/2015 : publish 0.4 on NPM
 * 16/05/2015 : Allow to specify dates in computed values
 * 13/05/2015 : Add basic auth for HTTP Output plugins (#100)

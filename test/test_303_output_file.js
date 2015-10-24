@@ -4,7 +4,7 @@ var vows = require('vows-batch-retry'),
   rimraf = require('rimraf'),
   moment = require('moment'),
   fs = require('fs'),
-  output_file = require('lib/outputs/output_file');
+  output_file = require('outputs/output_file');
 
 vows.describe('Output file ').addBatchRetry({
   'standard test': {

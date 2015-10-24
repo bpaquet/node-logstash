@@ -81,7 +81,7 @@ vows.describe('Integration error :').addBatch({
   'input_file_error : root directory not readable': check_error_init([
     'input://file:///root/toto/43input1.txt',
     'output://stdout://'
-  ], 'Error: watch EACCES'),
+  ], 'EACCES'),
 }).addBatch({
   'http unable to open port (access)': check_error_init([
     'input://http://localhost:80'
