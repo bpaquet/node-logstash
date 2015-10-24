@@ -8,7 +8,7 @@ if [ "$TARGET" = "" ]; then
 fi
 
 if [ "$NODE_VERSION" = "" ]; then
-  NODE_VERSION=v0.10.36
+  NODE_VERSION=v0.12.7
 fi
 
 COMMAND="npm test"

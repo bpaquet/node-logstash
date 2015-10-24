@@ -7,7 +7,7 @@ if [ "$TEST" = "" ]; then
   RUN_JSHINT=1
 fi
 
-export PATH="/usr/sbin:$PATH"
+export PATH="/usr/sbin:node_modules/.bin:$PATH"
 export TZ="Etc/GMT"
 export NODE_PATH="test:lib:$NODE_PATH"
 

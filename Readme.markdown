@@ -14,7 +14,7 @@ What to do with node-logstash ?
 
 node-logstash is a tool to collect logs on servers. It allow to send its to a central server and to [ElasticSearch](http://www.elasticsearch.org/) for indexing.
 
-In top of elastic search, you can use a specialized interface like [kibana](http://rashidkpc.github.com/Kibana/) to dive into your logs.
+In top of elastic search, you can use a specialized interface like [kibana](https://github.com/elastic/kibana) to dive into your logs.
 
 ![Archi](https://raw.github.com/bpaquet/node-logstash/master/docs/archi.jpg)
 
@@ -58,7 +58,7 @@ How to use it ?
 Installation
 ---
 
-* Install NodeJS, version >= 0.10, or [io.js](https://iojs.org).
+* Install NodeJS, version >= 0.12
 * Install build tools
   * Debian based system: `apt-get install build-essential`
   * Centos system: `yum install gcc gcc-c++ make`

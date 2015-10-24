@@ -1,7 +1,7 @@
 {
   "name": "node-logstash",
   "description": "Logstash implementation in node JS",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Bertrand Paquet <bertrand.paquet@gmail.com>",
   "keywords": ["logstash", "log", "zmq", "zeromq"],
   "main": "./lib/log4node.js",
@@ -10,12 +10,7 @@
     "type": "git",
     "url": "git://github.com/bpaquet/node-logstash.git"
   },
-  "licenses": [
-    {
-      "type": "Apache2",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0"
-    }
-  ],
+  "license": "Apache-2.0",
   "devDependencies": {
     "vows": "0.8.0",
     "vows-batch-retry": "0.0.4",
@@ -35,14 +30,14 @@
     "async": "0.9.0"
   },
   "optionalDependencies":{
-    "aws-lib": "0.0.6",
-    "amqplib": "0.3.2",
-    "zmq": "2.10.0",
+    "aws-sdk": "2.2.x",
+    "amqplib": "0.4.0",
+    "zmq": "2.13.0",
     "moment": "2.9.0",
-    "redis": "0.12.1",
-    "ws": "0.7.1",
-    "oniguruma": "4.0.0",
-    "msgpack": "0.2.6",
+    "redis": "2.2.5",
+    "ws": "0.8.0",
+    "oniguruma": "5.1.x",
+    "msgpack": "1.0.x",
     "geoip-lite": "1.1.6",
     "proxying-agent": "0.1.7"
   },
