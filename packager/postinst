@@ -5,4 +5,4 @@ set -e
 APP_NAME="node-logstash"
 CLI="$APP_NAME"
 
-${CLI} scale web=1 || true
+${CLI} scale main=1 || true
