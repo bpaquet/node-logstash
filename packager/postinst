@@ -4,8 +4,5 @@ set -e
 
 APP_NAME="node-logstash"
 CLI="$APP_NAME"
-APP_CONFIG="/etc/node-logstash.d"
-
-mkdir -p $APP_CONFIG
 
 ${CLI} scale web=1 || true
