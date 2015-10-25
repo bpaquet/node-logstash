@@ -1,3 +1,4 @@
+no_auto_dependencies:
 build_dependencies:
   - libzmq-dev
 dependencies:
