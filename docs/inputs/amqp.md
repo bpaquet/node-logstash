@@ -1,7 +1,7 @@
 AMQP input plugin
 ---
 
-Status : core plugin, fully tested.
+Status : core plugin, unit tested and maintained.
 
 This plugin is used to get logs from an [AMQP exchange](https://www.rabbitmq.com/tutorials/amqp-concepts.html), like a [RabbitMQ](http://www.rabbitmq.com/) exchange. This plugin is compatible with the original AMQP logstash plugin.
 

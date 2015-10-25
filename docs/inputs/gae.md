@@ -1,7 +1,7 @@
 Google App Engine input plugin
 ---
 
-Status : core plugin, fully tested.
+Status : core plugin, unit tested and maintained.
 
 This plugin is used to collect logs from a running Google App Engine Application.
 

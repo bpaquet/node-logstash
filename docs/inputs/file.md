@@ -1,7 +1,7 @@
 File input plugin
 ---
 
-Status : core plugin, fully tested.
+Status : core plugin, unit tested and maintained.
 
 This plugin monitor log files.
 

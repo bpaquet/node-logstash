@@ -1,7 +1,7 @@
 SQS input plugin
 ---
 
-Status : core plugin, fully tested.
+Status : core plugin, unit tested and maintained.
 
 This plugin is used to get logs from [SQS](https://aws.amazon.com/en/sqs/). This plugin use [long polling](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html) to get messages faster.
 

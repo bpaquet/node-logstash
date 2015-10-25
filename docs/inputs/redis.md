@@ -1,7 +1,7 @@
 Redis input plugin
 ---
 
-Status : core plugin, fully tested.
+Status : core plugin, unit tested and maintained.
 
 This plugin is used on log server to receive logs from redis channels. json_event format is expected.
 

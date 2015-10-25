@@ -1,7 +1,7 @@
 Unserializers for input plugins
 ---
 
-Status : core feature, fully tested.
+Status : core feature, unit tested and maintained.
 
 Some inputs plugins supports the ``unserializer`` params.
 Supported unserializer for input plugin :

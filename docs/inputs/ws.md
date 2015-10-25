@@ -1,7 +1,7 @@
 Websocket input plugin
 ---
 
-Status : core plugin, fully tested.
+Status : core plugin, unit tested and maintained.
 
 This plugin is used on log server to receive data over a websocket, optionally with SSL/TLS encryption. Websockets are like TCP, but are proxy and firewall friendly.
 

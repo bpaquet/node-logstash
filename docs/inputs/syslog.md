@@ -1,7 +1,7 @@
 Syslog input plugin
 ---
 
-Status : core plugin, fully tested.
+Status : core plugin, unit tested and maintained.
 
 There is no syslog plugin, but it's easy to emulate with udp plugin.
 

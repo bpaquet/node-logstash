@@ -1,6 +1,8 @@
 SSL Params
 ---
 
+Status : core feature, unit tested and maintained.
+
 When you are in SSL mode (client or server), you can use [all the parameters using by node for SSL / TLS](http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener), prefixed by ``ssl_``.
 You have to give path for certificate and key params, node-logstash will load them before initializing SSL / TLS stack.
 

@@ -1,7 +1,7 @@
 TCP / TLS input plugin
 ---
 
-Status : core plugin, fully tested.
+Status : core plugin, unit tested and maintained.
 
 This plugin is used on log server to receive data over TCP, optionnaly with SSL/TLS encryption.
 

@@ -1,7 +1,7 @@
 HTTP input plugin
 ---
 
-Status : core plugin, fully tested.
+Status : core plugin, unit tested and maintained.
 
 This plugin is used on log server to receive logs from an HTTP/HTTPS stream. This is useful
 in case the agent can only output logs through an HTTP/HTTPS channel.
