@@ -168,7 +168,7 @@ Outputs
 
 * [ZeroMQ](docs/outputs/zeromq.md)
 * [ElasticSearch](docs/outputs/elasticsearch.md)
-* [Statsd](docs/outputs/statsd)
+* [Statsd](docs/outputs/statsd.md)
 * [Gelf](docs/outputs/gelf.md)
 * [File](docs/outputs/file.md)
 * [HTTP Post](docs/outputs/http_post.md)
