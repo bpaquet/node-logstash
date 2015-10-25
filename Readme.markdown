@@ -169,16 +169,18 @@ Plugins list
 Inputs
 ---
 
+* [Unserializers](docs/inputs/unserializers.md)
+
 * [File](docs/inputs/file.md)
 * [Syslog](docs/inputs/syslog.md)
 * [ZeroMQ](docs/inputs/zeromq.md)
 * [Redis](docs/inputs/redis.md)
 * [HTTP](docs/inputs/http.md)
-* [Websocket](#websocket)
-* [TCP / TLS](#tcp--tls)
-* [Google app engine](#google-app-engine)
-* [AMQP](#amqp)
-* [SQS](#sqs)
+* [Websocket](docs/inputs/ws.md)
+* [TCP / TLS](docs/inputs/tcp_tls.md)
+* [Google app engine](docs/inputs/gae.md)
+* [AMQP](docs/inputs/amqp.md)
+* [SQS](docs/inputs/sqs.md)
 
 Filters
 ---
@@ -215,97 +217,6 @@ Outputs
 * [TCP / TLS](#tcp--tls-1)
 * [AMQP](#amqp-1)
 * [SQS](#sqs-1)
-
-
-Inputs plugins
-===
-
-Websocket
----
-This plugin is used on log server to receive data over a websocket, optionally with SSL/TLS encryption. Websockets are like TCP, but are proxy and firewall friendly.
-
-Examples:
-
-* Regular mode: ``input://ws://0.0.0.0:12345``
-* TLS mode: ``input://ws://0.0.0.0:443?ssl=true&ssl_key=/etc/ssl/private/logstash-server.key&ssl_cert=/etc/ssl/private/logstash-server.crt&ssl_requestCert=true&ssl_rejectUnauthorized=true``
-
-Parameters:
-
-* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
-* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
-* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
-
-TCP / TLS
----
-This plugin is used on log server to receive data over TCP, optionnaly with SSL/TLS encryption.
-
-Examples:
-
-* TCP mode: ``input://tcp://0.0.0.0:12345``
-* SSL mode: ``input://tcp://0.0.0.0:443?ssl=true&ssl_key=/etc/ssl/private/logstash-server.key&ssl_cert=/etc/ssl/private/logstash-server.crt&ssl_requestCert=true&ssl_rejectUnauthorized=true``
-
-Parameters:
-
-* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
-* ``appendPeerCert``: Optional. In SSL mode, adds details of the peer certificate to the @tls field if the peer certificate was received from the client using requestCert option. Default: true in SSL mode
-* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=tls``. No default value.
-* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
-
-Google App Engine
----
-This plugin is used to collect logs from a running Google App Engine Application.
-
-You have to add a [servlet in your App Engine App](docs/gae/Readme.md). The plugin will poll the logs from this servlet.
-
-This plugin collects logs 10s in the past to allow GAE internal logs propagation.
-
-Examples:
-
-* ``input://gae://myapp.appspot.com:80?key=toto``. Will grab the logs from myapp GAE app, every minutes, on url ``http://myapp.appspot.com:80/logs?log_key=toto``
-
-Parameters:
-
-* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=mygaeappp``. No default value.
-* ``key``. The security key which will be sent in the http query to Google App Engine.
-* ``ssl``: use ssl for grabbing logs. Use port 443 in this case. Default : false.
-* ``polling``: Polling delay. Default: 60s.
-* ``servlet_name``: Name of the servlet which serve logs. Default : ``logs``.
-* ``access_logs_field_name`` and ``access_logs_type``. If the received line of log has a field ``access_logs_field_name``, the plugin will set the type of the line to ``access_logs_type``. It's used to differentiate access logs from application logs, to apply specific filter on access_logs. Standard config is : ``access_logs_type=nginx_access_logs&access_logs_field_name=http_method``. No default value.
-
-AMQP
----
-This plugin is used to get logs from an [AMQP exchange](https://www.rabbitmq.com/tutorials/amqp-concepts.html), like a [RabbitMQ](http://www.rabbitmq.com/) exchange. This plugin is compatible with the original AMQP logstash plugin.
-
-Examples:
-
-* Fanout mode: ``input://amqp://localhost:5672?exchange_name=toto`` : Receive message from fanout exchange ``toto``
-* Topic mode: ``input://amqp://localhost:5672?exchange_name=toto_topic&topic=test`` : Receive message from topic ``test`` on  exchange ``toto_topic``
-
-Parameters:
-
-* ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
-* ``durable``: Optional. Set exchange durability. Default : true.
-* ``retry_delay``: Optional. Retry delay (in ms) to connect AMQP broker. Default : 3000.
-* ``heartbeat``: Optional. AMQP heartbeat in s. Default: 10
-* ``type``: Optional. To specify the log type, to faciliate crawling in kibana. Example: ``type=rabbit``. No default value.
-* ``username``: username for PLAIN authentication to amqp broker. No default value.
-* ``password``: password for PLAIN authentication to amqp broker. No default value.
-* ``vhost``: amqp vhost to use. No default value.
-* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
-* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
-
-SQS
----
-This plugin is used to get logs from [SQS](https://aws.amazon.com/en/sqs/). This plugin use [long polling](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html) to get messages faster.
-
-Example :
-* ``input://sqs://sqs.eu-west-1.amazonaws.com/66171255634/test?aws_access_key_id=key&aws_secret_access_key=secret``: get messages from the SQS queue ``sqs.eu-west-1.amazonaws.com/66171255634/test``
-
-Parameters :
-* ``aws_access_key_id``: your AWS Access Key Id. Required.
-* ``aws_secret_access_key``: your AWS Secret Access Key Id. Required.
-* ``polling_delay``: the long polling max delay, in seconds. Default value : 10.
-* ``unserializer``: Optional. Please see above. Default value to ``json_logstash``.
 
 Outputs and filter, commons parameters
 ===
