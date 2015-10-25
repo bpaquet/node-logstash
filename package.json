@@ -39,7 +39,8 @@
     "oniguruma": "5.1.x",
     "msgpack": "1.0.x",
     "geoip-lite": "1.1.6",
-    "proxying-agent": "0.1.7"
+    "http-proxy-agent": "1.x",
+    "https-proxy-agent": "1.x"
   },
   "directories": {
     "test": "./test",
