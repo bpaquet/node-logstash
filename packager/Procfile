@@ -1,0 +1,1 @@
+web: node bin/node-logstash-agent --config_dir /etc/node-logstash.d --log_level info --log_file /opt/node-logstash/log/node-logstash.log
