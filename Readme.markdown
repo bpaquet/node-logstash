@@ -148,7 +148,7 @@ Filter plugins
 * [Grep](docs/filters/grep.md)
 * [Reverse DNS](docs/filters/reverse_dns.md)
 * [Compute field](docs/filters/compute_field.md)
-* [Compute date field](docs/filters/compute_date_filed.md)
+* [Compute date field](docs/filters/compute_date_field.md)
 * [Split](docs/filters/split.md)
 * [Truncate](docs/filters/truncate.md)
 * [Multiline](docs/filters/multiline.md)
