@@ -169,8 +169,6 @@ Plugins list
 Inputs
 ---
 
-* [Unserializers](docs/inputs/unserializers.md)
-
 * [File](docs/inputs/file.md)
 * [Syslog](docs/inputs/syslog.md)
 * [ZeroMQ](docs/inputs/zeromq.md)
@@ -181,6 +179,8 @@ Inputs
 * [Google app engine](docs/inputs/gae.md)
 * [AMQP](docs/inputs/amqp.md)
 * [SQS](docs/inputs/sqs.md)
+
+* [Unserializers](docs/inputs/unserializers.md)
 
 Filters
 ---
