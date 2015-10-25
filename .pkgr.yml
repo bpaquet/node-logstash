@@ -1,5 +1,5 @@
 build_dependencies:
-  - libzmq1-dev
+  - libzmq-dev
 dependencies:
   - libzmq1
 targets:
