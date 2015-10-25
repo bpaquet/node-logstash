@@ -1,4 +1,4 @@
-Redis
+Redis input plugin
 ---
 
 Status : core plugin, fully tested.
@@ -21,4 +21,4 @@ Parameters:
 * ``channel``: Channel for publish / subscribe. No default value.
 * ``pattern_channel``: use channel as pattern. Default value : false.
 * ``key``: Queue name for queue. No default value.
-* ``unserializer``: please see please see [unserializer](docs/inputs/unserializers.md). Default value to ``json_logstash``.
+* ``unserializer``: please see please see [unserializer](unserializers.md). Default value to ``json_logstash``.
