@@ -166,7 +166,7 @@ Changelog
 Plugins list
 ===
 
-Inputs
+Input plugins
 ---
 
 * [File](docs/inputs/file.md)
@@ -184,7 +184,7 @@ Common concepts / parameters :
 
 * [Unserializers](docs/inputs/unserializers.md)
 
-Filters
+Filter plugins
 ---
 
 * [Regex](#regex)
