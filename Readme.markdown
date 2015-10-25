@@ -180,6 +180,7 @@ Inputs
 * [AMQP](docs/inputs/amqp.md)
 * [SQS](docs/inputs/sqs.md)
 
+Common concepts / parameters :
 
 * [Unserializers](docs/inputs/unserializers.md)
 
