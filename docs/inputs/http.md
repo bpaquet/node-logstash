@@ -13,5 +13,5 @@ Example:
 Parameters:
 
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=http``. No default value.
-* ``unserializer``: please see please see [unserializer](unserializers.md). Default value to ``json_logstash``.
+* ``unserializer``: please see please see [unserializers](unserializers.md). Default value to ``json_logstash``.
 * ``ssl``: enable SSL mode. Please see please see [ssl](../ssl.md). Default : false
