@@ -169,11 +169,11 @@ Plugins list
 Inputs
 ---
 
-* [File](#file)
-* [Syslog](#syslog)
-* [ZeroMQ](#zeromq)
-* [Redis](#redis)
-* [HTTP](#http)
+* [File](docs/inputs/file.md)
+* [Syslog](docs/inputs/syslog.md)
+* [ZeroMQ](docs/inputs/zeromq.md)
+* [Redis](docs/inputs/redis.md)
+* [HTTP](docs/inputs/http.md)
 * [Websocket](#websocket)
 * [TCP / TLS](#tcp--tls)
 * [Google app engine](#google-app-engine)
@@ -219,111 +219,6 @@ Outputs
 
 Inputs plugins
 ===
-
-Unserializers :
-
-Some inputs plugins supports the ``unserializer`` params.
-Supported unserializer for input plugin :
-
-* ``json_logstash``: the unserializer try to parse data as a json object. If fail, raw data is returned. Some input plugins can not accept raw data.
-* ``msgpack``: the unserializer try to parse data as a [msgpack](http://msgpack.org) object. If fail, raw data is returned. Some input plugins can not accept raw data.
-* ``raw``: the unserializer does not try to parse the input line. Best for performances.
-
-File
----
-
-This plugin monitor log files.
-
-Wildcard (* and ?) can be used, in path, and basename.
-
-This plugin is compatible with logrotate.
-
-If a db file is specified on node-logstash command line (``--db_file``), this plugin stores the last line read for each file, to allow restart at the same place, even the monitored file grows when node-logstash were down.
-
-Example:
-* ``input://file:///tmp/toto.log``, to monitor ``/tmp/toto.log``.
-* ``input://file:///var/log/*.log``, to monitor all log file in ``/var/log``.
-* ``input://file:///var/log/httpd/*/access.log``, to monitor all log ``access.log`` files in directories ``/var/log/httpd/*``.
-* ``input://file:///var/log/auth%3F.log``, to monitor all files matching ``auth?.log`` in ``/var/log``. ``%3F`` is the encoding of ``?``.
-
-Parameters:
-
-* ``start_index``: add ``?start_index=0`` to reread files from begining. Without this params, only new lines are read.
-* ``use_tail``: use system ``tail -f`` command to monitor file, instead of built in file monitoring. Should be used with logrotate and copytuncate option. Defaut value: false.
-* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=nginx_error_log``.
-* ``unserializer``: please see above. Default value to ``json_logstash``.
-
-Note: this plugin can be used on FIFO pipes.
-
-Syslog
----
-
-There is no syslog plugin, but it's easy to emulate with udp plugin.
-
-Example:
-
-* ``input://udp://0.0.0.0:514?type=syslog``
-* ``filter://regex://syslog?only_type=syslog``
-* ``filter://syslog_pri://?only_type=syslog``
-
-The first filter will parse the syslog line, and extract ``syslog_priority``, ``syslog_program``, ``syslog_pid`` fields,
-parse timestamp, and will replace ``host`` and ``message`` field.
-
-The second filter will extract from ``syslog_priority`` field severity and facility.
-
-You can also use the regex ``syslog_no_prio`` if there is no timestamp in syslog lines
-
-* ``input://udp://0.0.0.0:514?type=syslog``
-* ``filter://regex://syslog_no_prio?only_type=syslog``
-
-ZeroMQ
----
-
-This plugin is used on log server to receive logs from agents.
-
-Example: ``input://zeromq://tcp://0.0.0.0:5555``, to open a zeromq socket on port 5555.
-
-Parameters :
-* ``unserializer``: please see above. Default value to ``json_logstash``. This plugin does not support raw data.
-
-Redis
----
-
-This plugin is used on log server to receive logs from redis channels. json_event format is expected.
-
-They are two method to get message from redis :
-* Publish / subscribe : The ``subscribe`` redis command will be used. Parameters ``channel`` and ``pattern_channel`` are needed.
-* Queue. This ``blpop`` redis command will be used. ``key`` parameter is needed.
-
-Example:
-
-* ``input://redis://localhost:6379?channel=logstash_channel``
-
-Parameters:
-
-* ``auth_pass``: password to use when connecting to Redis
-* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=redis``. No default value.
-* ``method``: ``pubsub`` or ``queue`` Default value: ``queue``.
-* ``channel``: Channel for publish / subscribe. No default value.
-* ``pattern_channel``: use channel as pattern. Default value : false.
-* ``key``: Queue name for queue. No default value.
-* ``unserializer``: please see above. Default value to ``json_logstash``.
-
-HTTP
----
-
-This plugin is used on log server to receive logs from an HTTP/HTTPS stream. This is useful
-in case the agent can only output logs through an HTTP/HTTPS channel.
-
-Example:
-
-* ``input://http://localhost:8080``
-
-Parameters:
-
-* ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=http``. No default value.
-* ``unserializer``: please see above. Default value to ``json_logstash``.
-* ``ssl``: enable SSL mode. See below for SSL parameters. Default : false
 
 Websocket
 ---
@@ -901,21 +796,6 @@ Parameters:
 Misc
 ===
 
-SSL Params
----
-
-When you are in SSL mode (client or server), you can use [all the parameters using by node for SSL / TLS](http://nodejs.org/api/tls.html#tls_tls_createserver_options_secureconnectionlistener), prefixed by ``ssl_``.
-You have to give path for certificate and key params, node-logstash will load them before initializing SSL / TLS stack.
-
-For example, for a HTTPS server : ``ssl=true&ssl_cert=/path/to/cert&ssl_key=/path/to/key``
-
-For using a Certificate authority, add ``&ssl_ca=/path/to/ca``.
-
-For changing SSL ciphers, add ``ssl_ciphers=AES128-GCM-SHA256``.
-
-To use a client certificate, add ``ssl_cert=/client.cer&ssl_key=/client.key&ssl_ca=/tmp/ca.key``.
-
-To ignore ssl errors, add ``ssl_rejectUnauthorized=false`.
 
 HTTP Proxy
 ---
