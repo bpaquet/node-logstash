@@ -50,8 +50,57 @@ On log server, logs come trough a zeromq input plugin, are processed (fields and
 How to get help ?
 ===
 
-Please mail the users groups : node-logstash-users@googlegroups.com, or open an [issue](https://github.com/bpaquet/node-logstash/issues).
+Please open an [issue](https://github.com/bpaquet/node-logstash/issues).
 
+Future of this project
+===
+
+October 25th 2015.
+
+When I started node-logstash, the ecosystem around logstash and ElasticSearch were almost non-existant. In 2015, the siutation is not the same :
+* Great ecosystem around ElasticSearch and logstash, FileBeat project
+* Logstash is now the only way to push events to ElasticSearch ([deprecation of rivers](https://www.elastic.co/blog/deprecating-rivers))
+
+So, what is the future of node-logstash ?
+* as a tool to collect logs on files and send them through network, node-losgstash is still useful with lower size, instant start, lower CPU / Memory footprint (in my tests with logstash 1.5.0). The comparison is different with Lumberjack and FileBeat.
+* as log processing tool, it has the same advantages, but the plugin ecosystem is smaller than Logstash.
+* as an injection tool in ElasticSearch : ZeroMQ river will soon be unusable ([deprecation of rivers](https://www.elastic.co/blog/deprecating-rivers)). You have to use bulk api to inject data. It should be less efficient than starting an embedded ElasticSearch node, as in the original Logstash.
+
+Current project status
+---
+
+Node-logstash is production ready, and used in production. Installation is a classical node project installation, with some scripts for native packaging.
+
+Maintainers : currently I, @bpaquet, am the only maintainer. I will keep dependencies up to date, update the core to follow node version, but I do not have time to add features in the core. See Contributing below.
+
+Weakness :
+* format of config files is not easy to learn (next big move to do in the core)
+* tests are difficult to maintain, even if they are many and the code coverage is good. Replace vows by mocha is a good way to improve that, but it's a big rework.
+
+Contributing
+===
+
+What Pull Request (PR) will be merged ?
+
+Add plugin (output, input or filter)
+---
+
+Conditions to have a PR merged :
+
+* respect jslint
+* provide documentation in /docs
+* do not modify core. Modifications allowed :
+  * add plugin in ``Readme.md``.
+  * add optional dependencies in ``package.json``
+* If you provide unit tests, you can write in plugin documentation that the plugin is a plugin core.
+* If you do not provide unit tests, please indicate in the documentation : "Status : contributed plugin, maintained by @xxxx. Producion ready.", and indicate your Github login.
+
+You are encouraged to ask to merge plugins without tests, which are not production ready.
+
+Core modification
+---
+
+Please respect jslint, and provide all needed unit tests.
 How to use it ?
 ===
 
