@@ -1,5 +1,6 @@
 var vows = require('vows'),
   assert = require('assert'),
+  fs = require('fs'),
   logstash_config = require('logstash_config');
 
 function check(s, r) {
@@ -11,6 +12,10 @@ function check(s, r) {
       assert.deepEqual(result, r);
     }
   };
+}
+
+function check_file(f, r) {
+  return check(fs.readFileSync(f).toString(), r);
 }
 
 vows.describe('Logstash parser config').addBatch({
@@ -62,6 +67,51 @@ vows.describe('Logstash parser config').addBatch({
     output: [{
       elasticsearch: {
         host: 'localhost'
+      }
+    }, {
+      stdout: {}
+    }]
+  }),
+  'plugin config id string with "': check_file('test/parser/special_chars_quotes', {
+    output: [{
+      elasticsearch: {
+        host: '"localhost'
+      }
+    }, {
+      stdout: {}
+    }]
+  }),
+  'plugin config id string with \\n': check_file('test/parser/special_chars_new_line', {
+    output: [{
+      elasticsearch: {
+        host: '\nlocalhost'
+      }
+    }, {
+      stdout: {}
+    }]
+  }),
+  'plugin config id string with utf8': check_file('test/parser/special_chars_utf8', {
+    output: [{
+      elasticsearch: {
+        host: 'éàlocalhost'
+      }
+    }, {
+      stdout: {}
+    }]
+  }),
+  'plugin config id string with strange chars': check('output {\nelasticsearch { host => "[]\'!()localhost" }\nstdout { }\n}', {
+    output: [{
+      elasticsearch: {
+        host: '[]\'!()localhost'
+      }
+    }, {
+      stdout: {}
+    }]
+  }),
+  'plugin config id string with empty string': check('output {\nelasticsearch { host => "" }\nstdout { }\n}', {
+    output: [{
+      elasticsearch: {
+        host: ''
       }
     }, {
       stdout: {}

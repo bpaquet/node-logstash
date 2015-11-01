@@ -1,9 +1,15 @@
 
+%{
+  function process_string(s) {
+    return s.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t').replace(/\\"/, '"');
+  }
+%}
+
 /* lexical grammar */
 %lex
 %%
 
-\"[^\"]*\"            yytext = yytext.substr(1,yyleng-2); return 'VALUE'
+\"(\\\"|[^\"])*\"     yytext = process_string(yytext.substr(1, yyleng - 2)); return 'VALUE'
 \s+                   /* skip whitespace */
 "#".*                 /* ignore comment */
 [0-9]+\.[0-9]+        yytext = parseFloat(yytext, 10); return 'VALUE'
