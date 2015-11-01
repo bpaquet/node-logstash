@@ -120,4 +120,40 @@ vows.describe('Logstash parser config').addBatch({
       assert.deepEqual(result, {output: [{elasticsearch: {host: 'localhost', port: 354}}, {stdout: {}}]});
     }
   },
+  'conditional plugin': {
+    topic: function() {
+      return logstash_config.parse('filter {\nif [action] == "login" {\nmutate { remove => "secret" }\n}\n}');
+    },
+
+    check: function(result) {
+      assert.deepEqual(result, {filter: [{__if__: {ifs: [{cond: {op: '==', left: {field: 'action'}, right: {value: 'login'}}, then: [{mutate: {remove: 'secret'}}]}]}}]});
+    }
+  },
+  'conditional plugin multiple conditions, two plugins in then': {
+    topic: function() {
+      return logstash_config.parse('filter {\nif [action] == "login" and 23 != [action] {\nmutate { remove => "secret" }\nmutate { remove => "secret2" }}\n}');
+    },
+
+    check: function(result) {
+      assert.deepEqual(result, {filter: [{__if__: {ifs: [{cond: {op: 'and', left: {op: '==', left: {field: 'action'}, right: {value: 'login'}}, right: {op: '!=', left:{value: 23}, right:{field: 'action'}}}, then: [{mutate: {remove: 'secret'}}, {mutate: {remove: 'secret2'}}]}]}}]});
+    }
+  },
+  'conditional plugin regexp and else': {
+    topic: function() {
+      return logstash_config.parse('filter {\nif [action] =~ "login" {\nmutate { remove => "secret" }}\nelse{ mutate { remove => "secret2"}}\n}');
+    },
+
+    check: function(result) {
+      assert.deepEqual(result, {filter: [{__if__: {ifs: [{cond: {op: '=~', left: {field: 'action'}, right: {value: 'login'}}, then: [{mutate: {remove: 'secret'}}]}], else: [{mutate: {remove: 'secret2'}}]}}]});
+    }
+  },
+  'conditional plugin regexp, else, else if': {
+    topic: function() {
+      return logstash_config.parse('filter {\nif [action] =~ "login" {\nmutate { remove => "secret" }}\nelse if [action] == "logout" { mutate { remove => "secret3"}}\nelse{ mutate { remove => "secret2"}}\n}');
+    },
+
+    check: function(result) {
+      assert.deepEqual(result, {filter: [{__if__: {ifs: [{cond: {op: '=~', left: {field: 'action'}, right: {value: 'login'}}, then: [{mutate: {remove: 'secret'}}]}, {cond: {op: '==', left: {field: 'action'}, right: {value: 'logout'}}, then: [{mutate: {remove: 'secret3'}}]}], else: [{mutate: {remove: 'secret2'}}]}}]});
+    }
+  },
 }).export(module);

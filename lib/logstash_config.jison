@@ -3,9 +3,9 @@
 %lex
 %%
 
+\"[^\"]*\"            yytext = yytext.substr(1,yyleng-2); return 'VALUE'
 \s+                   /* skip whitespace */
 "#".*                 /* ignore comment */
-\"[^\"]*\"            yytext = yytext.substr(1,yyleng-2); return 'VALUE'
 [0-9]+\.[0-9]+        yytext = parseFloat(yytext, 10); return 'VALUE'
 [0-9]+                yytext = parseInt(yytext, 10); return 'VALUE'
 "true"                yytext = true; return 'VALUE'
@@ -15,12 +15,28 @@
 "["                   return 'ARRAY_START'
 "]"                   return 'ARRAY_STOP'
 "=>"                  return 'SET'
-[0-9a-zA-Z]+          return 'ID'
 ","                   return 'COMA'
+"if"                  return 'IF'
+"else"                return 'ELSE'
+"=="                  return 'BINARY_OPERATOR'
+"!="                  return 'BINARY_OPERATOR'
+"<"                   return 'BINARY_OPERATOR'
+">"                   return 'BINARY_OPERATOR'
+"<="                  return 'BINARY_OPERATOR'
+">="                  return 'BINARY_OPERATOR'
+"=~"                  return 'BINARY_OPERATOR'
+"!~"                  return 'BINARY_OPERATOR'
+"and"                 return 'CONDITION_OPERATOR'
+"or"                  return 'CONDITION_OPERATOR'
+"nand"                return 'CONDITION_OPERATOR'
+"xor"                 return 'CONDITION_OPERATOR'
+[0-9a-zA-Z]+          return 'ID'
 <<EOF>>               return 'EOF'
 .                     return 'INVALID'
 
 /lex
+
+%left "and" "or" "nand" "xor"
 
 %start logstash_config
 
@@ -48,6 +64,36 @@ lines
   { $$ = $1.concat($2) }
   | line
   { $$ = [$1] }
+  | if
+  { $$ = [$1] }
+  ;
+
+if
+  : IF condition START lines STOP
+  { $$ = {__if__: {ifs: [{cond: $2, then: $4}]}}}
+  | IF condition START lines STOP ELSE if
+  { $$ = $7; $$.__if__.ifs = [{cond: $2, then: $4}].concat($$.__if__.ifs) }
+  | IF condition START lines STOP ELSE START lines STOP
+  { $$ = {__if__: {ifs: [{cond: $2, then: $4}], else: $8}}}
+  ;
+
+condition
+  : sub_condition CONDITION_OPERATOR condition
+  { $$ = {op: $2, left: $1, right: $3}}
+  | sub_condition
+  { $$ = $1 }
+  ;
+
+sub_condition
+  : condition_member BINARY_OPERATOR condition_member
+  { $$ = {op: $2, left: $1, right: $3}}
+  ;
+
+condition_member
+  : ARRAY_START ID ARRAY_STOP
+  { $$ = {field: $2} }
+  | value
+  { $$ = {value: $1} }
   ;
 
 line
