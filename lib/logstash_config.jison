@@ -1,7 +1,7 @@
 
 %{
   function process_string(s) {
-    return s.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t').replace(/\\"/, '"');
+    return s.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t').replace(/\\"/g, '"');
   }
 %}
 
@@ -57,14 +57,14 @@ logstash_config
 
 main_lines
   : main_line
-  { $$ = $1 }
+  { $$ = {}; $$[$1.key] = $1.value }
   | main_lines main_line
-  { $$ = $1; k = Object.keys($2); $$[k] = $2[k] }
+  { $$ = $1; $$[$2.key] = $2.value }
   ;
 
 main_line
   : ID START lines STOP
-  { $$ = {}; $$[$1] = $3}
+  { $$ = {key: $1, value: $3} }
   ;
 
 lines
@@ -122,16 +122,16 @@ plugin_params
 
 params
   : params param
-  { $$ = $1; k = Object.keys($2); $$[k] = $2[k] }
+  { $$ = $1; $$[$2.key] = $2.value }
   | params COMA param
-  { $$ = $1; k = Object.keys($3); $$[k] = $3[k] }
+  { $$ = $1; $$[$3.key] = $3.value }
   | param
-  { $$ = $1 }
+  { $$ = {}; $$[$1.key] = $1.value }
   ;
 
 param
   : ID SET value
-  { $$ = {}; $$[$1] = $3}
+  { $$ = {key: $1, value: $3} }
   ;
 
 value
