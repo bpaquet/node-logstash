@@ -14,6 +14,8 @@
 "}"                   return 'STOP'
 "["                   return 'ARRAY_START'
 "]"                   return 'ARRAY_STOP'
+"("                   return 'PARENTHESIS_START'
+")"                   return 'PARENTHESIS_STOP'
 "=>"                  return 'SET'
 ","                   return 'COMA'
 "if"                  return 'IF'
@@ -26,17 +28,17 @@
 ">="                  return 'BINARY_OPERATOR'
 "=~"                  return 'BINARY_OPERATOR'
 "!~"                  return 'BINARY_OPERATOR'
+"not in"              return 'BINARY_OPERATOR'
+"in"                  return 'BINARY_OPERATOR'
+"!"                   return 'UNARY_OPERATOR'
 "and"                 return 'CONDITION_OPERATOR'
 "or"                  return 'CONDITION_OPERATOR'
 "nand"                return 'CONDITION_OPERATOR'
 "xor"                 return 'CONDITION_OPERATOR'
 [0-9a-zA-Z]+          return 'ID'
 <<EOF>>               return 'EOF'
-.                     return 'INVALID'
 
 /lex
-
-%left "and" "or" "nand" "xor"
 
 %start logstash_config
 
@@ -78,7 +80,7 @@ if
   ;
 
 condition
-  : sub_condition CONDITION_OPERATOR condition
+  : condition CONDITION_OPERATOR condition
   { $$ = {op: $2, left: $1, right: $3}}
   | sub_condition
   { $$ = $1 }
@@ -87,6 +89,10 @@ condition
 sub_condition
   : condition_member BINARY_OPERATOR condition_member
   { $$ = {op: $2, left: $1, right: $3}}
+  | PARENTHESIS_START condition PARENTHESIS_STOP
+  { $$ = $2 }
+  | UNARY_OPERATOR sub_condition
+  { $$ = {op: $1, left: $2}}
   ;
 
 condition_member
