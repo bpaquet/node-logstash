@@ -1,21 +1,25 @@
 var vows = require('vows'),
   assert = require('assert'),
   fs = require('fs'),
+  config_mapper = require('lib/config_mapper'),
   logstash_config = require('logstash_config');
 
-function check(s, r) {
+function check(s, r1, r2) {
   return {
     topic: function() {
       return logstash_config.parse(s);
     },
     check: function(result) {
-      assert.deepEqual(result, r);
+      assert.deepEqual(result, r1);
+      if (r2) {
+        assert.deepEqual(config_mapper.map(r1), r2);
+      }
     }
   };
 }
 
-function check_file(f, r) {
-  return check(fs.readFileSync(f).toString(), r);
+function check_file(f, r1, r2) {
+  return check(fs.readFileSync(f).toString(), r1, r2);
 }
 
 vows.describe('Logstash parser config').addBatch({
@@ -23,29 +27,29 @@ vows.describe('Logstash parser config').addBatch({
     input: [{
       stdin: {}
     }]
-  }),
+  }, ['input://stdin://']),
   'simple with comment': check('# this is a comment\ninput {stdin {}}', {
     input: [{
       stdin: {}
     }]
-  }),
+  }, ['input://stdin://']),
   'simple multi line': check('input {\nstdin      {\n\n}}', {
     input: [{
       stdin: {}
     }]
-  }),
+  }, ['input://stdin://']),
   'simple multi line with comment': check('# this is a comment\ninput { #this is a comment\nstdin {}}', {
     input: [{
       stdin: {}
     }]
-  }),
+  }, ['input://stdin://']),
   'two lines': check('output {\nelasticsearch {}\nstdout {}\n}', {
     output: [{
       elasticsearch: {}
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://', 'output://stdout://']),
   'input and output': check('input {stdin {}}\noutput { stdout {}}', {
     input: [{
       stdin: {}
@@ -53,7 +57,7 @@ vows.describe('Logstash parser config').addBatch({
     output: [{
       stdout: {}
     }]
-  }),
+  }, ['input://stdin://', 'output://stdout://']),
   'plugin config id value': check('output {\nelasticsearch { host => localhost }\nstdout { }\n}', {
     output: [{
       elasticsearch: {
@@ -62,7 +66,7 @@ vows.describe('Logstash parser config').addBatch({
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://?host=localhost', 'output://stdout://']),
   'plugin config id string': check('output {\nelasticsearch { host => "localhost" }\nstdout { }\n}', {
     output: [{
       elasticsearch: {
@@ -71,7 +75,7 @@ vows.describe('Logstash parser config').addBatch({
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://?host=localhost', 'output://stdout://']),
   'plugin config id string with "': check_file('test/parser/special_chars_quotes', {
     output: [{
       elasticsearch: {
@@ -80,7 +84,7 @@ vows.describe('Logstash parser config').addBatch({
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://?host=%22localhost', 'output://stdout://']),
   'plugin config id string with \\n': check_file('test/parser/special_chars_new_line', {
     output: [{
       elasticsearch: {
@@ -98,7 +102,16 @@ vows.describe('Logstash parser config').addBatch({
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://?host=%C3%A9%C3%A0localhost', 'output://stdout://']),
+  'plugin config id string with space': check_file('test/parser/special_chars_space', {
+    output: [{
+      elasticsearch: {
+        host: 'local host'
+      }
+    }, {
+      stdout: {}
+    }]
+  }, ['output://elasticsearch://?host=local%20host', 'output://stdout://']),
   'plugin config id string with strange chars': check('output {\nelasticsearch { host => "[]\'!()localhost" }\nstdout { }\n}', {
     output: [{
       elasticsearch: {
@@ -107,7 +120,7 @@ vows.describe('Logstash parser config').addBatch({
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://?host=%5B%5D\'!()localhost', 'output://stdout://']),
   'plugin config id string with empty string': check('output {\nelasticsearch { host => "" }\nstdout { }\n}', {
     output: [{
       elasticsearch: {
@@ -127,7 +140,7 @@ vows.describe('Logstash parser config').addBatch({
         host: 3.4
       }
     }]
-  }),
+  }, ['output://elasticsearch://?host=12', 'output://stdout://?host=3.4']),
   'plugin config bool': check('output {\nelasticsearch { host => true }\nstdout { host => false}\n}', {
     output: [{
       elasticsearch: {
@@ -138,7 +151,7 @@ vows.describe('Logstash parser config').addBatch({
         host: false
       }
     }]
-  }),
+  }, ['output://elasticsearch://?host=true', 'output://stdout://?host=false']),
   'plugin config array': check('output {\nelasticsearch { match => [ "timestamp" , "dd/MMM/yyyy:HH:mm:ss Z" ] }\nstdout {}\n}', {
     output: [{
       elasticsearch: {
@@ -147,7 +160,7 @@ vows.describe('Logstash parser config').addBatch({
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://?match=timestamp&match=dd%2FMMM%2Fyyyy%3AHH%3Amm%3Ass%20Z', 'output://stdout://']),
   'plugin multiple params, same line': check('output {\nelasticsearch { host => localhost, port => 354 }\nstdout {}\n}', {
     output: [{
       elasticsearch: {
@@ -157,7 +170,7 @@ vows.describe('Logstash parser config').addBatch({
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://?host=localhost&port=354', 'output://stdout://']),
   'plugin multiple params, multi lines': check('output {\nelasticsearch { host => localhost\nport => 354 }\nstdout {}\n}', {
     output: [{
       elasticsearch: {
@@ -167,7 +180,7 @@ vows.describe('Logstash parser config').addBatch({
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://?host=localhost&port=354', 'output://stdout://']),
   'conditional plugin': check('filter {\nif [action] == "login" {\nmutate { remove => "secret" }\n}\n}', {
     filter: [{
       __if__: {

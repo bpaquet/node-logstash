@@ -14,7 +14,7 @@ var optimist = require('optimist'),
 var argv = optimist.argv;
 
 function help() {
-  console.log('Syntax : node-logstasth-agent [--log_level=info] [--log_file=file] [--config_file=toto.json] [--config_dir=/etc/config] urls');
+  console.log('Syntax : node-logstasth-agent [--log_level=info] [--log_file=file] [--config_file=toto] [--config_dir=/etc/config] urls');
   console.log('Url examples: ');
   console.log('- input://stdin://');
   console.log('- input://file://main_input.txt?type=toto');
@@ -126,7 +126,7 @@ function after_config_directory(config) {
 function after_config_file(config) {
   if (argv.config_dir) {
     logger.info('Loading config files from : ' + argv.config_dir);
-    file_loader.loadDirectory(argv.config_dir, function(err, result) {
+    file_loader.loadDirectory(argv.config_dir, true, function(err, result) {
       if (err) {
         log_error('Unable to load config from directory');
         log_error(err.stack);
@@ -147,9 +147,9 @@ function after_config_file(config) {
 function load_config_file(config) {
   if (argv.config_file) {
     logger.info('Loading config file : ' + argv.config_file);
-    file_loader.loadFile(argv.config_file, function(err, result) {
+    file_loader.loadFile(argv.config_file, true, function(err, result) {
       if (err) {
-        log_error('Unable to load config file');
+        log_error('Unable to load config file', argv.config_file);
         log_error(err.stack);
         setTimeout(function() {
           process.exit(1);
@@ -170,7 +170,9 @@ function main_start() {
     'filter://add_host://',
     'filter://add_timestamp://',
     'filter://add_version://',
-  ].concat(argv._));
+  ].concat(argv._.map(function(x) {
+    return file_loader.filter(true, x)[0];
+  })));
 }
 
 function close() {
