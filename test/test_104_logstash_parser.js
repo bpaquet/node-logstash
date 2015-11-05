@@ -1,8 +1,13 @@
 var vows = require('vows'),
   assert = require('assert'),
   fs = require('fs'),
+  querystring = require('querystring'),
   config_mapper = require('lib/config_mapper'),
   logstash_config = require('logstash_config');
+
+function build_cond(x) {
+  return querystring.escape(JSON.stringify(x));
+}
 
 function check(s, r1, r2) {
   return {
@@ -129,7 +134,7 @@ vows.describe('Logstash parser config').addBatch({
     }, {
       stdout: {}
     }]
-  }),
+  }, ['output://elasticsearch://?host=', 'output://stdout://']),
   'plugin config id number': check('output {\nelasticsearch { host => 12 }\nstdout { host => 3.4 }\n}', {
     output: [{
       elasticsearch: {
@@ -198,7 +203,14 @@ vows.describe('Logstash parser config').addBatch({
         }]
       }
     }]
-  }),
+  }, ['filter://mutate://?remove=secret&__dynamic_eval__=' + build_cond({
+    false_clauses: [],
+    true_clause: {
+      op: '==',
+      left: {field: 'action'},
+      right: {value: 'login'}
+    }
+  })]),
   'conditional plugin multiple conditions, two plugins in then': check('filter {\nif [action] == "login" and 23 != [action] {\nmutate { remove => "secret" }\nmutate { remove => "secret2" }}\n}', {
     filter: [{
       __if__: {
@@ -228,7 +240,37 @@ vows.describe('Logstash parser config').addBatch({
         }]
       }
     }]
-  }),
+  }, ['filter://mutate://?remove=secret&__dynamic_eval__=' + build_cond({
+    false_clauses: [],
+    true_clause: {
+      op: 'and',
+      left: {
+        op: '==',
+        left: {field: 'action'},
+        right: {value: 'login'}
+      },
+      right: {
+        op: '!=',
+        left:{value: 23},
+        right:{field: 'action'}
+      }
+    }
+  }), 'filter://mutate://?remove=secret2&__dynamic_eval__=' + build_cond({
+    false_clauses: [],
+    true_clause: {
+      op: 'and',
+      left: {
+        op: '==',
+        left: {field: 'action'},
+        right: {value: 'login'}
+      },
+      right: {
+        op: '!=',
+        left:{value: 23},
+        right:{field: 'action'}
+      }
+    }
+  })]),
   'conditional plugin regexp and else': check('filter {\nif [action] =~ "login" {\nmutate { remove => "secret" }}\nelse{ mutate { remove => "secret2"}}\n}', {
     filter: [{
       __if__: {
@@ -285,7 +327,35 @@ vows.describe('Logstash parser config').addBatch({
         }]
       }
     }]
-  }),
+  }, ['filter://mutate://?remove=secret&__dynamic_eval__=' + build_cond({
+    false_clauses: [],
+    true_clause: {
+      op: '=~',
+      left: {field: 'action'},
+      right: {value: 'login'}
+    }
+  }), 'filter://mutate://?remove=secret3&__dynamic_eval__=' + build_cond({
+    false_clauses: [{
+      op: '=~',
+      left: {field: 'action'},
+      right: {value: 'login'}
+    }],
+    true_clause: {
+      op: '==',
+      left: {field: 'action'},
+      right: {value: 'logout'}
+    }
+  }), 'filter://mutate://?remove=secret2&__dynamic_eval__=' + build_cond({
+    false_clauses: [{
+      op: '=~',
+      left: {field: 'action'},
+      right: {value: 'login'}
+    }, {
+      op: '==',
+      left: {field: 'action'},
+      right: {value: 'logout'}
+    }],
+  })]),
   'conditional plugin not in': check('filter {\nif [action] not in ["login", "logout", "reset"] {\nmutate { remove => "secret" }\n}\n}', {
     filter: [{
       __if__: {
