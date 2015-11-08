@@ -1,0 +1,27 @@
+
+filter {
+  if [message] =~ 'cd' {
+    compute_field {
+      field => toto
+      value => tata
+    }
+  }
+  else if [message] =~ 'ef' {
+    compute_field {
+      field => toto
+      value => titi
+    }
+  }
+  else {
+    compute_field {
+      field => toto
+      value => tutu
+    }
+  }
+}
+output {
+  file {
+    path => output.txt
+    serializer => json_logstash
+  }
+}

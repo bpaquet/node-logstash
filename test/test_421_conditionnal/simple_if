@@ -1,0 +1,9 @@
+
+output {
+  if [message] != "abcd" {
+    file {
+      path => output.txt
+      serializer => json_logstash
+    }
+  }
+}

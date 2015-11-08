@@ -1,0 +1,7 @@
+output {
+  elasticsearch {
+    host => '\'localhost'
+    host2 => '"localhost'
+  }
+  stdout { }
+}

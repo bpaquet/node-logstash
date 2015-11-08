@@ -141,6 +141,26 @@ var op11 = {
   }
 };
 
+var op12 = {
+  op: '=~',
+  left: {
+    field: 'type',
+  },
+  right: {
+    regexp: '12'
+  }
+};
+
+var op13 = {
+  op: '=~',
+  left: {
+    field: 'type',
+  },
+  right: {
+    regexp: '/12'
+  }
+};
+
 vows.describe('Condition evaluator').addBatch({
   'simple equal': check(op1, {}, false),
   'equal 1': check(op2, {}, false),
@@ -183,4 +203,21 @@ vows.describe('Condition evaluator').addBatch({
   '<= 2': check(op10, {type: '35.2', message: 35.1}, false),
   '< 1': check(op11, {type: '35.2', message: 35.2}, false),
   '< 2': check(op11, {type: '35.2', message: 35.4}, true),
+  '! < 1': check({op: '!', left: op11}, {type: '35.2', message: 35.4}, false),
+  '! == 1': check({op: '!', left: op1}, {}, true),
+  '! string': check_error({op: '!', left: 'aaa'}, {}, /Not a boolean/),
+  '! bool': check({op: '!', left: 'false'}, {}, true),
+  'and 1': check({op: 'and', left: 'true', right: true}, {}, true),
+  'and 2': check({op: 'and', left: 'true', right: op1}, {}, false),
+  'and 3': check({op: 'and', left: 'true', right: {op: '!', left: op1}}, {}, true),
+  'or 1': check({op: 'or', left: 'false', right: {op: '!', left: op1}}, {}, true),
+  'xor 1': check({op: 'xor', left: 'false', right: {op: '!', left: op1}}, {}, true),
+  'xor 2': check({op: 'xor', left: 'true', right: {op: '!', left: op1}}, {}, false),
+  'nand 1': check({op: 'nand', left: 'true', right: {op: '!', left: op1}}, {}, false),
+  'nand 2': check({op: 'nand', left: 'false', right: {op: '!', left: op1}}, {}, true),
+  'regex2 1': check(op12, {type: 12}, true),
+  'regex2 2': check(op12, {type: 13}, false),
+  'regex2 3': check(op12, {}, false),
+  'regex2 4': check(op13, {type: 'aaaa/12'}, true),
+  'regex2 5': check(op13, {type: 'aaaa#12'}, false),
 }).export(module);

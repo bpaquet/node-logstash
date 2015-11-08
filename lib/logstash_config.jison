@@ -1,7 +1,7 @@
 
 %{
   function process_string(s) {
-    return s.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t').replace(/\\"/g, '"');
+    return s.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t').replace(/\\"/g, '"').replace(/\\'/g, '\'').replace(/\\\//g, '/');
   }
 %}
 
@@ -9,40 +9,42 @@
 %lex
 %%
 
-\"(\\\"|[^\"])*\"     yytext = process_string(yytext.substr(1, yyleng - 2)); return 'VALUE'
-\s+                   /* skip whitespace */
-"#".*                 /* ignore comment */
-[0-9]+\.[0-9]+        yytext = parseFloat(yytext, 10); return 'VALUE'
-[0-9]+                yytext = parseInt(yytext, 10); return 'VALUE'
-"true"                yytext = true; return 'VALUE'
-"false"               yytext = false; return 'VALUE'
-"{"                   return 'START'
-"}"                   return 'STOP'
-"["                   return 'ARRAY_START'
-"]"                   return 'ARRAY_STOP'
-"("                   return 'PARENTHESIS_START'
-")"                   return 'PARENTHESIS_STOP'
-"=>"                  return 'SET'
-","                   return 'COMA'
-"if"                  return 'IF'
-"else"                return 'ELSE'
-"=="                  return 'BINARY_OPERATOR'
-"!="                  return 'BINARY_OPERATOR'
-"<"                   return 'BINARY_OPERATOR'
-">"                   return 'BINARY_OPERATOR'
-"<="                  return 'BINARY_OPERATOR'
-">="                  return 'BINARY_OPERATOR'
-"=~"                  return 'BINARY_OPERATOR'
-"!~"                  return 'BINARY_OPERATOR'
-"not in"              return 'BINARY_OPERATOR'
-"in"                  return 'BINARY_OPERATOR'
-"!"                   return 'UNARY_OPERATOR'
-"and"                 return 'CONDITION_OPERATOR'
-"or"                  return 'CONDITION_OPERATOR'
-"nand"                return 'CONDITION_OPERATOR'
-"xor"                 return 'CONDITION_OPERATOR'
-[0-9a-zA-Z]+          return 'ID'
-<<EOF>>               return 'EOF'
+\"(\\\"|[^\"])*\"                   yytext = process_string(yytext.substr(1, yyleng - 2)); return 'VALUE'
+\'(\\\'|[^\'])*\'                   yytext = process_string(yytext.substr(1, yyleng - 2)); return 'VALUE'
+\/(\\\/|[^\/])*\/                   yytext = process_string(yytext.substr(1, yyleng - 2)); return 'REGEXP'
+\s+                                 /* skip whitespace */
+"#".*                               /* ignore comment */
+[0-9]+\.[0-9]+                      yytext = parseFloat(yytext, 10); return 'VALUE'
+[0-9]+                              yytext = parseInt(yytext, 10); return 'VALUE'
+"true"                              yytext = true; return 'VALUE'
+"false"                             yytext = false; return 'VALUE'
+"{"                                 return 'START'
+"}"                                 return 'STOP'
+"["                                 return 'ARRAY_START'
+"]"                                 return 'ARRAY_STOP'
+"("                                 return 'PARENTHESIS_START'
+")"                                 return 'PARENTHESIS_STOP'
+"=>"                                return 'SET'
+","                                 return 'COMA'
+"if"                                return 'IF'
+"else"                              return 'ELSE'
+"=="                                return 'BINARY_OPERATOR'
+"!="                                return 'BINARY_OPERATOR'
+"<"                                 return 'BINARY_OPERATOR'
+">"                                 return 'BINARY_OPERATOR'
+"<="                                return 'BINARY_OPERATOR'
+">="                                return 'BINARY_OPERATOR'
+"=~"                                return 'BINARY_OPERATOR'
+"!~"                                return 'BINARY_OPERATOR'
+"not in"                            return 'BINARY_OPERATOR'
+"in"                                return 'BINARY_OPERATOR'
+"!"                                 return 'UNARY_OPERATOR'
+"and"                               return 'CONDITION_OPERATOR'
+"or"                                return 'CONDITION_OPERATOR'
+"nand"                              return 'CONDITION_OPERATOR'
+"xor"                               return 'CONDITION_OPERATOR'
+[0-9a-zA-Z_\-\.]+                   return 'ID'
+<<EOF>>                             return 'EOF'
 
 /lex
 
@@ -104,6 +106,8 @@ sub_condition
 condition_member
   : ARRAY_START ID ARRAY_STOP
   { $$ = {field: $2} }
+  | REGEXP
+  { $$ = {regexp: $1} }
   | value
   { $$ = {value: $1} }
   ;

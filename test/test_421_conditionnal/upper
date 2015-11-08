@@ -1,0 +1,16 @@
+
+filter {
+  if [message] > 30 {
+    compute_field {
+      field => toto
+      value => tata
+    }
+  }
+}
+
+output {
+  file {
+    path => output.txt
+    serializer => json_logstash
+  }
+}

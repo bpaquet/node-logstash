@@ -81,15 +81,35 @@ vows.describe('Logstash parser config').addBatch({
       stdout: {}
     }]
   }, ['output://elasticsearch://?host=localhost', 'output://stdout://']),
-  'plugin config id string with "': check_file('test/parser/special_chars_quotes', {
+  'plugin config id string sinle quote': check('output {\nelasticsearch { host => \'localhost\' }\nstdout { }\n}', {
     output: [{
       elasticsearch: {
-        host: '"localhost'
+        host: 'localhost'
       }
     }, {
       stdout: {}
     }]
-  }, ['output://elasticsearch://?host=%22localhost', 'output://stdout://']),
+  }, ['output://elasticsearch://?host=localhost', 'output://stdout://']),
+  'plugin config id string with "': check_file('test/parser/special_chars_quotes', {
+    output: [{
+      elasticsearch: {
+        host: '"localhost',
+        host2: '\'localhost',
+      }
+    }, {
+      stdout: {}
+    }]
+  }, ['output://elasticsearch://?host=%22localhost&host2=\'localhost', 'output://stdout://']),
+  'plugin config id string with \' single quote': check_file('test/parser/special_chars_quotes_single_quotes', {
+    output: [{
+      elasticsearch: {
+        host: '\'localhost',
+        host2 : '"localhost'
+      }
+    }, {
+      stdout: {}
+    }]
+  }, ['output://elasticsearch://?host=\'localhost&host2=%22localhost', 'output://stdout://']),
   'plugin config id string with \\n': check_file('test/parser/special_chars_new_line', {
     output: [{
       elasticsearch: {
@@ -186,6 +206,13 @@ vows.describe('Logstash parser config').addBatch({
       stdout: {}
     }]
   }, ['output://elasticsearch://?host=localhost&port=354', 'output://stdout://']),
+  'special chars in ids': check('input {\ncompute_field {path => input.txt}\n}', {
+    input: [{
+      compute_field: {
+        path: 'input.txt'
+      }
+    }]
+  }, ['input://compute_field://?path=input.txt']),
   'conditional plugin': check('filter {\nif [action] == "login" {\nmutate { remove => "secret" }\n}\n}', {
     filter: [{
       __if__: {
@@ -271,14 +298,14 @@ vows.describe('Logstash parser config').addBatch({
       }
     }
   })]),
-  'conditional plugin regexp and else': check('filter {\nif [action] =~ "login" {\nmutate { remove => "secret" }}\nelse{ mutate { remove => "secret2"}}\n}', {
+  'conditional plugin regexp and else': check('filter {\nif [action] =~ /\\/login/ {\nmutate { remove => "secret" }}\nelse{ mutate { remove => "secret2"}}\n}', {
     filter: [{
       __if__: {
         ifs: [{
           cond: {
             op: '=~',
             left: {field: 'action'},
-            right: {value: 'login'}
+            right: {regexp: '/login'}
           },
           then: [{
             mutate: {
@@ -294,14 +321,14 @@ vows.describe('Logstash parser config').addBatch({
       }
     }]
   }),
-  'conditional plugin regexp, else, else if': check('filter {\nif [action] =~ "login" {\nmutate { remove => "secret" }}\nelse if [action] == "logout" { mutate { remove => "secret3"}}\nelse{ mutate { remove => "secret2"}}\n}', {
+  'conditional plugin regexp, else, else if': check('filter {\nif [action] =~ /login/ {\nmutate { remove => "secret" }}\nelse if [action] == "logout" { mutate { remove => "secret3"}}\nelse{ mutate { remove => "secret2"}}\n}', {
     filter: [{
       __if__: {
         ifs: [{
           cond: {
             op: '=~',
             left: {field: 'action'},
-            right: {value: 'login'}
+            right: {regexp: 'login'}
           },
           then: [{
             mutate: {
@@ -332,13 +359,13 @@ vows.describe('Logstash parser config').addBatch({
     true_clause: {
       op: '=~',
       left: {field: 'action'},
-      right: {value: 'login'}
+      right: {regexp: 'login'}
     }
   }), 'filter://mutate://?remove=secret3&__dynamic_eval__=' + build_cond({
     false_clauses: [{
       op: '=~',
       left: {field: 'action'},
-      right: {value: 'login'}
+      right: {regexp: 'login'}
     }],
     true_clause: {
       op: '==',
@@ -349,7 +376,7 @@ vows.describe('Logstash parser config').addBatch({
     false_clauses: [{
       op: '=~',
       left: {field: 'action'},
-      right: {value: 'login'}
+      right: {regexp: 'login'}
     }, {
       op: '==',
       left: {field: 'action'},
