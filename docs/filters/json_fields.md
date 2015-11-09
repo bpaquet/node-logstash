@@ -9,4 +9,15 @@ This allows to automatically index fields for messages that already contain a we
 
 Filter does nothing in case of error while parsing the message. Existing attributes in current line are kept, but overwritten if they conflict with attributes from the parsed payload.
 
-Example 1: ``filter://json_fields://?only_type=json_stream`` will parse, as JSON, the given stream of messages which ``type`` matches ``json_stream``.
+Example 1: will parse, as JSON, the given stream of messages which ``type`` matches ``json_stream``.
+
+Config using url : ``filter://json_fields://?only_type=json_stream``
+
+Config using logstash format :
+````
+filter {
+  if [type] == 'json_stream' {
+    json_fields
+  }
+}
+```
