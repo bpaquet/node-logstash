@@ -147,7 +147,7 @@ var op12 = {
     field: 'type',
   },
   right: {
-    regexp: '12'
+    value: '12'
   }
 };
 
@@ -157,7 +157,7 @@ var op13 = {
     field: 'type',
   },
   right: {
-    regexp: '/12'
+    value: '/12'
   }
 };
 

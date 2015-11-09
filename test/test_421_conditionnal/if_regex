@@ -1,6 +1,6 @@
 
 output {
-  if [message] =~ "ab" {
+  if [message] =~ ab {
     file {
       path => output.txt
       serializer => json_logstash

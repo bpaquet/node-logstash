@@ -1,0 +1,14 @@
+
+filter {
+  grep {
+    regex => /abcd/
+    invert => true
+  }
+}
+
+output {
+  file {
+    path => output.txt
+    serializer => json_logstash
+  }
+}

@@ -71,6 +71,14 @@ vows.describe('Conditional integration tests').addBatch(
     assert.equal('defg', l[0].message);
   })
 ).addBatch(
+  make_test('grep', [
+    'abcd',
+    'defg',
+  ], function(l) {
+    assert.equal(1, l.length);
+    assert.equal('defg', l[0].message);
+  })
+).addBatch(
   make_test('if_regex', [
     'abcd',
     'defgab',

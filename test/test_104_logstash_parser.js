@@ -305,7 +305,7 @@ vows.describe('Logstash parser config').addBatch({
           cond: {
             op: '=~',
             left: {field: 'action'},
-            right: {regexp: '/login'}
+            right: {value: '/login'}
           },
           then: [{
             mutate: {
@@ -328,7 +328,7 @@ vows.describe('Logstash parser config').addBatch({
           cond: {
             op: '=~',
             left: {field: 'action'},
-            right: {regexp: 'login'}
+            right: {value: 'login'}
           },
           then: [{
             mutate: {
@@ -359,13 +359,13 @@ vows.describe('Logstash parser config').addBatch({
     true_clause: {
       op: '=~',
       left: {field: 'action'},
-      right: {regexp: 'login'}
+      right: {value: 'login'}
     }
   }), 'filter://mutate://?remove=secret3&__dynamic_eval__=' + build_cond({
     false_clauses: [{
       op: '=~',
       left: {field: 'action'},
-      right: {regexp: 'login'}
+      right: {value: 'login'}
     }],
     true_clause: {
       op: '==',
@@ -376,7 +376,7 @@ vows.describe('Logstash parser config').addBatch({
     false_clauses: [{
       op: '=~',
       left: {field: 'action'},
-      right: {regexp: 'login'}
+      right: {value: 'login'}
     }, {
       op: '==',
       left: {field: 'action'},

@@ -11,7 +11,7 @@
 
 \"(\\\"|[^\"])*\"                   yytext = process_string(yytext.substr(1, yyleng - 2)); return 'VALUE'
 \'(\\\'|[^\'])*\'                   yytext = process_string(yytext.substr(1, yyleng - 2)); return 'VALUE'
-\/(\\\/|[^\/])*\/                   yytext = process_string(yytext.substr(1, yyleng - 2)); return 'REGEXP'
+\/(\\\/|[^\/])*\/                   yytext = process_string(yytext.substr(1, yyleng - 2)); return 'VALUE'
 \s+                                 /* skip whitespace */
 "#".*                               /* ignore comment */
 [0-9]+\.[0-9]+                      yytext = parseFloat(yytext, 10); return 'VALUE'
@@ -106,8 +106,6 @@ sub_condition
 condition_member
   : ARRAY_START ID ARRAY_STOP
   { $$ = {field: $2} }
-  | REGEXP
-  { $$ = {regexp: $1} }
   | value
   { $$ = {value: $1} }
   ;
