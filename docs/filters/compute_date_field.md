@@ -9,7 +9,7 @@ Example 1: add a field named ``toto``, containing timestamp formated with ``DD/M
 
 Config using url : ``filter://compute_date_field://toto?date_format=DD/MMMM/YYYY``
 
-Config using logstash files :
+Config using logstash format :
 
 ````
 filter {

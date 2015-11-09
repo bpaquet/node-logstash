@@ -21,7 +21,7 @@ Example 1: if ``message``field is ``hello 123``, the filter will add the field `
 
 Config using url : ``filter://grok://?grok=%{WORD:w1} %{NUMBER:num1}``
 
-Config using logstash files :
+Config using logstash format :
 ````
 filter {
   grok {
@@ -34,7 +34,7 @@ Example 2: to extract fields from a haproxy log. The ``HAPROXYHTTP`` pattern is 
 
 Config using url : ``filter://grok://only_type=haproxy&grok=%{HAPROXYHTTP}``
 
-Config using logstash files :
+Config using logstash format :
 ````
 filter {
   if [type] == haproxy {
@@ -49,7 +49,7 @@ Example 3: to load custom patterns from the ``/path/to/file`` file that defines 
 
 Config using url : ``filter://grok://?extra_patterns_file=/path/to/file&grok=%{MY_PATTERN}``
 
-Config using logstash files :
+Config using logstash format :
 ````
 filter {
   grok {

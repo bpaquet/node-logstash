@@ -13,7 +13,7 @@ Example 1: will lookup for ``ip`` field in the geoip database. The resulting obj
 
 Config using url : ``filter://geoip://ip``
 
-Config using logstash files :
+Config using logstash format :
 ````
 filter {
   geoip {

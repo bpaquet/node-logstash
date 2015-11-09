@@ -9,7 +9,7 @@ Example 1: add a field named ``toto`` with value ``abc``
 
 Config using url : ``filter://compute_field://toto?value=abc``
 
-Config using logstash files :
+Config using logstash format :
 ````
 filter {
   compute_field {
@@ -23,7 +23,7 @@ Example 2: add a field named ``toto`` with value ``abcef``, if line contain a fi
 
 Config using url : ``filter://compute_field://toto?value=abc#{titi}``
 
-Config using logstash files :
+Config using logstash format :
 ````
 filter {
   compute_field {

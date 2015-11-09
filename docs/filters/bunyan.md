@@ -9,7 +9,7 @@ Example 1 :  parse the logs with type toto, using the bunyan log format.
 
 Config using url : ``filter://bunyan://?only_type=toto``
 
-Config using logstash files :
+Config using logstash format :
 ````
 filter {
   if [type] == 'toto' {

@@ -9,7 +9,7 @@ Example 1: multiply the value of field ``delay`` by 1000.
 
 Config using url : ``filter://eval://delay?operation=x*1000``
 
-Config using logstash files :
+Config using logstash format :
 ````
 filter {
   eval {
@@ -23,7 +23,7 @@ Example 2: add ``a`` character to the field ``toto``.
 
 Config using url : ``filter://eval://toto?operation=x+%22a%22``
 
-Config using logstash files :
+Config using logstash format :
 ````
 filter {
   eval {
