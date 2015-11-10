@@ -1,0 +1,18 @@
+
+filter {
+  regex {
+    regex => /a(.*)b(.*)c/
+    fields => [toto, tata]
+    numerical_fields => [tata]
+  }
+  regex {
+    builtin_regex => syslog_no_prio
+  }
+}
+
+output {
+  file {
+    path => output.txt
+    serializer => json_logstash
+  }
+}

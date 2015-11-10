@@ -4,8 +4,11 @@ var vows = require('vows-batch-retry'),
   logger = require('log4node'),
   logstash_config = require('logstash_config'),
   config_mapper = require('lib/config_mapper'),
+  patterns_loader = require('../lib/lib/patterns_loader'),
   async = require('async'),
   agent = require('agent');
+
+patterns_loader.add('lib/patterns');
 
 function make_test(config_file, input, output_callback) {
   var r = {};
@@ -109,5 +112,16 @@ vows.describe('Conditional integration tests').addBatch(
     assert.equal(undefined, l[0].toto);
     assert.equal('tata', l[1].toto);
     assert.equal(undefined, l[2].toto);
+  })
+).addBatch(
+  make_test('regex', [
+    'atitib67c',
+    'Sep 14 02:01:37 lb haproxy[11223]: 127.0.0.1:12345 [14/Sep/2014:02:01:37.452] public nginx/server1 0/0/0/5/5 200 490 - - ---- 1269/1269/0/1/0 0/0 "GET /my/path HTTP/1.1"'
+  ], function(l) {
+    assert.equal(l.length, 2);
+    assert.equal('titi', l[0].toto);
+    assert.equal(67, l[0].tata);
+    assert.equal('haproxy', l[1].syslog_program);
+    assert.equal(11223, l[1].syslog_pid);
   })
 ).export(module);

@@ -81,6 +81,16 @@ vows.describe('Logstash parser config').addBatch({
       stdout: {}
     }]
   }, ['output://elasticsearch://?host=localhost', 'output://stdout://']),
+  'plugin config regex': check('output {\nregex { regex => /localhost/\n fields => [toto, "tata"]}\nstdout { }\n}', {
+    output: [{
+      regex: {
+        regex: 'localhost',
+        fields: ['toto', 'tata']
+      }
+    }, {
+      stdout: {}
+    }]
+  }, ['output://regex://?regex=localhost&fields=toto&fields=tata', 'output://stdout://']),
   'plugin config id string sinle quote': check('output {\nelasticsearch { host => \'localhost\' }\nstdout { }\n}', {
     output: [{
       elasticsearch: {
@@ -298,14 +308,14 @@ vows.describe('Logstash parser config').addBatch({
       }
     }
   })]),
-  'conditional plugin regexp and else': check('filter {\nif [action] =~ /\\/login/ {\nmutate { remove => "secret" }}\nelse{ mutate { remove => "secret2"}}\n}', {
+  'conditional plugin regexp and else': check('filter {\nif [action] =~ /\\/\\dlogin/ {\nmutate { remove => "secret" }}\nelse{ mutate { remove => "secret2"}}\n}', {
     filter: [{
       __if__: {
         ifs: [{
           cond: {
             op: '=~',
             left: {field: 'action'},
-            right: {value: '/login'}
+            right: {value: '/\\dlogin'}
           },
           then: [{
             mutate: {

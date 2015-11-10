@@ -161,6 +161,16 @@ var op13 = {
   }
 };
 
+var op14 = {
+  op: '=~',
+  left: {
+    field: 'type',
+  },
+  right: {
+    value: '56.'
+  }
+};
+
 vows.describe('Condition evaluator').addBatch({
   'simple equal': check(op1, {}, false),
   'equal 1': check(op2, {}, false),
@@ -220,4 +230,6 @@ vows.describe('Condition evaluator').addBatch({
   'regex2 3': check(op12, {}, false),
   'regex2 4': check(op13, {type: 'aaaa/12'}, true),
   'regex2 5': check(op13, {type: 'aaaa#12'}, false),
+  'regex2 6': check(op14, {type: '567'}, true),
+  'regex2 7': check(op14, {type: '597'}, false),
 }).export(module);
