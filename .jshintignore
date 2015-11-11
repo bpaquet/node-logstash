@@ -1,2 +1,3 @@
+test/maxmind_db.sh
 lib/logstash_config.js
 lib/logstash_config.jison

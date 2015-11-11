@@ -48,6 +48,47 @@ vows.describe('Filter Geoip ').addBatch({
       'ip_geo_lonlat': [ip2_res.ll[1], ip2_res.ll[0]]
     },
   ]),
+  'normal with maxmind plugin': filter_helper.create('geoip', 'ip?maxmind_dir=test/maxmind', [
+    {
+      'titi': 'tata'
+    },
+    {
+      'titi': 'tata',
+      'ip': 'toto'
+    },
+    {
+      'titi': 'tata',
+      'ip': ip1
+    },
+    {
+      'titi': 'tata',
+      'ip': ip2
+    },
+  ], [
+    {
+      'titi': 'tata'
+    },
+    {
+      'titi': 'tata',
+      'ip': 'toto'
+    },
+    {
+      'titi': 'tata',
+      'ip': ip1,
+      'ip_geo_country': ip1_res.country,
+      'ip_geo_lonlat': [ip1_res.ll[1], ip1_res.ll[0]],
+      'ip_geo_asn': 'AS16276 OVH SAS',
+    },
+    {
+      'titi': 'tata',
+      'ip': ip2,
+      'ip_geo_country': ip2_res.country,
+      'ip_geo_region': ip2_res.region,
+      'ip_geo_city': ip2_res.city,
+      'ip_geo_lonlat': [ip2_res.ll[1], ip2_res.ll[0]],
+      'ip_geo_asn': 'AS12322 Free SAS',
+    },
+  ]),
   'hide city': filter_helper.create('geoip', 'ip?city_field=none', [
     {
       'titi': 'tata',

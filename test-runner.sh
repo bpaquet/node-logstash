@@ -11,6 +11,10 @@ export PATH="/usr/sbin:node_modules/.bin:$PATH"
 export TZ="Etc/GMT"
 export NODE_PATH="test:lib:$NODE_PATH"
 
+if [ ! -d test/maxmind ]; then
+  test/maxmind_db.sh
+fi
+
 echo "Launching test : $TEST"
 
 if [ "$COVER" != "" ]; then

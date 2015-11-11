@@ -26,7 +26,7 @@ if [ "SSH_LD_LIBRARY_PATH" != "" ]; then
 fi
 
 echo "Using node version $NODE_VERSION"
-rsync -avh --delete --exclude=.git --exclude=node_modules --exclude=coverage ../node-logstash/ $TARGET:node-logstash_$NODE_VERSION/
+rsync -avh --delete --exclude=.git --exclude=test/maxmind --exclude=node_modules --exclude=coverage ../node-logstash/ $TARGET:node-logstash_$NODE_VERSION/
 ssh $TARGET "source .nvm/nvm.sh && nvm use $NODE_VERSION && cd node-logstash_$NODE_VERSION && echo $NODE_VERSION > .node_version && $COMMAND"
 
 if [ "$COVER" != "" ]; then
