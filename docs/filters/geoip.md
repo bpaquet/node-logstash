@@ -49,8 +49,7 @@ Parameters:
 * ``asn_field``: field in which to store the asn result. Default value : ``ip_geo_asn``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip asn result will not be stored.
 * ``cache_*``: cache configuration. More doc at [cache](../cache.md).
 
-Note if you are using the native package
----
+#### Note if you are using the native package
 
 For reduce the size of the package, the native package does not contains any geoip database.
 The recommended mode is ``node-maxmind``.
