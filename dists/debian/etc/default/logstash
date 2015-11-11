@@ -1,1 +1,0 @@
-NODE_OPTS="--config_dir /etc/logstash.d --log_level info "

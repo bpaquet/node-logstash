@@ -6,10 +6,9 @@ Status : core plugin, unit tested and maintained.
 The multiline filter is used to regroup lines into blocks. For example, you can group lines from a Java stacktrace into single line of log. To do that, you have to provide a regular expression which match the first line of each block. Standard way is to detect a timestamp.
 
 Example 1: to regroup lines by blocks, each block have to start with a line with a date like ``2012-12-02``
+Config using url: ``filter://multiline://?start_line_regex=^\\d{4}-\\d{2}-\\d{2}``
 
-Config using url : ``filter://multiline://?start_line_regex=^\\d{4}-\\d{2}-\\d{2}``
-
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   multiline {

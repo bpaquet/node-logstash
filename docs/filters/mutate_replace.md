@@ -5,11 +5,11 @@ Status : core plugin, unit tested and maintained.
 
 The mutate replace filter is used to run regex on specified field.
 
-Example: replace all ``.`` in ``toto`` field by ``-``
+Example 1: replace all ``.`` in ``toto`` field by ``-``
 
-Config using url : ``filter://mutate_replace://toto?from=\\.&to=-``
+Config using url: ``filter://mutate_replace://toto?from=\\.&to=-``
 
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   mutate_replace {

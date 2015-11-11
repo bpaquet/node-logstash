@@ -81,6 +81,24 @@ vows.describe('Logstash parser config').addBatch({
       stdout: {}
     }]
   }, ['output://elasticsearch://?host=localhost', 'output://stdout://']),
+  'plugin config id ip': check('output {\nelasticsearch { host => 127.0.0.1 }\nstdout { }\n}', {
+    output: [{
+      elasticsearch: {
+        host: '127.0.0.1'
+      }
+    }, {
+      stdout: {}
+    }]
+  }, ['output://elasticsearch://?host=127.0.0.1', 'output://stdout://']),
+  'plugin config id dot': check('output {\nelasticsearch { file => output.txt }\nstdout { }\n}', {
+    output: [{
+      elasticsearch: {
+        file: 'output.txt'
+      }
+    }, {
+      stdout: {}
+    }]
+  }, ['output://elasticsearch://?file=output.txt', 'output://stdout://']),
   'plugin config regex': check('output {\nregex { regex => /localhost/\n fields => [toto, "tata"]}\nstdout { }\n}', {
     output: [{
       regex: {

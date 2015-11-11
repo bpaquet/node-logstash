@@ -5,11 +5,10 @@ Status : core plugin, unit tested and maintained.
 
 The remove field when equal filter allow to remove a message when equal to a given value. Typical usage is to remove field containing ``-`` in apache or nginx logs.
 
-Example : will remove the field ``http_user`` when equal to  ``-``.
+Example 1: will remove the field ``http_user`` when equal to  ``-``.
+Config using url: ``filter://remove_field_when_equal://http_user?value=-``
 
-Config using url : ``filter://remove_field_when_equal://http_user?value=-``
-
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   remove_field_when_equal {

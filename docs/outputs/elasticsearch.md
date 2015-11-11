@@ -9,11 +9,52 @@ By default, each incoming message generate one HTTP request to ElasticSearch. Th
 
 Note : for better performance, you can use the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
 
-Example 1: ``output://elasticsearch://localhost:9001`` to send to the HTTP interface of an ElasticSearch server listening on port 9001.
-Example 2: ``output://elasticsearch://localhost:9001&index_prefix=audit&data_type=audits`` to send to index ``audit-<date>`` and type ``audits``.
-Example 3: ``output://elasticsearch://localhost:9001?bulk_limit=1000&bulk_timeout=100`` to perform bulk updates with a limit of 1000 messages per bulk update and a timeout of 100 ms to wait for 'limit' messages.
+Example 1: to send to the HTTP interface of an ElasticSearch server listening on port 9001.
+Config using url: ``output://elasticsearch://localhost:9001``
+
+Config using logstash format:
+````
+output {
+  elasticsearch {
+    host => localhost
+    port => 9001
+  }
+}
+````
+
+Example 2: to send to index ``audit-<date>`` and type ``audits``.
+Config using url: ``output://elasticsearch://localhost:9001&index_prefix=audit&data_type=audits``
+
+Config using logstash format:
+````
+output {
+  elasticsearch {
+    host => localhost
+    port => 9001
+    index_prefix => audit
+    data_type => audits
+  }
+}
+````
+
+Example 3: to perform bulk updates with a limit of 1000 messages per bulk update and a timeout of 100 ms to wait for 'limit' messages.
+Config using url: ``output://elasticsearch://localhost:9001?bulk_limit=1000&bulk_timeout=100``
+
+Config using logstash format:
+````
+output {
+  elasticsearch {
+    host => localhost
+    port => 9001
+    bulk_limit => 1000
+    bulk_timeout => 100
+  }
+}
+````
 
 Parameters:
+* ``host``: ip of the elasticsearch server.
+* ``port``: port of the elasticsearch server.
 * ``index_prefix``: specifies the index prefix that messages will be stored under. Default : ``logstash``. Default index will be ``logstash-<date>``
 * ``index_name``: specifies a fixed name for the index that messages will be stored under. Disable the ``index_prefix`` option. No default value.
 * ``data_type``: specifies the type under the index that messages will be stored under. (default is ``logs``)

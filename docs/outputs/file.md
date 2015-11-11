@@ -11,12 +11,47 @@ In raw mode, each line of log is dumped to target file as specified in ``format`
 
 Note: target files can be reopened by sending USR2 signal to node-logstash.
 
-Example 1: ``output://file:///var/log/toto.log?only_type=nginx``, to write each ``nginx`` log lines to ``/var/log/toto.log``.
-Example 2: ``output://file:///var/log/log_#{type}.log``, to write each ``nginx`` log lines to ``/var/log/log_nginx.log``.
-Example 3: ``output://file:///var/log/http/#{now:YYYY-MM}/http.log``, to create a new directory for each month, and write to a file ``http.log``.
+Example 1: to write each ``nginx`` log lines to ``/var/log/toto.log``.
+Config using url: ``output://file:///var/log/toto.log?only_type=nginx``
+
+Config using logstash format:
+````
+output {
+  if [type] == nginx {
+    file {
+      path => "/var/log/toto.log"
+    }
+  }
+}
+````
+
+Example 2: to write each ``nginx`` log lines to ``/var/log/log_nginx.log``.
+Config using url: ``output://file:///var/log/log_#{type}.log``
+
+Config using logstash format:
+````
+output {
+  file {
+    path => "/var/log/log_#{type}.log"
+  }
+}
+````
+
+Example 3: to create a new directory for each month, and write to a file ``http.log``.
+Config using url: ``output://file:///var/log/http/#{now:YYYY-MM}/http.log``
+
+Config using logstash format:
+````
+output {
+  file {
+    path => "/var/log/http/#{now:YYYY-MM}/http.log"
+  }
+}
+````
 
 Parameters:
 
+* ``path``: the target path.
 * ``serializer``: more doc at [serializers](serializers.md). Default value to ``raw``.
 * ``format``: params used by the ``raw`` [serializer](serializers.md).
 * ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.

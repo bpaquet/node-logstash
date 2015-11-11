@@ -7,9 +7,9 @@ The reverse dns filter replace an ip in a field by the hostname, performing a dn
 
 Example 1: performs a dns resolution on the field ``host``.
 
-Config using url : ``filter://reverse_dns://host``
+Config using url: ``filter://reverse_dns://host``
 
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   reverse_dns {

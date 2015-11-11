@@ -10,11 +10,23 @@ They are two method to send message from redis :
 * Queue. This ``rpush`` redis command will be used. ``key`` parameter is needed.
 
 Example:
+Config using url: ``output://redis://localhost:6379?channel=logstash_channel``
 
-* ``output://redis://localhost:6379?channel=logstash_channel``
+Config using logstash format:
+````
+input {
+  redis {
+    host => localhost
+    port => 6379
+    channel => logstash_channel
+  }
+}
+````
 
 Parameters:
 
+* ``host``: ip of the redis server.
+* ``port``: port of the redis server.
 * ``auth_pass``: password to use when connecting to Redis
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=app_name_log``.
 * ``method``: ``pubsub`` or ``queue``. Method to use for redis messaging.

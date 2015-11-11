@@ -9,10 +9,24 @@ In JSON mode, the HTTP POST body request will contain a JSON dump of log line, c
 
 In raw mode, the HTTP POST body request will contain the log line. Content-Type will be set to ``application/json``.
 
-Example 1: Send data to [Loggly](http://loggly.com/): ``output://http_post://logs.loggly.com:80?path=/inputs/YOUR_INPUT_KEY``
+Example 1: Send data to [Loggly](http://loggly.com/)
+Config using url: ``output://http_post://logs.loggly.com:80?path=/inputs/YOUR_INPUT_KEY``
+
+Config using logstash format:
+````
+output {
+  http_post {
+    host => logs.loggly.com
+    port => 80
+    path => "/inputs/YOUR_INPUT_KEY"
+  }
+}
+````
 
 Parameters:
 
+* ``host``: ip of the target HTTP server.
+* ``port``: port of the target HTTP server.
 * ``path``: path to use in the HTTP request. Can reference log line properties (see [interpolation](../interpolation.md)).
 * ``serializer``: more doc at [serializers](serializers.md). Default value to ``raw``.
 * ``format``: params used by the ``raw`` [serializer](serializers.md).

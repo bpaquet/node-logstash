@@ -12,10 +12,9 @@ There are two mode :
 The reverse dns filter can be used before geop filter to resolve hostname.
 
 Example 1: will lookup for ``ip`` field in the geoip database, using node-geoip-lite. The resulting object will contains following fields: ``ip_geo_country``, ``ip_geo_region``, ``ip_geo_city``, ``ip_geo_lonlat``, filled with geoip lookup result.
+Config using url: ``filter://geoip://ip``
 
-Config using url : ``filter://geoip://ip``
-
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   geoip {
@@ -25,10 +24,9 @@ filter {
 ````
 
 Example 2: will lookup for ``http_remote_ip`` field in provided maxmind directory, using node-maxmin. The resulting object will contains following fields: ``http_remote_ip_geo_country``, ``http_remote_ip_geo_region``, ``http_remote_ip_geo_city``, ``http_remote_ip_geo_lonlat``, ``http_remote_ip_geo_asn`` filled with geoip lookup result.
+Config using url: ``filter://geoip://http_remote_ip?maxmind_dir=/var/db/maxmind&cache_size=1000``
 
-Config using url : ``filter://geoip://http_remote_ip?maxmind_dir=/var/db/maxmind&cache_size=1000``
-
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   geoip {

@@ -7,9 +7,9 @@ The truncate filter is used to truncate the log message at a certain size.
 
 Example 1: truncate the message field to a max size of 200.
 
-Config using url : ``filter://truncate://?max_size=200``
+Config using url: ``filter://truncate://?max_size=200``
 
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   truncate {

@@ -5,8 +5,29 @@ Status : core plugin, unit tested and maintained.
 
 This plugin is used on agents to ship to logs servers, or to send logs to [Elasticsearch Logstash River](https://github.com/bpaquet/elasticsearch-river-zeromq).
 
-Example 1: ``output://zeromq://tcp://192.168.1.1:5555``, to send logs to 192.168.1.1 port 5555.
-Example 1: ``output://zeromq://tcp://192.168.1.1:5555,tcp://192.168.1.2:5555``, to send logs to 192.168.1.1 and 192.168.1.1, using built in ZeroMQ load balancing feature.
+Example 1: to send logs to 192.168.1.1 port 5555.
+Config using url: ``output://zeromq://tcp://192.168.1.1:5555``
+
+Config using logstash format:
+````
+output {
+  zeromq {
+    address => ['tcp://192.168.1.1:5555']
+  }
+}
+````
+
+Example 2: to send logs to 192.168.1.1 and 192.168.1.1, using built in ZeroMQ load balancing feature.
+Config using url: ``output://zeromq://tcp://192.168.1.1:5555,tcp://192.168.1.2:5555``
+
+Config using logstash format:
+````
+output {
+  zeromq {
+    address => ['tcp://192.168.1.1:5555', 'tcp://192.168.1.2:5555']
+  }
+}
+````
 
 There are two queues in ZeroMQ output plugin :
 
@@ -15,6 +36,7 @@ There are two queues in ZeroMQ output plugin :
 
 Parameters:
 
+* ``address``: array of target ZeroMQ url.
 * ``serializer``: more doc at [serializers](serializers.md). Default value to ``json_logstash``.
 * ``format``: params used by the ``raw`` [serializer](serializers.md).
 * ``zmq_high_watermark``: set the high watermark param on [ZeroMQ socket](http://api.zeromq.org/2-1:zmq-setsockopt). Default : no value.

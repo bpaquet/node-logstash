@@ -5,11 +5,10 @@ Status : core plugin, unit tested and maintained.
 
 The http status classifier filter parse the status code.
 
-Example: parse the ``http_status`` field and fill the ``http_class`` field with value like ``2xx``, ``3xx``.
+Example 1: parse the ``http_status`` field and fill the ``http_class`` field with value like ``2xx``, ``3xx``.
+Config using url: ``filter://http_status_classifier://http_status``
 
-Config using url : ``filter://http_status_classifier://http_status``
-
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   http_status_classifier {

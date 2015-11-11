@@ -6,10 +6,9 @@ Status : core plugin, unit tested and maintained.
 The regex filter is used to extract data from lines of logs. The lines of logs are not modified by this filter.
 
 Example 1: to extract the first word of a line of logs, and place it into the ``toto`` field.
+Config using url: ``filter://regex://?regex=^(\S)+ &fields=toto``
 
-Config using url : ``filter://regex://?regex=^(\S)+ &fields=toto``
-
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   regex {
@@ -21,9 +20,9 @@ filter {
 
 Example 2: to extract fields following configuration into the http_combined pattern. node-logstash is bundled with [some configurations](https://github.com/bpaquet/node-logstash/tree/master/lib/patterns). You can add your custom patterns directories, see options ``--patterns_directories``.
 
-Config using url : ``filter://regex://http_combined?only_type=nginx``
+Config using url: ``filter://regex://http_combined?only_type=nginx``
 
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   if [type] == 'nginx' {
@@ -36,9 +35,9 @@ filter {
 
 Example 3: to force number extraction. If the macthed string is not a number but ``-``, the field ``a`` will not be set.
 
-Config using url : ``filter://regex://?regex=(\d+|-)&fields=a&numerical_fields=a``
+Config using url: ``filter://regex://?regex=(\d+|-)&fields=a&numerical_fields=a``
 
-Config using logstash format :
+Config using logstash format:
 ````
 filter {
   regex {

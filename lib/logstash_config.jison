@@ -14,8 +14,8 @@
 \/(\\\/|[^\/])*\/                   yytext = process_string(yytext.substr(1, yyleng - 2)); return 'VALUE'
 \s+                                 /* skip whitespace */
 "#".*                               /* ignore comment */
-[0-9]+\.[0-9]+                      yytext = parseFloat(yytext, 10); return 'VALUE'
-[0-9]+                              yytext = parseInt(yytext, 10); return 'VALUE'
+[0-9]+\.[0-9]+[^0-9\.]              yytext = parseFloat(yytext, 10); return 'VALUE'
+[0-9]+[^0-9\.]                      yytext = parseInt(yytext, 10); return 'VALUE'
 "true"                              yytext = true; return 'VALUE'
 "false"                             yytext = false; return 'VALUE'
 "{"                                 return 'START'
@@ -43,7 +43,7 @@
 "or"                                return 'CONDITION_OPERATOR'
 "nand"                              return 'CONDITION_OPERATOR'
 "xor"                               return 'CONDITION_OPERATOR'
-[0-9a-zA-Z_\-\.]+                   return 'ID'
+[0-9a-zA-Z_\-\./]+                  return 'ID'
 <<EOF>>                             return 'EOF'
 
 /lex

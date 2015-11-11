@@ -9,12 +9,24 @@ You have to add a servlet in your App Engine App (see below). The plugin will po
 
 This plugin collects logs 10s in the past to allow GAE internal logs propagation.
 
-Examples:
+Example 1: to grab the logs from myapp GAE app, every minutes, on url ``http://myapp.appspot.com:80/logs?log_key=toto``
+Config using url: ``input://gae://myapp.appspot.com:80?key=toto``
 
-* ``input://gae://myapp.appspot.com:80?key=toto``. Will grab the logs from myapp GAE app, every minutes, on url ``http://myapp.appspot.com:80/logs?log_key=toto``
+Config using logstash format:
+````
+input {
+  gae {
+    host => myapp.appspot.com
+    port => 80
+    key => toto
+  }
+}
+````
 
 Parameters:
 
+* ``host``: hostname of the GAE webapp.
+* ``port``: port of the GAE webapp.
 * ``type``: to specify the log type, to faciliate crawling in kibana. Example: ``type=mygaeappp``. No default value.
 * ``key``. the security key which will be sent in the http query to Google App Engine.
 * ``ssl``: use ssl for grabbing logs. Use port 443 in this case. Default : false.

@@ -107,6 +107,14 @@ How to use it ?
 Installation
 ---
 
+### Simple way
+
+Use [prepackaged deb files](https://packager.io/gh/nodelogstashpackager/node-logstash/install).
+
+After install, just add your config files to ``/etc/node-logstash/plugins.conf.d``, and restart node-logstash ``service node-logstash restart``.
+
+### Manual install
+
 * Install NodeJS, version >= 0.12
 * Install build tools
   * Debian based system: `apt-get install build-essential`
@@ -117,14 +125,19 @@ Installation
 * Clone repository: `git clone git://github.com/bpaquet/node-logstash.git && cd node-logstash`
 * Install dependencies: `npm install`.
 
-The executable is in ``bin/node-logstash-agent``
+The executable is ``bin/node-logstash-agent``
 
-You have scripts in ``dists`` folder to build packages. Actually, only debian is supported.
-
-Configuration
+Configuration formats
 ---
 
-Configuration is done by url. A plugin is instanciated by an url. Example: ``input://file:///tmp/toto.log``. This url
+There are two format for configuration. The legacy format use urls. The new one is identical to the [logstash config format](https://www.elastic.co/guide/en/logstash/current/configuration.html).
+
+Note : if you are using multiple config files, you can mix formats.
+
+Configuration by url (legacy)
+---
+
+A plugin is instanciated by an url. Example: ``input://file:///tmp/toto.log``. This url
 instanciate an input file plugin which monitor the file ``/tmp/toto.log``.
 
 The urls can be specified:
@@ -133,7 +146,30 @@ The urls can be specified:
 * in a file (use the ``--config_file`` switch)
 * in all files in a directory (use the ``--config_dir`` switch)
 
-Others params:
+Configuration by logstash config files (recommended)
+---
+
+Example for an input file
+````
+input {
+  file {
+    path => '/tmp/toto.log'
+  }
+}
+````
+
+You can use ``if`` to have an [event dependent configuration](https://www.elastic.co/guide/en/logstash/current/event-dependent-configuration.html). See [here for details](docs/common_params.md).
+As for urls, config can be specified
+
+* directly on the command line
+* in a file (use the ``--config_file`` switch)
+* in all files in a directory (use the ``--config_dir`` switch)
+
+Note : the implementation is young, all bugs reports are welcome.
+Note : both formats can be mixed.
+
+Command lines params
+---
 
 * ``--log_level`` to change the log level (emergency, alert, critical, error, warning, notice, info, debug)
 * ``--log_file`` to redirect log to a log file.
@@ -146,15 +182,41 @@ Examples
 ---
 
 Config file for an agent:
+````
+input {
+  file {
+    path => "/var/log/nginx/access.log"
+  }
+}
 
-    input://file:///var/log/nginx/access.log
-    output://zeromq://tcp://log_server:5555
+output {
+  zeromq {
+    address => ["tcp://log_server:5555"]
+  }
+}
+````
 
 Config file for log server:
+````
+input {
+  zeromq {
+    address => ["tcp://0.0.0.0:5555"]
+  }
+}
 
-    input://zeromq://tcp://0.0.0.0:5555
-    filter://regex://http_combined
-    output://elasticsearch://localhost:9001
+filter {
+  regex {
+    pattern => http_combined
+  }
+}
+
+output {
+  elasticsearch {
+    host => localhost
+    port => 9200
+  }
+}
+```
 
 Signals
 ---

@@ -7,11 +7,39 @@ This plugin is used to send logs to an [AMQP exchange](https://www.rabbitmq.com/
 
 Examples:
 
-* Fanout mode: ``output://amqp://localhost:5672?exchange_name=toto`` : Receive message from fanout exchange ``toto``
-* Topic mode: ``output://amqp://localhost:5672?exchange_name=toto_topic&topic=test`` : Receive message from topic ``test`` on  exchange ``toto_topic``
+* Fanout mode: Receive message from fanout exchange ``toto``
+Config using url: ``output://amqp://localhost:5672?exchange_name=toto``
+
+Config using logstash format:
+````
+output {
+  amqp {
+    host => localhost
+    port => 5672
+    exchange_name => toto
+  }
+}
+````
+
+* Topic mode: Receive message from topic ``test`` on  exchange ``toto_topic``
+Config using url: ``output://amqp://localhost:5672?exchange_name=toto_topic&topic=test``
+
+Config using logstash format:
+````
+output {
+  amqp {
+    host => localhost
+    port => 5672
+    exchange_name => toto_topic
+    topic => test
+  }
+}
+````
 
 Parameters:
 
+* ``host``: ip of the AMQP broker.
+* ``port``: port of the AMQP broker.
 * ``topic``: Optional. Topic to use in topic mode. Default : none, fanout mode is used.
 * ``durable``: Optional. Set exchange durability. Default : true.
 * ``persistent``: Optional. Set persistent flag on each send message. Default: false.

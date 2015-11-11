@@ -1,3 +1,6 @@
+* 11/09/2015 : new config format, based on logstash config format
+* 11/09/2015 : new installer using [packager.io](packager.io), thx to @crohr
+* 11/09/2015 : mass documentation update
 * 11/09/2015 : allow to use node-maxmind plugin for geoip filter. Geoip filter can now fetch ASN.
 * 11/09/2015 : add cache on reverse dns and geoip filters
 * 25/10/2015 : Reorganize doc
