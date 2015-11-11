@@ -7,4 +7,5 @@ CLI="$APP_NAME"
 
 mkdir -p "/etc/node-logstash/plugins.conf.d"
 
+${CLI} scale main=0 || true
 ${CLI} scale main=1 || true
