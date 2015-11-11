@@ -48,3 +48,19 @@ Parameters:
 * ``lonlat_field``: field in which to store the geo ip longitude and latitude result. Default value : ``ip_geo_lonlat`, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip longitude and latitude result will not be stored.
 * ``asn_field``: field in which to store the asn result. Default value : ``ip_geo_asn``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip asn result will not be stored.
 * ``cache_*``: cache configuration. More doc at [cache](../cache.md).
+
+Note if you are using the native package
+---
+
+For reduce the size of the package, the native package does not contains any geoip database.
+The recommended mode is ``node-maxmind``.
+
+To enable it, just type
+    node-logstash config:set MAXMIND_DB_DIR=/var/db/node-logstash/maxmind
+    node-logstash run node_modules/.bin/maxmind-geolite-mirror
+    service node-logstash restart
+
+The geoip plugin will use the env var ``MAXMIND_DB_DIR`` be auto configured (the ``maxmind_dir``is not needed.).
+
+To refresh automaticaly the database, just a weekly cron
+    2 2 0 * * node-logstash run node_modules/.bin/maxmind-geolite-mirror
