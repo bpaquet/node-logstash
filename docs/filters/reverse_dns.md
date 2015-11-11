@@ -14,6 +14,7 @@ Config using logstash format :
 filter {
   reverse_dns {
     field => dns
+    cache_size => 1000
   }
 }
 ````
@@ -22,4 +23,5 @@ Parameters:
 
 * ``field``: which field to work on.
 * ``target_field``: field to store the result. Default: field used for resolution.
-* ``only_hostname``: after dns resolution, the filter will keep only the first word of dns name. Example : 'www.free.fr' will be transformed to 'www'. Default value: true
+* ``only_hostname``: after dns resolution, the filter will keep only the first word of dns name. Example : 'www.free.fr' will be transformed to 'www'. Default value: true.
+* ``cache_*``: cache configuration. More doc at [cache](../cache.md).
