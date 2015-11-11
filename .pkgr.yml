@@ -5,6 +5,8 @@ dependencies:
   - libzmq1
 targets:
   ubuntu-14.04:
+  debian-8:
+  debian-7:
 before:
   - mv packager/Procfile .
 after_install: ./packager/postinst
