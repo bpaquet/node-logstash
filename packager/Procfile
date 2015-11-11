@@ -1,0 +1,1 @@
+main: node bin/node-logstash-agent --config_dir /etc/node-logstash/plugins.conf.d --log_level info --log_file $APP_HOME/log/node-logstash.log --db_file /var/db/$APP_NAME/files.json --alarm_file /var/db/$APP_NAME/on_alarm

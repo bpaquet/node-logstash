@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+APP_NAME="node-logstash"
+CONFIG_DIR="/etc/node-logstash/plugins.conf.d"
+CLI="$APP_NAME"
+
+mkdir -p "$CONFIG_DIR"
+chown "$APP_USER" "$CONFIG_DIR"
+
+$CLI scale main=0 || true
+$CLI scale main=1 || true
