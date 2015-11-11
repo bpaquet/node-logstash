@@ -5,4 +5,6 @@ set -e
 APP_NAME="node-logstash"
 CLI="$APP_NAME"
 
+mkdir -p "/etc/node-logstash/plugins.conf.d"
+
 ${CLI} scale main=1 || true
