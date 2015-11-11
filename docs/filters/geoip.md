@@ -56,11 +56,13 @@ For reduce the size of the package, the native package does not contains any geo
 The recommended mode is ``node-maxmind``.
 
 To enable it, just type
+
     node-logstash config:set MAXMIND_DB_DIR=/var/db/node-logstash/maxmind
     node-logstash run node_modules/.bin/maxmind-geolite-mirror
     service node-logstash restart
 
 The geoip plugin will use the env var ``MAXMIND_DB_DIR`` be auto configured (the ``maxmind_dir``is not needed.).
 
-To refresh automaticaly the database, just a weekly cron
+To refresh the database, just add a weekly cron
+
     2 2 0 * * node-logstash run node_modules/.bin/maxmind-geolite-mirror
