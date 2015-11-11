@@ -1,3 +1,4 @@
+* 11/09/2015 : publish 0.0.5 on NPM
 * 11/09/2015 : new config format, based on logstash config format
 * 11/09/2015 : new installer using [packager.io](packager.io), thx to @crohr
 * 11/09/2015 : mass documentation update
