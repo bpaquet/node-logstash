@@ -4,6 +4,7 @@ services:
 node_js:
   - "0.12"
   - "4"
+  - "5"
 env:
   - ZEROMQ_VERSION=4.0.4-bpa~precise1
 before_install:
