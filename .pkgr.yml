@@ -9,4 +9,6 @@ targets:
   debian-7:
 before:
   - mv packager/Procfile .
+after:
+  - rm node_modules/geoip-lite/data/*.dat
 after_install: ./packager/postinst
