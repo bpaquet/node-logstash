@@ -54,7 +54,7 @@ The recommended mode is ``node-maxmind``.
 
 To enable it, just type
 
-    node-logstash config:set MAXMIND_DB_DIR=/var/db/node-logstash/maxmind
+    node-logstash config:set MAXMIND_DB_DIR=/var/db/node-logstash/maxmind/
     node-logstash run node_modules/.bin/maxmind-geolite-mirror
     service node-logstash restart
 
