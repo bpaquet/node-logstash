@@ -50,6 +50,7 @@ filter {
 
 Parameters:
 
+* ``field``: the field to work on. Default to : message.
 * ``regex``: regex to apply.
 * ``regex_flags``: regex flags (eg : g, i, m).
 * ``fields``: name of fields which will receive the pattern extracted (see below for the special field @timestamp).
