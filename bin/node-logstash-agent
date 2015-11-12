@@ -44,7 +44,7 @@ process.on('uncaughtException', function(err) {
 if (argv.log_file) {
   logger.info('Log to file', argv.log_file, ', log_level', argv.log_level);
   logger.reconfigure({
-    level: argv.log_level,
+    level: argv.log_level || process.env.LOG_LEVEL,
     file: argv.log_file
   });
 }
