@@ -49,9 +49,10 @@ if (argv.log_file) {
   });
 }
 else {
-  if (argv.log_level) {
-    logger.info('Changing log_level', argv.log_level);
-    logger.setLogLevel(argv.log_level);
+  var log_level = argv.log_level || process.env.LOG_LEVEL;
+  if (log_level) {
+    logger.info('Changing log_level', log_level);
+    logger.setLogLevel(log_level);
   }
 }
 

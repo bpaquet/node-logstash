@@ -6,6 +6,7 @@ APP_NAME="node-logstash"
 CONFIG_DIR="/etc/node-logstash/plugins.conf.d"
 CLI="$APP_NAME"
 
+mkdir -p "/var/db/$APP_NAME/patterns"
 mkdir -p "$CONFIG_DIR"
 chown "$APP_USER" "$CONFIG_DIR"
 

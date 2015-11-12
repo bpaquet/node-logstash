@@ -113,6 +113,10 @@ Use [prepackaged deb files](https://packager.io/gh/nodelogstashpackager/node-log
 
 After install, just add your config files to ``/etc/node-logstash/plugins.conf.d``, and restart node-logstash ``service node-logstash restart``.
 
+To see what options are passed to node-logstash, see [here](packager/Procfile).
+
+To change log level, do ``node-logstash config:set LOG_LEVEL=debug``, and restart node-logstash.
+
 ### Manual install
 
 * Install NodeJS, version >= 0.12
