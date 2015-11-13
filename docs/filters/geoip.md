@@ -43,7 +43,7 @@ Parameters:
 * ``country_field``: field in which to store the geo ip country result. Default value : ``ip_geo_country``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip country result will not be stored.
 * ``region_field``: field in which to store the geo ip region result. Default value : ``ip_geo_region``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip region result will not be stored.
 * ``city_field``: field in which to store the geo ip city result. Default value : ``ip_geo_city``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip city result will not be stored.
-* ``lonlat_field``: field in which to store the geo ip longitude and latitude result. Default value : ``ip_geo_lonlat`, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip longitude and latitude result will not be stored.
+* ``lonlat_field``: field in which to store the geo ip longitude and latitude result. Default value : ``ip_geo_lonlat``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip longitude and latitude result will not be stored.
 * ``asn_field``: field in which to store the asn result. Default value : ``ip_geo_asn``, if the field containing the ip is ``ip``. If you specify ``none``, the geo ip asn result will not be stored.
 * ``cache_*``: cache configuration. More doc at [cache](../cache.md).
 
