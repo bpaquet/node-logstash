@@ -4,6 +4,11 @@ build_dependencies:
 dependencies:
   - libzmq1
 targets:
+  ubuntu-12.04:
+    before:
+      - cd /tmp && wget -q https://github.com/nodelogstashpackager/precise-gcc48/raw/master/gcc-4.8.5.tar.xz && xz -d gcc-4.8.5.tar.xz && tar xf gcc-4.8.5.tar 
+    env:
+      - PATH="/tmp/opt/gcc-4.8.5/bin:$PATH"
   ubuntu-14.04:
   debian-8:
   debian-7:
