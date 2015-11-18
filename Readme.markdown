@@ -73,8 +73,7 @@ Node-logstash is production ready, and used in production. Installation is a cla
 
 Maintainers : currently I, @bpaquet, am the only maintainer. I will keep dependencies up to date, update the core to follow node version, but I do not have time to add features in the core. See Contributing below.
 
-Weakness :
-* format of config files is not easy to learn (next big move to do in the core)
+Weaknesses :
 * tests are difficult to maintain, even if they are many and the code coverage is good. Replace vows by mocha is a good way to improve that, but it's a big rework.
 
 Contributing
@@ -221,6 +220,24 @@ output {
   }
 }
 ```
+
+Adding your plugins
+---
+
+You can add easily add your plugins :
+
+Manually :
+
+* create a directory layout on the path of your choice : ``/var/my_plugins/inputs``, ``/var/my_plugins/outputs``, ``/var/my_plugins/filters``
+* set the NODE_PATH variable to ``NODE_PATH=/var/my_plugins:/node_logstash_path/lib``
+* add your plugins in ``inputs``, ``outputs`` or ``filters`` directory. In the plugin code, you can reference base plugins with ``var base_filter = require('lib/base_filter');``
+* reference your plugin as usual.
+
+
+With native packaging
+
+The plugins must be deployed in ``/var/db/node-logstash/custom_plugins``. All subdirectories already exists. The NODE_PATH is already set.
+
 
 Signals
 ---
