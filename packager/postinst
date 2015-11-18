@@ -10,7 +10,7 @@ CUSTOM_PLUGINS="/var/db/node-logstash/custom_plugins"
 mkdir -p "/var/db/$APP_NAME/patterns"
 mkdir -p "$CONFIG_DIR"
 mkdir -p "$CUSTOM_PLUGINS" "$CUSTOM_PLUGINS/inputs" "$CUSTOM_PLUGINS/outputs" "$CUSTOM_PLUGINS/filters"
-chown "$APP_USER" "$CONFIG_DIR" "$CUSTOM_PLUGINS"
+chown "$APP_USER" "$CONFIG_DIR" "$CUSTOM_PLUGINS" "$CUSTOM_PLUGINS/inputs" "$CUSTOM_PLUGINS/outputs" "$CUSTOM_PLUGINS/filters"
 
 $CLI config | grep NODE_PATH || $CLI config:set NODE_PATH=$CUSTOM_PLUGINS:/opt/node-logstash/lib
 
