@@ -4,6 +4,7 @@ var vows = require('vows-batch-retry'),
   rimraf = require('rimraf'),
   moment = require('moment'),
   fs = require('fs'),
+  not_readable_helper = require('./not_readable_helper'),
   output_file = require('outputs/output_file');
 
 vows.describe('Output file ').addBatchRetry({
@@ -147,8 +148,9 @@ vows.describe('Output file ').addBatchRetry({
       var callback = this.callback;
       var e;
       mkdirp.sync('output');
+      not_readable_helper.create('root');
       var p = output_file.create();
-      p.init('/etc/toto.txt?retry_delay=0.3', function(err) {
+      p.init('root/toto.txt?retry_delay=0.3', function(err) {
         assert.ifError(err);
         p.process({message: 'line1'});
         p.process({message: 'line2'});
@@ -170,6 +172,8 @@ vows.describe('Output file ').addBatchRetry({
     },
     check: function(err, e) {
       assert.ifError(err);
+
+      not_readable_helper.remove('root');
 
       rimraf.sync('output');
 

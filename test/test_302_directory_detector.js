@@ -5,6 +5,7 @@ var vows = require('vows-batch-retry'),
   spawn = require('child_process').spawn,
   mkdirp = require('mkdirp'),
   rimraf = require('rimraf'),
+  not_readable_helper = require('./not_readable_helper'),
   directory_detector = require('lib/directory_detector');
 
 function TestDirectoryDetector(directory, callback) {
@@ -34,6 +35,7 @@ function check(detector, exists, removed) {
 function create_test(directory, start_callback, check_callback) {
   return {
     topic: function() {
+      not_readable_helper.create('root');
       var callback = this.callback;
       var already = false;
       var detector = new TestDirectoryDetector(directory, function() {
@@ -49,6 +51,7 @@ function create_test(directory, start_callback, check_callback) {
 
     check: function(err, detector, detector2) {
       assert.ifError(err);
+      not_readable_helper.remove('root');
       check_callback(detector, detector2);
     }
   };
@@ -57,6 +60,7 @@ function create_test(directory, start_callback, check_callback) {
 function create_test_init_failed(directory, pattern) {
   return {
     topic: function() {
+      not_readable_helper.create('root');
       var callback = this.callback;
       var start_called = false;
       var detector = new directory_detector.DirectoryDetector();
@@ -72,6 +76,7 @@ function create_test_init_failed(directory, pattern) {
 
     check: function(err, start_called) {
       assert.ifError(err);
+      not_readable_helper.remove('root');
       assert.isFalse(start_called);
     }
   };
@@ -118,7 +123,7 @@ vows.describe('Directory detector ').addBatchRetry({
     check(detector, []);
   }),
 }, 5, 10000).addBatchRetry({
-  'directory does not exists at startup, parent not readable': create_test_init_failed('/root/toto87/uio', 'EACCES'),
+  'directory does not exists at startup, parent not readable': create_test_init_failed('root/toto87/uio', 'EACCES'),
 }, 5, 10000).addBatchRetry({
   '1 subdirectory': create_test(path.resolve('.') + '/toto44', function(callback, detector) {
     setTimeout(function() {
