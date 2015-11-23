@@ -148,7 +148,7 @@ vows.describe('Output file ').addBatchRetry({
       var e;
       mkdirp.sync('output');
       var p = output_file.create();
-      p.init('/root/toto.txt?retry_delay=0.3', function(err) {
+      p.init('/etc/toto.txt?retry_delay=0.3', function(err) {
         assert.ifError(err);
         p.process({message: 'line1'});
         p.process({message: 'line2'});
