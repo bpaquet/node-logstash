@@ -6,15 +6,16 @@ dependencies:
 targets:
   ubuntu-12.04:
     before:
-      - mv packager/Procfile .
+      - mv packager/Procfile Procfile
       - cd /tmp && wget -q https://github.com/nodelogstashpackager/precise-gcc48/raw/master/gcc-4.8.5.tar.xz && xz -d gcc-4.8.5.tar.xz && tar xf gcc-4.8.5.tar 
     env:
       - PATH="/tmp/opt/gcc-4.8.5/bin:$PATH"
   ubuntu-14.04:
   debian-8:
+      - mv packager/Procfile_debian8 Procfile
   debian-7:
 before:
-  - mv packager/Procfile .
+  - mv packager/Procfile Procfile
 after:
   - rm node_modules/geoip-lite/data/*.dat
 after_install: ./packager/postinst
