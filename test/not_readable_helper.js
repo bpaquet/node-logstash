@@ -7,6 +7,6 @@ exports.create = function(name) {
 };
 
 exports.remove = function(name) {
-  fs.chmodSync(name, '0600');
+  fs.chmodSync(name, '755');
   rimraf.sync(name);
 };
