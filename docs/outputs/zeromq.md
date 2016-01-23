@@ -3,7 +3,7 @@ ZeroMQ output plugin
 
 Status : core plugin, unit tested and maintained.
 
-This plugin is used on agents to ship to logs servers, or to send logs to [Elasticsearch Logstash River](https://github.com/bpaquet/elasticsearch-river-zeromq).
+This plugin is used on agents to ship to logs servers, or to send logs to [Elasticsearch Logstash River (ES < 2.0)](https://github.com/bpaquet/elasticsearch-river-zeromq) or to [Elasticsarch ZeroMQ torrent (ES >= 2.x)](https://github.com/bpaquet/elasticsearch-zeromq-torrent).
 
 Example 1: to send logs to 192.168.1.1 port 5555.
 Config using url: ``output://zeromq://tcp://192.168.1.1:5555``
