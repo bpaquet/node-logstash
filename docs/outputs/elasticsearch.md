@@ -7,7 +7,7 @@ This plugin is used on log server to ship to ElasticSearch, using HTTP REST inte
 
 By default, each incoming message generate one HTTP request to ElasticSearch. The bulk feature allows to send grouped messages. For example, under heavy traffic, you can send messages to ElasticSearch by bulk of 1000 messages. In this mode, the bulk is send even if incomplete after a configured timeout (100 ms by default).
 
-Note : for better performance, you can use the ZeroMQ plugin and the [ZeroMQ Logasth river](https://github.com/bpaquet/elasticsearch-river-zeromq).
+Note : for better performance, you can use the ZeroMQ plugin and the [ZeroMQ Logasth river for ES < 2.0](https://github.com/bpaquet/elasticsearch-river-zeromq), or the [ElasticSearch ZeroMQ Torrent for ES >= 2.x](https://github.com/bpaquet/elasticsearch-zeromq-torrent).
 
 Example 1: to send to the HTTP interface of an ElasticSearch server listening on port 9001.
 Config using url: ``output://elasticsearch://localhost:9001``
