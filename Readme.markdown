@@ -283,6 +283,7 @@ Filter plugins
 * [Compute date field](docs/filters/compute_date_field.md)
 * [Split](docs/filters/split.md)
 * [Truncate](docs/filters/truncate.md)
+* [Rename](docs/filters/rename.md)
 * [Multiline](docs/filters/multiline.md)
 * [Json fields](docs/filters/json_fields.md)
 * [Geoip](docs/filters/geoip.md)
