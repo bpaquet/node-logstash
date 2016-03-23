@@ -44,7 +44,8 @@
     "maxmind": "0.6.x",
     "maxmind-geolite-mirror": "1.0.x",
     "http-proxy-agent": "1.x",
-    "https-proxy-agent": "1.x"
+    "https-proxy-agent": "1.x",
+    "lumberjack-protocol": "git://github.com/bpaquet/node-lumberjack-protocol.git"
   },
   "directories": {
     "test": "./test",
