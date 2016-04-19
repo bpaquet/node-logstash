@@ -18,7 +18,7 @@ The grok filter has many built-in grok patterns. The full list can be found in t
 (Note: patterns were copied from [elasticsearch/patterns](https://github.com/elasticsearch/logstash/tree/master/patterns)).
 
 Example 1: if ``message``field is ``hello 123``, the filter will add the field ``w1`` with value ``hello`` and field ``num1`` with value ``123``.
-Config using url: ``filter://grok://?grok=%{WORD:w1} %{NUMBER:num1}``
+Config using url: ``filter://grok://?match=%{WORD:w1} %{NUMBER:num1}``
 
 Config using logstash format:
 ````
@@ -30,7 +30,7 @@ filter {
 ````
 
 Example 2: to extract fields from a haproxy log. The ``HAPROXYHTTP`` pattern is already built-in to the grok filter.
-Config using url: ``filter://grok://only_type=haproxy&grok=%{HAPROXYHTTP}``
+Config using url: ``filter://grok://only_type=haproxy&match=%{HAPROXYHTTP}``
 
 Config using logstash format:
 ````
@@ -44,7 +44,7 @@ filter {
 ````
 
 Example 3: to load custom patterns from the ``/path/to/file`` file that defines the ``MY_PATTERN`` pattern.
-Config using url: ``filter://grok://?extra_patterns_file=/path/to/file&grok=%{MY_PATTERN}``
+Config using url: ``filter://grok://?extra_patterns_file=/path/to/file&match=%{MY_PATTERN}``
 
 Config using logstash format:
 ````
