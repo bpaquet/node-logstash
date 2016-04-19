@@ -158,17 +158,17 @@ vows.describe('Integration error :').addBatch({
   ], 'You have to specify the channel parameter in pubsub mode'),
 }).addBatch({
   'wrong grok pattern': check_error_init([
-    'filter://grok://?grok=%{GROKTEST}'
+    'filter://grok://?match=%{GROKTEST}'
   ], 'Unable to find grok pattern GROKTEST'),
 }).addBatch({
   'wrong grok pattern recurse': check_error_init([
-    'filter://grok://?grok=%{GROKTEST2}&extra_patterns_file=' + __dirname + '/grok/extra'
+    'filter://grok://?match=%{GROKTEST2}&extra_patterns_file=' + __dirname + '/grok/extra'
   ], 'Unable to find grok pattern NUMBER98'),
 }).addBatch({
   'unexistent grok pattern file': check_error_init([
-    'filter://grok://?grok=%{GROKTEST}&extra_patterns_file=/tmp/titi'
+    'filter://grok://?match=%{GROKTEST}&extra_patterns_file=/tmp/titi'
   ], 'Error'),
   'wrong pattern file': check_error_init([
-    'filter://grok://?grok=%{GROKTEST}&extra_patterns_file=' + __dirname + '/grok/wrong'
+    'filter://grok://?match=%{GROKTEST}&extra_patterns_file=' + __dirname + '/grok/wrong'
   ], 'Unable to find grok pattern GROKTEST'),
 }).export(module);
