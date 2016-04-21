@@ -55,5 +55,5 @@ Parameters:
 * ``serializer``: more doc at [serializers](serializers.md). Default value to ``raw``.
 * ``format``: params used by the ``raw`` [serializer](serializers.md).
 * ``delimiter``: Optional. Delimiter inserted between message. Default : ``\n``. Must be encoded in url (eg ``%0A`` for ``\n``). Can be empty.
-* ``idle_timeout``: delay before closing a file without activity, in seconds. Default : 300.
+* ``idle_timeout``: delay before closing a file without activity, in seconds. Set it to 0 to never close files. Why closing file ? Because you can use current date in filename, so node-logtash can close them automatically to avoid keeping useless files open). Default : 0.
 * ``retry_delay``: after an error, delay before retry, in seconds. Default : 300.
