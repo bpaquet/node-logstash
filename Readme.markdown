@@ -270,6 +270,7 @@ Input plugins
 Common concepts / parameters :
 
 * [Unserializers](docs/inputs/unserializers.md)
+* [Tags/fields](docs/inputs/tags_fields.md)
 
 Filter plugins
 ---
@@ -295,6 +296,7 @@ Filter plugins
 Common concepts / parameters :
 
 * [Common parameters](docs/common_params.md)
+* [Tags/fields](docs/filters/tags_fields.md)
 
 Outputs
 ---

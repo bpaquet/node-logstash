@@ -522,6 +522,27 @@ vows.describe('Logstash parser config').addBatch({
       }
     }]
   }),
+  'fields and tags 1': check('input { stdin { tags => ["b", "c"]\nadd_fields => {\nz => toto}}}', {
+    input: [{
+      stdin: {
+        tags: ['b', 'c'],
+        add_fields: {
+          'z': 'toto'
+        }
+      }
+    }]
+  }),
+  'fields and tags 2': check('input { stdin { tags => ["b", "c"]\nadd_fields => {\nz => toto, z2 => "toto2"}}}', {
+    input: [{
+      stdin: {
+        tags: ['b', 'c'],
+        add_fields: {
+          'z': 'toto',
+          'z2': 'toto2',
+        }
+      }
+    }]
+  }),
   'multi if': check('filter { if "GROKED" not in [tags] { drop{} } \n if "GROKED2" not in [tags] { drop{} } }', {
     filter: [{
       __if__: {

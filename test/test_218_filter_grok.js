@@ -101,7 +101,63 @@ vows.describe('Filter grok ').addBatch({
     },
   ], [
     {
-      'message': 'toto'
+      'message': 'toto',
+      tags: ['_grokparsefailure'],
+    }
+  ]),
+  'parse ok 1': filter_helper.create('grok', '?match=%{IP}&add_tags=x&add_fields=a:#{host}&remove_field=error', [
+    {
+      'message': '1.2.3.4',
+      'host': 'titi',
+      'error': 'a',
+    },
+  ], [
+    {
+      'message': '1.2.3.4',
+      'host': 'titi',
+      'tags': ['x'],
+      'a': 'titi'
+    }
+  ]),
+  'parse ok 2': filter_helper.create('grok', '?match=%{IP}&add_tags=x,t&add_field=a:#{host},b:2&remove_fields=toto,error', [
+    {
+      'message': '1.2.3.4',
+      'host': 'titi',
+      'error': 'a',
+    },
+  ], [
+    {
+      'message': '1.2.3.4',
+      'host': 'titi',
+      'tags': ['x', 't'],
+      'a': 'titi',
+      'b': 2,
+    }
+  ]),
+  'parse error 1': filter_helper.create('grok', '?match=%{IP}&tag_on_failure=&add_tags=y,t&add_tags=x&add_fields=a:#{host}&remove_field=error', [
+    {
+      'message': 'toto',
+      'error': 'a',
+      'tags': ['x'],
+    },
+  ], [
+    {
+      'message': 'toto',
+      'error': 'a',
+      'tags': ['x'],
+    }
+  ]),
+  'parse error 2': filter_helper.create('grok', '?match=%{IP}&tag_on_failure=a,b&remove_tags=y&add_tags=x&add_fields=a:#{host}&remove_field=error', [
+    {
+      'message': 'toto',
+      'error': 'a',
+      'tags': ['x', 'y'],
+    },
+  ], [
+    {
+      'message': 'toto',
+      'error': 'a',
+      'tags': ['x', 'y', 'a', 'b'],
     }
   ]),
 }).export(module);

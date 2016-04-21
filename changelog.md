@@ -1,3 +1,5 @@
+* 22/04/2016 : Fields and tag management for input plugins
+* 21/04/2016 : Fix #123 : Do not close file automatically in output file plugin
 * 19/04/2016 : Fix #120 : Grok filter use match param, not grok
 * 18/09/2015 : allow to load plugins from NODE_PATH
 * 11/09/2015 : publish 0.0.5 on NPM

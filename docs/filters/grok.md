@@ -62,5 +62,7 @@ Parameters:
 * ``extra_patterns_file``: path to a file containing custom patterns to load.
 * ``numerical_fields``: name of fields which have to contain a numerical value. If value is not numerical, field will not be set.
 * ``date_format``: if ``date_format`` is specified and a ``@timestamp`` field is extracted, the filter will process the data extracted with the date\_format, using [moment](http://momentjs.com/docs/#/parsing/string-format/). The result will replace the original timestamp of the log line.
+* ``tag_on_failure``: if the parse fail, tags in this paramter will be added. In url config format, use ``,`` for splitting. Eg : ``tag_on_failure=a,b``. Default: ``["_grokparsefailure"]``.
+* ``add_tags``, ``add_field``, ``add_fields``, ``remove_tags``, ``remove_fields``: tags and fields to add or remove when parsing is ok. More doc at [tags and fields](./tags_fields.md).
 
 Note: fields with empty values will not be set.
