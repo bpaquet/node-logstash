@@ -69,4 +69,45 @@ vows.describe('File loader').addBatch({
     }
   },
 
+  'empty standard': {
+    topic: function() {
+      file_loader.loadFile('test/file_loader_test/empty', false, this.callback);
+    },
+    check: function(err, result) {
+      assert.ifError(err);
+      assert.deepEqual(result, []);
+    }
+  },
+
+  'empty': {
+    topic: function() {
+      file_loader.loadFile('test/file_loader_test/empty', true, this.callback);
+    },
+    check: function(err, result) {
+      assert.ifError(err);
+      assert.deepEqual(result, []);
+    }
+  },
+
+  'empty spaces': {
+    topic: function() {
+      file_loader.loadFile('test/file_loader_test/empty_spaces', true, this.callback);
+    },
+    check: function(err, result) {
+      assert.ifError(err);
+      assert.deepEqual(result, []);
+    }
+  },
+
+  'only one cr': {
+    topic: function() {
+      file_loader.loadFile('test/file_loader_test/only_one_cr', true, this.callback);
+    },
+    check: function(err, result) {
+      assert.ifError(err);
+      assert.deepEqual(result, []);
+    }
+  },
+
+
 }).export(module);

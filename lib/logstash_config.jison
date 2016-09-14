@@ -74,8 +74,6 @@ lines
   { $$ = $1.concat($2); }
   | line
   { $$ = [$1]; }
-  | if
-  { $$ = [$1]; }
   ;
 
 if
@@ -113,6 +111,8 @@ condition_member
 line
   : ID plugin_params
   { $$ = {}; $$[$1] = $2; }
+  | if
+  { $$ = $1; }
   ;
 
 plugin_params
@@ -134,6 +134,8 @@ params
 param
   : ID SET value
   { $$ = {key: $1, value: $3}; }
+  | value SET value
+  { $$ = {key: $1, value: $3}; }
   ;
 
 value
@@ -142,6 +144,8 @@ value
   | ID
   { $$ = $1; }
   | ARRAY_START values ARRAY_STOP
+  { $$ = $2; }
+  | START params STOP
   { $$ = $2; }
   ;
 

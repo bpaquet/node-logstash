@@ -1,0 +1,15 @@
+
+filter {
+  grok {
+    match => '%{IP}'
+    add_tags => [a, b]
+    add_fields => { a => b }
+  }
+}
+
+output {
+  file {
+    path => output.txt
+    serializer => json_logstash
+  }
+}

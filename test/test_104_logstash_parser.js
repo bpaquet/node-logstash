@@ -513,4 +513,67 @@ vows.describe('Logstash parser config').addBatch({
       }
     }]
   }),
+  'hash': check('filter {grok { match => {\'message\' => \'toto\'}}}', {
+    filter: [{
+      grok: {
+        match: {
+          'message': 'toto'
+        }
+      }
+    }]
+  }),
+  'fields and tags 1': check('input { stdin { tags => ["b", "c"]\nadd_fields => {\nz => toto}}}', {
+    input: [{
+      stdin: {
+        tags: ['b', 'c'],
+        add_fields: {
+          'z': 'toto'
+        }
+      }
+    }]
+  }),
+  'fields and tags 2': check('input { stdin { tags => ["b", "c"]\nadd_fields => {\nz => toto, z2 => "toto2"}}}', {
+    input: [{
+      stdin: {
+        tags: ['b', 'c'],
+        add_fields: {
+          'z': 'toto',
+          'z2': 'toto2',
+        }
+      }
+    }]
+  }),
+  'multi if': check('filter { if "GROKED" not in [tags] { drop{} } \n if "GROKED2" not in [tags] { drop{} } }', {
+    filter: [{
+      __if__: {
+        ifs: [{
+          cond: {
+            op: 'not in',
+            left: { value: 'GROKED' },
+            right: { field: 'tags' }
+          },
+          then: [{
+            drop: {}
+          }]
+        }]
+      }
+    },
+    {
+      __if__: {
+        ifs: [{
+          cond: {
+            op: 'not in',
+            left: { value: 'GROKED2' },
+            right: { field: 'tags' }
+          },
+          then: [{
+            drop: {}
+          }]
+        }]
+      }
+    }]
+  }, [
+    'filter://drop://?__dynamic_eval__=%7B%22false_clauses%22%3A%5B%5D%2C%22true_clause%22%3A%7B%22op%22%3A%22not%20in%22%2C%22left%22%3A%7B%22value%22%3A%22GROKED%22%7D%2C%22right%22%3A%7B%22field%22%3A%22tags%22%7D%7D%7D',
+    'filter://drop://?__dynamic_eval__=%7B%22false_clauses%22%3A%5B%5D%2C%22true_clause%22%3A%7B%22op%22%3A%22not%20in%22%2C%22left%22%3A%7B%22value%22%3A%22GROKED2%22%7D%2C%22right%22%3A%7B%22field%22%3A%22tags%22%7D%7D%7D',
+  ]),
 }).export(module);

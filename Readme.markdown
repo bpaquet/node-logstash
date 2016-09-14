@@ -270,6 +270,7 @@ Input plugins
 Common concepts / parameters :
 
 * [Unserializers](docs/inputs/unserializers.md)
+* [Tags/fields](docs/inputs/tags_fields.md)
 
 Filter plugins
 ---
@@ -283,6 +284,7 @@ Filter plugins
 * [Compute date field](docs/filters/compute_date_field.md)
 * [Split](docs/filters/split.md)
 * [Truncate](docs/filters/truncate.md)
+* [Rename](docs/filters/rename.md)
 * [Multiline](docs/filters/multiline.md)
 * [Json fields](docs/filters/json_fields.md)
 * [Geoip](docs/filters/geoip.md)
@@ -294,6 +296,7 @@ Filter plugins
 Common concepts / parameters :
 
 * [Common parameters](docs/common_params.md)
+* [Tags/fields](docs/filters/tags_fields.md)
 
 Outputs
 ---

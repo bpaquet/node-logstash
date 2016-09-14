@@ -7,7 +7,7 @@ patterns_loader.add('lib/patterns');
 patterns_loader.add('lib/toto');
 
 vows.describe('Filter grok ').addBatch({
-  'normal': filter_helper.create('grok', '?grok=%{NUMBER:fnumber} %{WORD:fword} %{GREEDYDATA:fgreedy}', [
+  'normal': filter_helper.create('grok', '?match=%{NUMBER:fnumber} %{WORD:fword} %{GREEDYDATA:fgreedy}', [
     {
       'message': '123 abc def jhi'
     },
@@ -19,7 +19,7 @@ vows.describe('Filter grok ').addBatch({
       'fgreedy': 'def jhi'
     },
   ]),
-  'same type': filter_helper.create('grok', '?grok=%{NUMBER:fn1} %{NUMBER:fn2} %{NUMBER:fn3}', [
+  'same type': filter_helper.create('grok', '?match=%{NUMBER:fn1} %{NUMBER:fn2} %{NUMBER:fn3}', [
     {
       'message': '123 456 789'
     },
@@ -35,7 +35,7 @@ vows.describe('Filter grok ').addBatch({
     assert.equal(typeof(r[0].fn2), 'number');
     assert.equal(typeof(r[0].fn3), 'number');
   }),
-  'haproxy': filter_helper.create('grok', '?grok=%{HAPROXYHTTP}', [
+  'haproxy': filter_helper.create('grok', '?match=%{HAPROXYHTTP}', [
     {
       'message': 'Sep 14 02:01:37 lb haproxy[11223]: 127.0.0.1:12345 [14/Sep/2014:02:01:37.452] public nginx/server1 0/0/0/5/5 200 490 - - ---- 1269/1269/0/1/0 0/0 "GET /my/path HTTP/1.1"'
     },
@@ -82,7 +82,7 @@ vows.describe('Filter grok ').addBatch({
       'http_version': 1.1
     },
   ]),
-  'extra patterns': filter_helper.create('grok', '?grok=%{GROKTEST}&extra_patterns_file=' + __dirname + '/grok/extra', [
+  'extra patterns': filter_helper.create('grok', '?match=%{GROKTEST}&extra_patterns_file=' + __dirname + '/grok/extra', [
     {
       'message': '123 abc def jhi ABC123'
     },
@@ -95,13 +95,69 @@ vows.describe('Filter grok ').addBatch({
       'ftestpattern': 'ABC123'
     },
   ]),
-  'wrong grok pattern syntax error': filter_helper.create('grok', '?grok=%{GROKTEST3}&extra_patterns_file=' + __dirname + '/grok/extra', [
+  'wrong grok pattern syntax error': filter_helper.create('grok', '?match=%{GROKTEST3}&extra_patterns_file=' + __dirname + '/grok/extra', [
     {
       'message': 'toto'
     },
   ], [
     {
-      'message': 'toto'
+      'message': 'toto',
+      tags: ['_grokparsefailure'],
+    }
+  ]),
+  'parse ok 1': filter_helper.create('grok', '?match=%{IP}&add_tags=x&add_fields=a:#{host}&remove_field=error', [
+    {
+      'message': '1.2.3.4',
+      'host': 'titi',
+      'error': 'a',
+    },
+  ], [
+    {
+      'message': '1.2.3.4',
+      'host': 'titi',
+      'tags': ['x'],
+      'a': 'titi'
+    }
+  ]),
+  'parse ok 2': filter_helper.create('grok', '?match=%{IP}&add_tags=x,t&add_field=a:#{host},b:2&remove_fields=toto,error', [
+    {
+      'message': '1.2.3.4',
+      'host': 'titi',
+      'error': 'a',
+    },
+  ], [
+    {
+      'message': '1.2.3.4',
+      'host': 'titi',
+      'tags': ['x', 't'],
+      'a': 'titi',
+      'b': 2,
+    }
+  ]),
+  'parse error 1': filter_helper.create('grok', '?match=%{IP}&tag_on_failure=&add_tags=y,t&add_tags=x&add_fields=a:#{host}&remove_field=error', [
+    {
+      'message': 'toto',
+      'error': 'a',
+      'tags': ['x'],
+    },
+  ], [
+    {
+      'message': 'toto',
+      'error': 'a',
+      'tags': ['x'],
+    }
+  ]),
+  'parse error 2': filter_helper.create('grok', '?match=%{IP}&tag_on_failure=a,b&remove_tags=y&add_tags=x&add_fields=a:#{host}&remove_field=error', [
+    {
+      'message': 'toto',
+      'error': 'a',
+      'tags': ['x', 'y'],
+    },
+  ], [
+    {
+      'message': 'toto',
+      'error': 'a',
+      'tags': ['x', 'y', 'a', 'b'],
     }
   ]),
 }).export(module);

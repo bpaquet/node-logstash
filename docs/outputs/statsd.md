@@ -29,6 +29,7 @@ Parameters:
 * ``metric_type``: one of ``increment``, ``decrement``, ``counter``, ``timer``, ``gauge``. Type of value to send to statsd.
 * ``metric_key``: key to send to statsd.
 * ``metric_value``: metric value to send to statsd. Mandatory for ``timer``, ``counter`` and ``gauge`` type.
+* ``cache_*``: cache configuration for resolving ``host``. More doc at [cache](../cache.md). (By default, the UDP node stack will resolve the ``host`` field for each write. This behaviour can be expensive).
 
 ``metric_key`` and ``metric_value`` can reference log line properties (see [interpolation](../interpolation.md)).
 
