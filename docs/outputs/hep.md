@@ -11,12 +11,25 @@ Config using url: ``output://hep://localhost:9060``
 
 Config using logstash format:
 ````
-output {
-  hep {
-    host => localhost
-    port => 9060
-  }
-}
+    input {
+      file {
+        path => "/var/log/kamailio/kamailio.log"
+      }
+    }
+
+    filter {
+          regex {
+            regex => /ID=([^&]\\S*)/
+            fields => [hep_cid]
+          }
+        }
+
+    output {
+      hep {
+        host => localhost
+        port => 9060
+      }
+    }
 ````
 
 Parameters:
