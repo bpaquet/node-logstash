@@ -77,7 +77,7 @@ vows.describe('Filter Geoip ').addBatch({
       'ip': ip1,
       'ip_geo_country': ip1_res.country,
       'ip_geo_lonlat': [ip1_res.ll[1], ip1_res.ll[0]],
-      'ip_geo_asn': 'AS16276 OVH SAS',
+      'ip_geo_asn': 'AS16276 OVH',
     },
     {
       'titi': 'tata',
@@ -86,7 +86,7 @@ vows.describe('Filter Geoip ').addBatch({
       'ip_geo_region': ip2_res.region,
       'ip_geo_city': ip2_res.city,
       'ip_geo_lonlat': [ip2_res.ll[1], ip2_res.ll[0]],
-      'ip_geo_asn': 'AS12322 Free SAS',
+      'ip_geo_asn': 'AS12322 PROXAD',
     },
   ]),
   'hide city': filter_helper.create('geoip', 'ip?city_field=none', [
