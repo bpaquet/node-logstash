@@ -313,7 +313,6 @@ Outputs
 * [TCP / TLS](docs/outputs/tcp_tls.md)
 * [AMQP](docs/outputs/amqp.md)
 * [SQS](docs/outputs/sqs.md)
-* [HEP](docs/outputs/hep.md)
 
 Common concepts / parameters :
 
