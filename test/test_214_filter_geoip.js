@@ -1,12 +1,17 @@
 var vows = require('vows'),
   geoip = require('geoip-lite'),
+  maxmind = require('maxmind'),
   filter_helper = require('./filter_helper');
+
+maxmind.init(['test/maxmind/GeoIPCity.dat', 'test/maxmind/GeoIPASNum.dat']);
 
 var ip1 = '91.121.153.187';
 var ip1_res = geoip.lookup(ip1);
+var ip1_res_maxmind = maxmind.getLocation(ip1);
 
 var ip2 = '82.66.65.173';
 var ip2_res = geoip.lookup(ip2);
+var ip2_res_maxmind = maxmind.getLocation(ip2);
 
 vows.describe('Filter Geoip ').addBatch({
   'normal': filter_helper.create('geoip', 'ip', [
@@ -76,7 +81,7 @@ vows.describe('Filter Geoip ').addBatch({
       'titi': 'tata',
       'ip': ip1,
       'ip_geo_country': ip1_res.country,
-      'ip_geo_lonlat': [ip1_res.ll[1], ip1_res.ll[0]],
+      'ip_geo_lonlat': [Number((ip1_res_maxmind.longitude).toFixed(4)), Number((ip1_res_maxmind.latitude).toFixed(4))],
       'ip_geo_asn': 'AS16276 OVH',
     },
     {
@@ -85,7 +90,7 @@ vows.describe('Filter Geoip ').addBatch({
       'ip_geo_country': ip2_res.country,
       'ip_geo_region': ip2_res.region,
       'ip_geo_city': ip2_res.city,
-      'ip_geo_lonlat': [ip2_res.ll[1], ip2_res.ll[0]],
+      'ip_geo_lonlat': [Number((ip2_res_maxmind.longitude).toFixed(4)), Number((ip2_res_maxmind.latitude).toFixed(4))],
       'ip_geo_asn': 'AS12322 PROXAD',
     },
   ]),
