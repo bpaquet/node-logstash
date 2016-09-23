@@ -4,7 +4,7 @@ HEP/EEP output plugin
 Status : experimental
 
 
-This plugin is used to sent correlated data to a [HEP](http://hep.sipcapture.org) server.
+This plugin is used to send correlated data to a collector supporting the [HEP](http://hep.sipcapture.org) encapsulation protocol.
 
 Example:
 Config using url: ``output://hep://localhost:9060``
