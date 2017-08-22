@@ -153,13 +153,13 @@ Configuration by logstash config files (recommended)
 ---
 
 Example for an input file
-````
+```
 input {
   file {
     path => '/tmp/toto.log'
   }
 }
-````
+```
 
 You can use ``if`` to have an [event dependent configuration](https://www.elastic.co/guide/en/logstash/current/event-dependent-configuration.html). See [here for details](docs/common_params.md).
 As for urls, config can be specified
@@ -185,7 +185,7 @@ Examples
 ---
 
 Config file for an agent:
-````
+```
 input {
   file {
     path => "/var/log/nginx/access.log"
@@ -197,10 +197,10 @@ output {
     address => ["tcp://log_server:5555"]
   }
 }
-````
+```
 
 Config file for log server:
-````
+```
 input {
   zeromq {
     address => ["tcp://0.0.0.0:5555"]
