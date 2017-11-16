@@ -12,42 +12,42 @@ It's a [NodeJS](http://nodejs.org) implementation of [Logstash](http://logstash.
 What to do with node-logstash ?
 ---
 
-node-logstash is a tool to collect logs on servers. It allow to send its to a central server and to [ElasticSearch](http://www.elasticsearch.org/) for indexing.
+node-logstash is a tool to collect logs on servers. It allows sending its logs to a central server and to [ElasticSearch](http://www.elasticsearch.org/) for indexing.
 
-In top of elastic search, you can use a specialized interface like [kibana](https://github.com/elastic/kibana) to dive into your logs.
+On top of the elastic search, you can use a specialized interface like [kibana](https://github.com/elastic/kibana) to dive into your logs.
 
 ![Archi](https://raw.github.com/bpaquet/node-logstash/master/docs/archi.jpg)
 
-Why a new implementation ?
+Why a new implementation?
 ---
 
-When I tried logstash, I had some problems. This version should have:
+When I tried logstash, I had some problems. This project mainly addresses those problems. This version should have:
 
 * lower memory footprint
-* lower cpu footprint
+* lower CPU footprint
 * faster startup delay
 
-Moreover it's written in NodeJS, which is a perfect language for programs with many IO.
+Moreover, it's written in NodeJS, which is a perfect language for programs with many IO.
 
-node-logstash is compatible with logstash. You can replace a node-logstash node by a logstash one. The data are formatted in the same way to be compatible with logstash UIs.
+node-logstash is compatible with logstash. You can replace a node-logstash node with a logstash one. The data are formatted in the same way to be compatible with logstash UIs.
 
-How does it works ?
+How does it work?
 ===
 
-The architecture is identical to logstash architecture. You have to instanciates plugins with the node-logstash core. There are three type of modules:
+The architecture is identical to logstash architecture. You have to instantiate plugins with the node-logstash core. There are three type of modules:
 
-* [inputs plugins](#inputs): where datas come into node-logstash. Examples: file, zeromq transport layer
+* [inputs plugins](#inputs): where data come into node-logstash. Examples: file, zeromq transport layer
 * [filter plugins](#filters): extract fields from logs, like timestamps. Example: regex plugin
-* [outputs plugins](#outputs): where datas leave from node-logstash: Examples: ElasticSearch , zeromq transport layer.
+* [outputs plugins](#outputs): where data leave from node-logstash: Examples: ElasticSearch , zeromq transport layer.
 
 
-A typical node-logstash deployement contains agents to crawl logs and a log server.
+A typical node-logstash deployment contains agents to crawl logs and a log server.
 
-On agent, node-logstash is configured whith inputs plugins to get logs from your software stack, and one output plugin to send logs to log server (eg. zeromq output plugin).
+On agent, node-logstash is configured with inputs plugins to get logs from your software stack, and one output plugin to send logs to log server (eg. zeromq output plugin).
 
-On log server, logs come trough a zeromq input plugin, are processed (fields and timestamps extraction), and send to ElasticSearch.
+On log server, logs come through a zeromq input plugin, are processed (fields and timestamps extraction), and send to ElasticSearch.
 
-How to get help ?
+How to get help?
 ===
 
 Please open an [issue](https://github.com/bpaquet/node-logstash/issues).
@@ -55,31 +55,31 @@ Please open an [issue](https://github.com/bpaquet/node-logstash/issues).
 Future of this project
 ===
 
-October 25th 2015.
+October 25th, 2015.
 
-When I started node-logstash, the ecosystem around logstash and ElasticSearch were almost non-existant. In 2015, the siutation is not the same :
+When I started node-logstash, the ecosystem around logstash and ElasticSearch were almost non-existent. In 2015, the situation is not the same :
 * Great ecosystem around ElasticSearch and logstash, FileBeat project
 * Logstash is now the only way to push events to ElasticSearch ([deprecation of rivers](https://www.elastic.co/blog/deprecating-rivers))
 
-So, what is the future of node-logstash ?
-* as a tool to collect logs on files and send them through network, node-losgstash is still useful with lower size, instant start, lower CPU / Memory footprint (in my tests with logstash 1.5.0). The comparison is different with Lumberjack and FileBeat.
+So, what is the future of node-logstash?
+* as a tool to collect logs on files and send them through the network, node-logstash is still useful with lower size, instant start, lower CPU / Memory footprint (in my tests with logstash 1.5.0). The comparison is different with Lumberjack and FileBeat.
 * as log processing tool, it has the same advantages, but the plugin ecosystem is smaller than Logstash.
-* as an injection tool in ElasticSearch : ZeroMQ river will soon be unusable ([deprecation of rivers](https://www.elastic.co/blog/deprecating-rivers)). You have to use bulk api to inject data. It should be less efficient than starting an embedded ElasticSearch node, as in the original Logstash.
+* as an injection tool in ElasticSearch: ZeroMQ river will soon be unusable ([deprecation of rivers](https://www.elastic.co/blog/deprecating-rivers)). You have to use bulk api to inject data. It should be less efficient than starting an embedded ElasticSearch node, as in the original Logstash.
 
 Current project status
 ---
 
-Node-logstash is production ready, and used in production. Installation is a classical node project installation, with some scripts for native packaging.
+Node-logstash is production ready and used in production. Installation is a classical node project installation, with some scripts for native packaging.
 
-Maintainers : currently I, @bpaquet, am the only maintainer. I will keep dependencies up to date, update the core to follow node version, but I do not have time to add features in the core. See Contributing below.
+Maintainers: currently I, @bpaquet, am the only maintainer. I will keep dependencies up to date, update the core to follow node version, but I do not have time to add features to the core. See Contributing below.
 
 Weaknesses :
-* tests are difficult to maintain, even if they are many and the code coverage is good. Replace vows by mocha is a good way to improve that, but it's a big rework.
+* tests are difficult to maintain, even if they are many and the code coverage is good. Replacing vows by mocha is a good way to improve that, but it's a big rework.
 
 Contributing
 ===
 
-What Pull Request (PR) will be merged ?
+Which Pull Requests (PR) will be merged?
 
 Add plugin (output, input or filter)
 ---
@@ -89,10 +89,10 @@ Conditions to have a PR merged :
 * respect jslint
 * provide documentation in /docs
 * do not modify core. Modifications allowed :
-  * add plugin in ``Readme.md``.
+  * add a plugin in ``Readme.md``.
   * add optional dependencies in ``package.json``
 * If you provide unit tests, you can write in plugin documentation that the plugin is a plugin core.
-* If you do not provide unit tests, please indicate in the documentation : "Status : contributed plugin, maintained by @xxxx. Producion ready.", and indicate your Github login.
+* If you do not provide unit tests, please indicate in the documentation: "Status: contributed plugin, maintained by @xxxx. Production ready.", and indicate your Github login.
 
 You are encouraged to ask to merge plugins without tests, which are not production ready.
 
@@ -100,7 +100,7 @@ Core modification
 ---
 
 Please respect jslint, and provide all needed unit tests.
-How to use it ?
+How to use it?
 ===
 
 Installation
@@ -133,17 +133,19 @@ The executable is ``bin/node-logstash-agent``
 Configuration formats
 ---
 
-There are two format for configuration. The legacy format use urls. The new one is identical to the [logstash config format](https://www.elastic.co/guide/en/logstash/current/configuration.html).
+There are two formats for configuration: 
+1. The legacy format uses URLs. 
+2. The other one is identical to the [logstash config format](https://www.elastic.co/guide/en/logstash/current/configuration.html).
 
-Note : if you are using multiple config files, you can mix formats.
+Note: if you are using multiple config files, you can mix formats.
 
-Configuration by url (legacy)
+Configuration by URL (legacy)
 ---
 
-A plugin is instanciated by an url. Example: ``input://file:///tmp/toto.log``. This url
-instanciate an input file plugin which monitor the file ``/tmp/toto.log``.
+A plugin is instantiated by an URL. Example: ``input://file:///tmp/toto.log``. This URL
+instantiates an input file plugin which monitors the file ``/tmp/toto.log``.
 
-The urls can be specified:
+The URLs can be specified:
 
 * directly on the command line
 * in a file (use the ``--config_file`` switch)
@@ -162,22 +164,22 @@ input {
 ````
 
 You can use ``if`` to have an [event dependent configuration](https://www.elastic.co/guide/en/logstash/current/event-dependent-configuration.html). See [here for details](docs/common_params.md).
-As for urls, config can be specified
+As for URLs, config can be specified
 
 * directly on the command line
 * in a file (use the ``--config_file`` switch)
 * in all files in a directory (use the ``--config_dir`` switch)
 
-Note : the implementation is young, all bugs reports are welcome.
-Note : both formats can be mixed.
+Note: the implementation is young, all bugs reports are welcome.
+Note: both formats can be mixed.
 
 Command lines params
 ---
 
 * ``--log_level`` to change the log level (emergency, alert, critical, error, warning, notice, info, debug)
-* ``--log_file`` to redirect log to a log file.
-* ``--patterns_directories`` to add some directories (separated by ,), for loading config for regex plugin and grok plugins. Grok patterns files must be located under a ``grok`` subdirectory for each specified directory.
-* ``--db_file`` to specify the file to use as database for file inputs (see below)
+* ``--log_file`` to redirect logs to a log file.
+* ``--patterns_directories`` to add some directories (separated by , ), for loading config for regex plugin and grok plugins. Grok patterns files must be located under a ``grok`` subdirectory for each specified directory.
+* ``--db_file`` to specify the file to use a database for file inputs (see below)
 * ``--http_max_sockets`` to specify the max sockets of [http.globalAgent.maxSockets](http://nodejs.org/api/http.html#http_agent_maxsockets). Default to 100.
 * ``--alarm_file`` to specify a file which will be created if node-logstash goes in alarm mode (see below).
 
@@ -236,13 +238,13 @@ Manually :
 
 With native packaging
 
-The plugins must be deployed in ``/var/db/node-logstash/custom_plugins``. All subdirectories already exists. The NODE_PATH is already set.
+The plugins must be deployed in ``/var/db/node-logstash/custom_plugins``. All subdirectories already exist. The NODE_PATH is already set.
 
 
 Signals
 ---
 
-* USR1: stoping or starting all inputs plugins. Can be used to close input when output targer are failing
+* USR1: stopping or starting all inputs plugins. Can be used to close input when output targets are failing
 * USR2: see below file output plugin
 
 Changelog
