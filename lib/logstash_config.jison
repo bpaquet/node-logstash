@@ -1,7 +1,18 @@
 
 %{
   function process_string(s) {
-    return s.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t').replace(/\\"/g, '"').replace(/\\'/g, '\'').replace(/\\\//g, '/');
+    var rv = s.replace(/\\n/g, '\n').replace(/\\r/g, '\r').replace(/\\t/g, '\t').replace(/\\"/g, '"').replace(/\\'/g, '\'').replace(/\\\//g, '/');
+    if (rv) {
+      var re = /\$\{(.*?)\}/g;
+      var match = re.exec(rv);
+      if (match) {
+        var envVar = match[1];
+        if (process.env[envVar]) {
+          rv = rv.replace(re, process.env[envVar]);
+        }
+      }      
+    }
+    return rv;
   }
 %}
 
